@@ -1,17 +1,37 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div class="text-center">
-	<h1>Bienvenu sur {{title}}!!</h1>
-	<img width="300" src="./assets/images/img-acceuil.jpg">
-	<h2>Rechercher une définition : </h2>
-	<div class="ui category search">
-		<div class="ui icon input">
-			<input class="prompt" type="text" placeholder="Rechercher ..">
-			<i class="search icon"></i>
+<div class="text-center margin-top-xl" style="height: 100%">
+	<div>
+		<img src="/assets/images/img-acceuil.jpg" alt="" width="20%" style="margin-top:-50px">
+		<h1 class="ui center aligned icon header">
+			{{title}}
+			<div class="sub header">L'outil de recherche intelligente </div>
+		</h1>
+		<h2 class="ui header center" style="display: inline-block;">
+			<i class="google icon"></i>
+			<div class="content">
+				Google
+			</div>
+			<i class="wikipedia icon" style="padding-left: 80px"></i>
+			<div class="content">
+				Wikipedia
+			</div>
+		</h2>
+	</div>
+	<h4 class="ui horizontal divider header">
+</h4>
+	<div class="inline field" >
+		<div class="ui bottom pointing label">
+			Rechercher une définition : 
 		</div>
-		<div class="results">
-
+	</div>
+	<div style="background-image: url('/assets/images/blur.jpg');min-height: 100%!important; padding-top:20px;">
+		<div class="ui fluid category search" >
+			<div class="ui icon input">
+				<input class="prompt" type="text" placeholder="Rechercher ...">
+				<i class="search icon"></i>
+			</div>
+			<div class="results"></div>
 		</div>
 	</div>
 </div>
-
 
