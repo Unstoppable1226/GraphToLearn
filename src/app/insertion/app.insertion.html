@@ -1,19 +1,29 @@
 <router-outlet></router-outlet>
+<jaspero-alerts [defaultSettings]="options"></jaspero-alerts>
 <h2 class="ui icon header" style="margin-top:60px; margin-bottom: -200px">
 	<i class="settings icon" style="color:white"></i>
 	<div class="content" style="color:white">
 		Insertion d'un terme
 	</div>
 </h2>
+<div class="ui icon message"  [hidden]="!search">
+	<i class="notched circle loading icon"></i>
+	<div class="content">
+		<div class="header">
+			Juste une seconde ...
+		</div>
+		<p>Nous insérons le contenu et vous serez averti dès que la transaction sera terminé.</p>
+	</div>
+</div>
 <form id="insert-form" class="ui form" style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
-	<div class="field icon">
+	<div class="field icon required">
 		<label>Mot</label>
 		<div class="ui icon input">
 			<i class="left info icon"></i>
 			<input  class="input-insert" type="text" [(ngModel)]="word" [ngModelOptions]="{standalone: true}" placeholder="AAA, Module, ..." />
 		</div>
 	</div>
-	<div class="field icon">
+	<div class="field icon required">
 		<label>Type</label>
 		<div class="ui icon input">
 			<i class="left info icon"></i>
@@ -30,7 +40,7 @@
 		</div>
 	</div>
 
-	<div class="field icon">
+	<div class="field icon required">
 		<label>Source</label>
 		<div class="ui icon input">
 			<i class="left users icon"></i>
@@ -76,7 +86,7 @@
 			<input class="input-insert" style="text-align: center" type="text" placeholder="AAA, Module, ...">
 		</div>
 	</div>
-	<div class="field icon">
+	<div class="field icon required">
 		<label>Explication</label>
 		<i class="left talk icon"></i>
 		<textarea class="input-insert" rows="3"></textarea>
@@ -100,7 +110,7 @@
 		</div>
 	</div>
 </form>
-	<button  style="margin-top:10px;min-width:200px!important " class="ui button button-blur" (click)="saveInsertion()">Enregistrer</button>
-	<br><br><br><br>
-	{{ data | json}}
+<button  style="margin-top:10px;min-width:200px!important " class="ui button button-blur" (click)="saveInsertion()">Enregistrer</button>
+<br><br><br><br>
+{{ data | json}}
 

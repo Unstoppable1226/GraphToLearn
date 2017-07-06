@@ -21,6 +21,7 @@
     "@angular/platform-browser": "^4.0.0",
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
+    "@jaspero/ng2-alerts": "0.0.7",
     "classlist.js": "^1.1.20150312",
     "core-js": "^2.4.1",
     "intl": "^1.2.5",

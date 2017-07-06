@@ -1,5 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { HttpAPIService } from '../api/app.http-service';
+import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
+
 declare var $:any;
 
 @Component({
@@ -11,7 +13,7 @@ declare var $:any;
 
 export class AppInsertion {
 	public new = false;
-	
+	public search = false;
 	public styleModuleNew = '#EEE';
 	public styleModuleNewCol = 'black';
 	public styleModuleEx = '#333';
@@ -19,16 +21,26 @@ export class AppInsertion {
 	public data = {};
 	word : string = '';
 
-	constructor(private _httpService : HttpAPIService) {}
+	constructor(private _httpService : HttpAPIService, private _alert: AlertsService) {}
 
 	ngAfterViewInit(){
 		$('.ui.dropdown').dropdown();
 	}
 
 	saveInsertion() {
+		this.search = true;
+		let instance = this;
 		let dataInfo = {name : this.word};
 		this._httpService.postJSON(dataInfo)
-			.subscribe(data => this.data = data);
+		.subscribe(
+			function(response) {
+				instance.search = false; 
+				instance._alert.create('success', "Les informations ont été inséré avec succès")
+			},
+			function(error) {instance.search = false; instance._alert.create('error', "Un problème est survenu lors de l'insertion des données, Veuillez réessayer svp !"); },
+			function() { data => this.data = data},
+		);
+
 	}
 
 	switchModule(val, choice) {
