@@ -10,7 +10,7 @@
 		<label>Mot</label>
 		<div class="ui icon input">
 			<i class="left info icon"></i>
-			<input  class="input-insert" type="text" placeholder="AAA, Module, ...">
+			<input  class="input-insert" type="text" [(ngModel)]="word" [ngModelOptions]="{standalone: true}" placeholder="AAA, Module, ..." />
 		</div>
 	</div>
 	<div class="field icon">
@@ -99,6 +99,8 @@
 			</div>
 		</div>
 	</div>
-	<button class="ui button button-blur" type="submit">Enregistrer</button>
 </form>
+	<button  style="margin-top:10px;min-width:200px!important " class="ui button button-blur" (click)="saveInsertion()">Enregistrer</button>
+	<br><br><br><br>
+	{{ data | json}}
 
