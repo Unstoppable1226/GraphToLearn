@@ -1,0 +1,104 @@
+<router-outlet></router-outlet>
+<h2 class="ui icon header" style="margin-top:60px; margin-bottom: -200px">
+	<i class="settings icon"></i>
+	<div class="content">
+		Insertion d'un terme
+	</div>
+</h2>
+<form id="insert-form" class="ui form" style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
+	<div class="field icon">
+		<label>Mot</label>
+		<div class="ui icon input">
+			<i class="left info icon"></i>
+			<input  class="input-insert" type="text" placeholder="AAA, Module, ...">
+		</div>
+	</div>
+	<div class="field icon">
+		<label>Type</label>
+		<div class="ui icon input">
+			<i class="left info icon"></i>
+			<div class="ui fluid selection dropdown input-insert" style="text-align: center">
+				<input type="hidden" name="gender">
+				<i class="dropdown icon"></i>
+				<div class="default text" >Type du terme : Acronyme, Expression ou Terme</div>
+				<div class="menu" >
+					<div class="item" data-value="0">Acronyme</div>
+					<div class="item" data-value="1">Expression</div>
+					<div class="item" data-value="2">Terme</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="field icon">
+		<label>Source</label>
+		<div class="ui icon input">
+			<i class="left users icon"></i>
+			<input class="input-insert" style="text-align: center" type="text" placeholder="IDEC Metafichier, Google, Wikipedia, ...">
+		</div>
+	</div>
+	<div class="field icon">
+		<label>Modules</label>
+		<div class="ui buttons">
+			<button class="ui button" [ngStyle]="{'background-color': styleModuleEx, 'color': styleModuleExCol}" (click)="switchModule(false, 'A')" type="button">Existant</button>
+			<div class="or" data-text="ou"></div>
+			<button class="ui button" [ngStyle]="{'background-color': styleModuleNew, 'color': styleModuleNewCol}" (click)="switchModule(true, 'B')" type="button">Nouveau</button>
+		</div>
+		<div [hidden]="new" class="ui icon input" style="margin-top:5px;">
+			<div class="ui fluid multiple search selection dropdown">
+				<input type="hidden" name="country">
+				<i class="dropdown icon"></i>
+				<div class="default text">Selectionnez les modules</div>
+				<div class="menu">
+					<div class="item" data-value="af"><i class="af flag"></i>Afghanistan</div>
+					<div class="item" data-value="ax"><i class="ax flag"></i>Aland Islands</div>
+					<div class="item" data-value="al"><i class="al flag"></i>Albania</div>
+					<div class="item" data-value="dz"><i class="dz flag"></i>Algeria</div>
+					<div class="item" data-value="as"><i class="as flag"></i>American Samoa</div>
+					<div class="item" data-value="ad"><i class="ad flag"></i>Andorra</div>
+					<div class="item" data-value="ao"><i class="ao flag"></i>Angola</div>
+					<div class="item" data-value="ai"><i class="ai flag"></i>Anguilla</div>
+					<div class="item" data-value="ag"><i class="ag flag"></i>Antigua</div>
+					<div class="item" data-value="ar"><i class="ar flag"></i>Argentina</div>
+				</div>
+			</div>
+
+		</div>
+		<div [hidden]="!new" class="ui icon input" style="margin-top:5px">
+			<i class="left search icon"></i>
+			<input class="input-insert" style="text-align: center" type="text" placeholder="166-486, 207">
+		</div>
+	</div>
+	<div class="field icon">
+		<label>Définition</label>
+		<div class="ui icon input">
+			<i class="left info icon"></i>
+			<input class="input-insert" style="text-align: center" type="text" placeholder="AAA, Module, ...">
+		</div>
+	</div>
+	<div class="field icon">
+		<label>Explication</label>
+		<i class="left talk icon"></i>
+		<textarea class="input-insert" rows="3"></textarea>
+	</div>
+	<div class="field icon">
+		<label>Contexte / Domaine</label>
+		<div class="ui icon input">
+			<div class="ui icon input">
+				<i class="left info icon"></i>
+				<div class="ui fluid selection dropdown input-insert" style="text-align: center">
+					<input type="hidden" name="gender">
+					<i class="dropdown icon"></i>
+					<div class="default text" >Sécurité, Juridique, ...</div>
+					<div class="menu" >
+						<div class="item" data-value="0">Sécurité</div>
+						<div class="item" data-value="1">Juridique</div>
+						<div class="item" data-value="2">Technique</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<button class="ui button button-blur" type="submit">Enregistrer</button>
+</form>
+

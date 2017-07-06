@@ -6,19 +6,18 @@
 		<div class="sub header" style="color:white">L'outil de recherche intelligente en collaboration avec <span style="font-weight: bold; font-size: 1.2em">Cowaboo </span></div>
 	</h1>
 </div>
-
 <div class="text-center margin-top-xl" style="height: 100%">
 	<div>
 		<div class="tabs">
 			<input type="radio" id="tab1" name="tab-control" checked>
 			<input type="radio" id="tab2" name="tab-control">
 			<ul>
-				<li title="Rechercher un terme">
-					<label for="tab1" role="button">
+				<li title="Rechercher un terme" >
+					<label for="tab1" role="button" routerLink="/rechercher" routerLinkActive="active">
 						<svg viewBox="0 0 24 24"><path d="M17.7,16.1c-0.9,0-1.7-0.3-2.3-1c-0.6-0.6-1-1.4-1-2.3c0-0.9,0.3-1.7,1-2.3c0.6-0.6,1.4-1,2.3-1
-						c0.9,0,1.7,0.3,2.3,1c0.6,0.6,1,1.4,1,2.3c0,0.9-0.3,1.7-1,2.3C19.4,15.8,18.5,16.1,17.7,16.1z M21.7,8.8c-1.1-1.1-2.5-1.7-4-1.7
-						c-1.5,0-2.9,0.6-4,1.7c-1.1,1.1-1.7,2.5-1.7,4c0,0.9,0.2,1.7,0.6,2.5L8,20c-0.7,0.7-0.7,1.8,0,2.5C8.4,22.8,8.8,23,9.3,23
-						c0.5,0,0.9-0.2,1.3-0.5l4.6-4.6c0.8,0.4,1.6,0.6,2.5,0.6c1.5,0,2.9-0.6,4-1.7c1.1-1.1,1.7-2.5,1.7-4C23.3,11.3,22.7,9.9,21.7,8.8z"/>
+							c0.9,0,1.7,0.3,2.3,1c0.6,0.6,1,1.4,1,2.3c0,0.9-0.3,1.7-1,2.3C19.4,15.8,18.5,16.1,17.7,16.1z M21.7,8.8c-1.1-1.1-2.5-1.7-4-1.7
+							c-1.5,0-2.9,0.6-4,1.7c-1.1,1.1-1.7,2.5-1.7,4c0,0.9,0.2,1.7,0.6,2.5L8,20c-0.7,0.7-0.7,1.8,0,2.5C8.4,22.8,8.8,23,9.3,23
+							c0.5,0,0.9-0.2,1.3-0.5l4.6-4.6c0.8,0.4,1.6,0.6,2.5,0.6c1.5,0,2.9-0.6,4-1.7c1.1-1.1,1.7-2.5,1.7-4C23.3,11.3,22.7,9.9,21.7,8.8z"/>
 						</svg><br>
 						<span>Rechercher</span>
 					</label>
@@ -35,7 +34,7 @@
 
 			<div class="slider"><div class="indicator"></div></div>
 			<div class="content">
-				<section>
+				<section style="text-align: center">
 					<h2>Rechercher</h2>
 					<div class="inline field" >
 						<div class="ui bottom pointing label">
@@ -48,17 +47,17 @@
 					Wikipedia
 					<br>
 					<br>
-					<div class="ui fluid category search" >
-						<div class="ui icon input">
-							<input class="prompt" type="text" placeholder="Rechercher ...">
+					<div class="ui fluid big category search" >
+						<div class="ui icon input" style="width: 80%;margin-top:20px;border:2px solid #333; border-radius:100%">
+							<input style="text-align:center" class="prompt" type="text" placeholder="Rechercher ...">
 							<i class="search icon"></i>
 						</div>
 						<div class="results"></div>
 					</div>
-					
+
 				</section>
-				<section>
-					<h2>Delivery Contents</h2>
+				<section style="text-align: center">
+					<h2>Insertion</h2>
 					<div class="ui animated fade button" tabindex="0" style="height: 30px">
 						<div class="visible content" style="margin-top: -3px;">Choisir un fichier</div>
 						<div class="hidden content">
@@ -68,9 +67,10 @@
 					<div class="ui horizontal divider">
 						Ou
 					</div>
-					<button class="ui button">Insérer un terme</button>
+					<button class="ui button" [routerLink]="['insertion']" fragment="insert-form">Insérer un terme</button>
+					<hr>
 				</section>
-
+				<router-outlet></router-outlet>
 			</div>
 		</div>
 		<div class="image-back"></div>
