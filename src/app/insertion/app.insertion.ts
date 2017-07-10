@@ -1,8 +1,10 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { HttpAPIService } from '../api/app.http-service';
 import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
+import { AppSettings } from '../settings/app.settings';
+import { OnInit } from '@angular/core';
 
-declare var $:any;
+declare var $:any; // This is necessary if you want to use jQuery in the app
 
 @Component({
 	selector: 'app-insertion',
@@ -11,15 +13,21 @@ declare var $:any;
 	providers: [HttpAPIService]
 })
 
-export class AppInsertion {
+export class AppInsertion implements OnInit {
 	public new = false;
-	public search = false;
-	public styleModuleNew = '#EEE';
-	public styleModuleNewCol = 'black';
-	public styleModuleEx = '#333';
-	public styleModuleExCol = 'white';
+	public loading = false;
+	public styleModuleNew = AppSettings.WHITEMOREDARK;
+	public styleModuleNewCol = AppSettings.BLACK;
+	public styleModuleEx = AppSettings.GREY;
+	public styleModuleExCol = AppSettings.WHITE;
 	public data = {};
-	word : string = '';
+	public word : string = '';
+	public modules : string = '';
+	public types = [];
+	public sources : string = ""; // Separate with the comma
+	public definition : string = ""; 
+	public explications : string = "";
+	public contexts = [];
 
 	constructor(private _httpService : HttpAPIService, private _alert: AlertsService) {}
 
@@ -27,28 +35,60 @@ export class AppInsertion {
 		$('.ui.dropdown').dropdown();
 	}
 
-	saveInsertion() {
-		this.search = true;
-		let instance = this;
-		let dataInfo = {name : this.word};
-		this._httpService.postJSON(dataInfo)
+	getData(observatory, table) {
+		this._httpService.getEntryJSON(observatory)
 		.subscribe(
-			function(response) {
-				instance.search = false; 
-				instance._alert.create('success', "Les informations ont été inséré avec succès")
+			function(response) { // The communication with the API has matched
+				console.log(response); // Transform js object into json
+				console.log(response.dictionary.entries);
+				let obj = response.dictionary.entries;
+				for (let prop in obj){ table.push(obj[prop])}
 			},
-			function(error) {instance.search = false; instance._alert.create('error', "Un problème est survenu lors de l'insertion des données, Veuillez réessayer svp !"); },
-			function() { data => this.data = data},
-		);
+		)
+	}
 
+	ngOnInit() {
+		let instance = this;
+		this._httpService.getTagsJSON()
+		.subscribe(
+			function(response) { // The communication with the API has matched
+				console.log(JSON.stringify(response)); // Transform js object into json
+				console.log(response.tag_list.list.Modules); // Get every modules
+				console.log(response.tag_list.list.Types);
+			},
+		)
+		this.getData(AppSettings.API_TYPES, instance.types); // Get the data of types
+		this.getData(AppSettings.API_CONTEXT, instance.contexts); // Get the data of contexts
+	}
+
+	validated() { // Function who validates if everything is ok before the insert
+		return this.word != "";
+	}
+
+	saveInsertion() {
+		if (this.validated()) {
+			this.loading = true;
+			let instance = this;
+			let source = this.sources.split(',');
+			let dataInfo = {name : this.word, type: $('#select-types').text(), source : source, definition: this.definition, explications : this.explications, context :  $('#select-context').text()};
+			this._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS)
+			.subscribe(
+				function(response) { // The communication with the API has matched
+					instance.loading = false; 
+					instance._alert.create('success', AppSettings.MSGSUCCESS)
+					data => this.data = data
+				},
+				// The communication with the API has not matched
+				function(error) {instance.loading = false; instance._alert.create('error', AppSettings.MSGERROR); },
+			);
+		}
 	}
 
 	switchModule(val, choice) {
-		console.log(this.data);
 		this.new = val;
-		this.styleModuleNew = (choice == 'A' ? '#EEE' : '#333');
-		this.styleModuleNewCol = (choice == 'A' ? 'black' : 'white');
-		this.styleModuleEx = (choice == 'B' ? '#EEE' : '#333');
-		this.styleModuleExCol = (choice == 'B' ? 'black' : 'white');
+		this.styleModuleNew = (choice == 'A' ? AppSettings.WHITEMOREDARK : AppSettings.GREY);
+		this.styleModuleNewCol = (choice == 'A' ? AppSettings.BLACK : AppSettings.WHITE);
+		this.styleModuleEx = (choice == 'B' ? AppSettings.WHITEMOREDARK : AppSettings.GREY);
+		this.styleModuleExCol = (choice == 'B' ? AppSettings.BLACK : AppSettings.WHITE);
 	}
 }

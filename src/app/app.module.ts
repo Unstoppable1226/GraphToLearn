@@ -27,7 +27,7 @@ const appRoutes: Routes = [
 		AppComponent,
 		AppSearch,
 		AppInsertion,
-		PageNotFoundComponent
+		PageNotFoundComponent,
 	],
 	imports: [
 		RouterModule.forRoot(

@@ -48,12 +48,11 @@
 					Wikipedia
 					<br>
 					<br>
-					<div class="ui fluid big category search" >
+					<div class="ui fluid big category search searchWord" >
 						<div class="ui icon input" style="width: 80%;margin-top:20px;border:2px solid #333; border-radius:100%">
-							<input style="text-align:center" class="prompt" type="text" placeholder="Rechercher ...">
+							<input style="text-align:center" class="prompt" type="text" [(ngModel)]="searchWord"  placeholder="Rechercher ...">
 							<i class="search icon"></i>
 						</div>
-						<div class="results"></div>
 					</div>
 
 				</section>

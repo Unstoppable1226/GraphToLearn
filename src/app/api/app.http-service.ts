@@ -8,16 +8,21 @@ import 'rxjs/add/operator/map';
 export class HttpAPIService  {
 	constructor (private _http: Http) {}
 
-	getJSON() {
+	getTagsJSON() {
 		return this._http.get(AppSettings.API_TAGS)
 			.map((res: Response) => res.json());
 	}
 
-	postJSON(dataInfo) {
-		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept' : 'application/json'}); // ... Set content type to JSON
-        		let options  = new RequestOptions({ headers: headers });
+	getEntryJSON(observatory) {
+		return this._http.get(AppSettings.API_OBSERVATORY + "?observatoryId=" + observatory)
+			.map((res: Response) => res.json());
+	}
 
-		return this._http.post(AppSettings.API_OBSERVATORY, "secretKey=SDRSUEUEOJAJJG4MC76F2H7FTGYYTFASNCTMEJ7XJFUHFRQG5M2QI5O3%20&observatoryId=" + dataInfo.name , options)
+	postEntryJSON(dataInfo, observatory) {
+		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept' : 'application/json'}); // ... Set content type to JSON
+     		let options  = new RequestOptions({ headers: headers });
+
+		return this._http.post(AppSettings.API_ENTRY, "secretKey=SDRSUEUEOJAJJG4MC76F2H7FTGYYTFASNCTMEJ7XJFUHFRQG5M2QI5O3%20&observatoryId=" + observatory + "&tags= " + dataInfo.name + "&value= " + JSON.stringify(dataInfo), options)
 			.map((res: Response) => res.json());
 	}
 }

@@ -1,4 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
+import { AppComponent } from '../app.component';
+
 
 @Component({
 	selector: 'app-search',
@@ -6,4 +8,6 @@ import { Component, AfterViewInit } from '@angular/core';
 	styleUrls: ['./app.search.css'],
 })
 
-export class AppSearch {}
+export class AppSearch{
+
+}
