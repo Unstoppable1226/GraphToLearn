@@ -14,6 +14,7 @@ import { PageNotFoundComponent } from './app.pagenotfound';
 
 const appRoutes: Routes = [
 	{ path: 'rechercher', component: AppSearch },
+	{ path: 'search/:id', component: AppSearch },
 	{ path: 'insertion', component: AppInsertion },
 	{ path: '',
 		redirectTo: '/rechercher',

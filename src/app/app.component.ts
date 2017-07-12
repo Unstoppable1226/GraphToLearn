@@ -18,6 +18,11 @@ export class AppComponent {
 
 	constructor(private _httpService : HttpAPIService) {}
 
+	insertWithFile() {
+
+	}
+
+
 	ngAfterViewInit() {
 		let instance = this;
 		$('.ui.search.searchWord')
@@ -42,7 +47,7 @@ export class AppComponent {
 						responseSearch.results.push({
 							title       : itemObj.name,
 							description : itemObj.explications,
-							url         : itemObj.context
+							url         : 'http://localhost:4200/search/' + itemObj.name
 						});
 					});
 					console.log(responseSearch);

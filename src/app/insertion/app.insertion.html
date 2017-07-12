@@ -6,7 +6,7 @@
 		Insertion d'un terme
 	</div>
 </h2>
-<div class="ui icon message"  [hidden]="!search">
+<div class="ui icon message"  [hidden]="!loading">
 	<i class="notched circle loading icon"></i>
 	<div class="content">
 		<div class="header">
@@ -42,7 +42,7 @@
 		<label>Source</label>
 		<div class="ui icon input">
 			<i class="left users icon"></i>
-			<input class="input-insert" style="text-align: center" type="text" [(ngModel)]="sources"  [ngModelOptions]="{standalone: true}"  placeholder="IDEC Metafichier, Google, Wikipedia, ...">
+			<input class="input-insert" style="text-align: center" type="text" [(ngModel)]="source"  [ngModelOptions]="{standalone: true}"  placeholder="IDEC Metafichier, Google, Wikipedia, ...">
 		</div>
 	</div>
 	<div class="field icon">
@@ -52,17 +52,17 @@
 			<div class="or" data-text="ou"></div>
 			<button class="ui button" [ngStyle]="{'background-color': styleModuleNew, 'color': styleModuleNewCol}" (click)="switchModule(true, 'B')" type="button">Nouveau</button>
 		</div>
-		<div class="ui fluid multiple remote search selection dropdown input-insert modules" style="margin-top:5px" [hidden]="new">
+		<div class="ui fluid multiple remote search selection dropdown input-insert modules" style="margin-top:5px" [hidden]="newModule">
 			<input type="hidden" name="receipt">
 			<i class="dropdown icon"></i>
 			<div class="default text">Sélectionner les modules</div>
 			<div class="menu">
-				
+				<div class="item" *ngFor="let module of modules; let i = index" data-value="{i}">{{module.value}}</div>
 			</div>
 		</div>
-		<div [hidden]="!new" class="ui icon input" style="margin-top:5px">
+		<div [hidden]="!newModule" class="ui icon input" style="margin-top:5px">
 			<i class="left search icon"></i>
-			<input class="input-insert" style="text-align: center" type="text" placeholder="166-486, 207">
+			<input class="input-insert" [(ngModel)]="newModules"  [ngModelOptions]="{standalone: true}"  style="text-align: center" type="text" placeholder="166-486, 207">
 		</div>
 	</div>
 	<div class="field icon">

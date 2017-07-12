@@ -11,7 +11,7 @@ export class AppSettings {
    	
    	public static API_WORDS = "Words";
    	public static API_MODULES = "Modules";
-        public static API_TYPES = "Types";
+          public static API_TYPES = "Types";
    	public static API_CONTEXT= "Context";
 
    	/* Colors */
