@@ -1,100 +1,121 @@
-<router-outlet></router-outlet>
+<hr style="margin-top:-50px; margin-bottom: 80px;">
 
-<h2 class="ui icon header" style="margin-top:60px; margin-bottom: -200px">
-	<i class="settings icon" style="color:white"></i>
-	<div class="content" style="color:white">
-		Insertion d'un terme
-	</div>
-</h2>
-<div class="ui icon message"  [hidden]="!loading">
-	<i class="notched circle loading icon"></i>
-	<div class="content">
-		<div class="header">
-			Juste une seconde ...
+<div style="width: 100%;text-align: center!important">
+	<div style="width: 95%;display: inline-block;">
+		<h2 class="ui icon header" style="margin-top:-50px; text-align:center!important;margin-bottom: -200px">
+			<i class="settings icon" style="color:white"></i>
+			<div class="content" style="color:white">
+				Insertion d'un terme
+			</div>
+		</h2>
+		<button  style="display:block; margin-top:-25px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home" [routerLink]="['/home']" > <i class="reply icon"></i> Retour <span style="margin-left:8px">|</span><i class="home icon" style="margin-left:10px"></i></button>
+		<div class="ui icon message"  [hidden]="!loading">
+			<i class="notched circle loading icon"></i>
+			<div class="content">
+				<div class="header">
+					Juste une seconde ...
+				</div>
+				<p>Nous insérons le contenu et vous serez averti dès que la transaction sera terminé.</p>
+			</div>
 		</div>
-		<p>Nous insérons le contenu et vous serez averti dès que la transaction sera terminé.</p>
-	</div>
-</div>
-<form id="insert-form" class="ui form" style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
-	<div class="field icon required">
-		<label>Mot</label>
-		<div class="ui icon input">
-			<i class="left info icon"></i>
-			<input  class="input-insert" type="text" [(ngModel)]="word" [ngModelOptions]="{standalone: true}" placeholder="AAA, Module, ..." />
-		</div>
-	</div>
-	<div class="field icon">
-		<label>Type</label>
-		<div class="ui icon input">
-			<i class="left info icon"></i>
-			<div class="ui fluid selection dropdown input-insert" style="text-align: center">
-				<input type="hidden" name="gender">
-				<i class="dropdown icon"></i>
-				<div class="default text"  id="select-types">Type du terme : Acronyme, Expression ou Terme</div>
-				<div class="menu" >
-					<div class="item" *ngFor="let type of types; let i = index" data-value="{i}">{{type.value}}</div>
+		<form id="insert-form" class="ui form" [ngClass]="{'loading' : loading}"  style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
+			
+			<div class="field icon required">
+				<label>Mot</label>
+				<div class="ui icon input">
+					<i id="wordInfo" class="left info icon"></i>
+					<input  class="input-insert" type="text" [(ngModel)]="word" [ngModelOptions]="{standalone: true}" (ngModelChange)="isUnique()"placeholder="AAA, Module, ..." />
+				</div>
+				<div [hidden]="!nameChosen" class="ui top pointing basic label" [ngClass]="{'green': !nameTaken, 'red': nameTaken}">
+					{{msgNameTaken}} <i class="icon"  [ngClass]="{'checkmark': !nameTaken, 'minus circle' : nameTaken}"></i>
 				</div>
 			</div>
-		</div>
-	</div>
-
-	<div class="field icon required">
-		<label>Source</label>
-		<div class="ui icon input">
-			<i class="left users icon"></i>
-			<input class="input-insert" style="text-align: center" type="text" [(ngModel)]="source"  [ngModelOptions]="{standalone: true}"  placeholder="IDEC Metafichier, Google, Wikipedia, ...">
-		</div>
-	</div>
-	<div class="field icon">
-		<label>Modules</label>
-		<div class="ui buttons">
-			<button class="ui button" [ngStyle]="{'background-color': styleModuleEx, 'color': styleModuleExCol}" (click)="switchModule(false, 'A')" type="button">Existant</button>
-			<div class="or" data-text="ou"></div>
-			<button class="ui button" [ngStyle]="{'background-color': styleModuleNew, 'color': styleModuleNewCol}" (click)="switchModule(true, 'B')" type="button">Nouveau</button>
-		</div>
-		<div class="ui fluid multiple remote search selection dropdown input-insert modules" style="margin-top:5px" [hidden]="newModule">
-			<input type="hidden" name="receipt">
-			<i class="dropdown icon"></i>
-			<div class="default text">Sélectionner les modules</div>
-			<div class="menu">
-				<div class="item" *ngFor="let module of modules; let i = index" data-value="{i}">{{module.value}}</div>
+			<div class="ui success message">
+				<div class="header">Form Completed</div>
+				<p>You're all signed up for the newsletter.</p>
 			</div>
-		</div>
-		<div [hidden]="!newModule" class="ui icon input" style="margin-top:5px">
-			<i class="left search icon"></i>
-			<input class="input-insert" [(ngModel)]="newModules"  [ngModelOptions]="{standalone: true}"  style="text-align: center" type="text" placeholder="166-486, 207">
-		</div>
-	</div>
-	<div class="field icon">
-		<label>Définition</label>
-		<div class="ui icon input">
-			<i class="left info icon"></i>
-			<input class="input-insert" style="text-align: center" [(ngModel)]="definition"  [ngModelOptions]="{standalone: true}" type="text" placeholder="AAA, Module, ...">
-		</div>
-	</div>
-	<div class="field icon required">
-		<label>Explication</label>
-		<i class="left talk icon"></i>
-		<textarea class="input-insert" [(ngModel)]="explications"  [ngModelOptions]="{standalone: true}" rows="3" style="text-align: left!important"></textarea>
-	</div>
-	<div class="field icon">
-		<label>Contexte / Domaine</label>
-		<div class="ui icon input">
-			<div class="ui icon input">
-				<i class="left info icon"></i>
-				<div class="ui fluid selection dropdown input-insert" style="text-align: center">
-					<input type="hidden" name="gender">
-					<i class="dropdown icon"></i>
-					<div class="default text" id="select-context">Sécurité, Juridique, ...</div>
-					<div class="menu" >
-						<div class="item" *ngFor="let con of contexts; let i = index" data-value="{i}">{{con.value}}</div>
+			<div class="field icon">
+				<label>Type</label>
+				<div class="ui icon input">
+					<i class="left info icon"></i>
+					<div class="ui fluid selection dropdown input-insert" style="text-align: center">
+						<input type="hidden" name="gender" value="default">
+						<i class="dropdown icon"></i>
+						<div class="default text"  id="select-types">Type du terme : Acronyme, Expression ou Terme</div>
+						<div class="menu" >
+							<div class="item" data-value="default">Aucun</div>
+							<div class="item" *ngFor="let type of types; let i = index" data-value="{i}">{{type.value}}</div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+			<div class="field icon">
+				<label>Définition</label>
+				<div class="ui icon input">
+					<i class="left info icon"></i>
+					<input class="input-insert" style="text-align: center" [(ngModel)]="definition"  [ngModelOptions]="{standalone: true}" type="text" placeholder="AAA, Module, ...">
+				</div>
+			</div>
+
+			<div class="field icon required">
+				<label>Source</label>
+				<div class="ui icon input">
+					<i class="left users icon"></i>
+					<input class="input-insert" style="text-align: center" type="text" [(ngModel)]="source"  [ngModelOptions]="{standalone: true}"  placeholder="IDEC Metafichier, Google, Wikipedia, ...">
+				</div>
+			</div>
+			<div class="field icon">
+				<label>Modules</label>
+				<div class="ui buttons">
+					<button class="ui button" [ngStyle]="{'background-color': styleModuleEx, 'color': styleModuleExCol}" (click)="switchModule(false, 'A')" type="button">Existant</button>
+					<div class="or" data-text="ou"></div>
+					<button class="ui button" [ngStyle]="{'background-color': styleModuleNew, 'color': styleModuleNewCol}" (click)="switchModule(true, 'B')" type="button">Nouveau</button>
+				</div>
+				<div id="multi-select-modules" class="ui fluid multiple search selection dropdown input-insert" style="margin-top:5px" [hidden]="newModule">
+					<input  type="hidden" name="receipt">
+					<i class="dropdown icon"></i>
+					<div class="default text" id="input-modules">Sélectionner les modules</div>
+					<div class="menu">
+						<div class="item" *ngFor="let module of modules; let i = index"  data-value="{i}">{{module.value}}</div>
+					</div>
+				</div>
+				<div [hidden]="!newModule" class="ui icon input" style="margin-top:5px">
+					<i class="left search icon"></i>
+					<input class="input-insert" [(ngModel)]="newModules"  [ngModelOptions]="{standalone: true}"  style="text-align: center" type="text" placeholder="166-486, 207">
+				</div>
+			</div>
+			<div class="field icon required">
+				<label>Explication</label>
+				<i class="left talk icon"></i>
+				<textarea class="input-insert" [(ngModel)]="explications"  [ngModelOptions]="{standalone: true}" rows="3" style="text-align: left!important"></textarea>
+			</div>
+			<div class="field icon">
+				<label>Contexte / Domaine</label>
+				<div class="ui icon input">
+					<div class="ui icon input">
+						<i class="left info icon"></i>
+						<div class="ui fluid selection dropdown input-insert" style="text-align: center">
+							<input type="hidden" name="gender"  value="default">
+							<i class="dropdown icon"></i>
+							<div class="default text" id="select-context" >Sécurité, Juridique, ...</div>
+							<div class="menu" >
+								<div class="item" data-value="default">Aucun</div>
+								<div class="item" *ngFor="let con of contexts; let i = index" data-value="{i}">{{con.value}}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="field icon" style="text-align: center!important">
+				<label>Tags associés</label>
+				<tag-input [(ngModel)]='items'  [ngModelOptions]="{standalone: true}"></tag-input>
+			</div>
+			<div class="field icon required">
+				<label style="color:#db2828; font-size: 0.8em; float: right;">Champ obligatoire </label>
+			</div>
+		</form>
+		<button  style="margin-top:10px;min-width:250px!important; font-size: 1.2em;" class="ui button button-blur" (click)="saveInsertion()">Enregistrer <i class="plus icon" style="margin-left: 10px"></i></button>
+		<br><br><br>
 	</div>
-</form>
-<button  style="margin-top:10px;min-width:200px!important " class="ui button button-blur" (click)="saveInsertion()">Enregistrer</button>
-<br><br><br><br>
-{{ data | json}}
+</div>
 

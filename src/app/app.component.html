@@ -1,78 +1,11 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <jaspero-alerts [defaultSettings]="options"></jaspero-alerts>
-<img src="/assets/images/blur.jpg" alt="" width="100%" height="100%" style="position:fixed; top:0px; z-index: -1;opacity: 0.9">
-<div style="margin-top: 50px">
+<img src="/assets/images/blur-3.jpg" alt="" width="100%" height="100%" style="position:fixed; top:0px; z-index: -1;opacity: 0.9">
+<div style="margin-top: 50px; margin-bottom: 100px">
 	<h1 class="ui center aligned icon header" style="font-size:350%!important;color:white">
 		{{title}}
 		<div class="sub header" style="color:white">L'outil de recherche intelligente en collaboration avec <span style="font-weight: bold; font-size: 1.2em">Cowaboo </span></div>
 	</h1>
 </div>
-<div class="text-center margin-top-xl" style="height: 100%">
-	<div>
-		<div class="tabs">
-			<input type="radio" id="tab1" name="tab-control" checked>
-			<input type="radio" id="tab2" name="tab-control">
-			<ul>
-				<li title="Rechercher un terme" >
-					<label for="tab1" role="button" routerLink="/rechercher" routerLinkActive="active">
-						<svg viewBox="0 0 24 24"><path d="M17.7,16.1c-0.9,0-1.7-0.3-2.3-1c-0.6-0.6-1-1.4-1-2.3c0-0.9,0.3-1.7,1-2.3c0.6-0.6,1.4-1,2.3-1
-							c0.9,0,1.7,0.3,2.3,1c0.6,0.6,1,1.4,1,2.3c0,0.9-0.3,1.7-1,2.3C19.4,15.8,18.5,16.1,17.7,16.1z M21.7,8.8c-1.1-1.1-2.5-1.7-4-1.7
-							c-1.5,0-2.9,0.6-4,1.7c-1.1,1.1-1.7,2.5-1.7,4c0,0.9,0.2,1.7,0.6,2.5L8,20c-0.7,0.7-0.7,1.8,0,2.5C8.4,22.8,8.8,23,9.3,23
-							c0.5,0,0.9-0.2,1.3-0.5l4.6-4.6c0.8,0.4,1.6,0.6,2.5,0.6c1.5,0,2.9-0.6,4-1.7c1.1-1.1,1.7-2.5,1.7-4C23.3,11.3,22.7,9.9,21.7,8.8z"/>
-						</svg><br>
-						<span>Rechercher</span>
-					</label>
-				</li>
-				<li title="Insérer un terme">
-					<label for="tab2" role="button">
-						<svg viewBox="0 -5 30 30">
-							<path d="m23,10h-8.5c-0.3,0-0.5-0.2-0.5-0.5v-8.5c0-0.6-0.4-1-1-1h-2c-0.6,0-1,0.4-1,1v8.5c0,0.3-0.2,0.5-0.5,0.5h-8.5c-0.6,0-1,0.4-1,1v2c0,0.6 0.4,1 1,1h8.5c0.3,0 0.5,0.2 0.5,0.5v8.5c0,0.6 0.4,1 1,1h2c0.6,0 1-0.4 1-1v-8.5c0-0.3 0.2-0.5 0.5-0.5h8.5c0.6,0 1-0.4 1-1v-2c0-0.6-0.4-1-1-1z"/>
-						</svg><br>
-						<span>Insertion</span>
-					</label>
-				</li>
-			</ul>
+<router-outlet></router-outlet>
 
-			<div class="slider"><div class="indicator"></div></div>
-			<div class="content">
-				<section style="text-align: center">
-					<h2>Rechercher</h2>
-					<div class="inline field" >
-						<div class="ui bottom pointing label">
-							Rechercher une définition sur 
-						</div>
-					</div>
-					<i class="google icon"></i>
-					Google
-					<i class="wikipedia icon" style="margin-left: 20px"></i>
-					Wikipedia
-					<br>
-					<br>
-					<div class="ui fluid big category search searchWord" >
-						<div class="ui icon input" style="width: 80%;margin-top:20px;border:2px solid #333; border-radius:100%">
-							<input style="text-align:center" class="prompt" type="text" [(ngModel)]="searchWord"  placeholder="Rechercher ...">
-							<i class="search icon"></i>
-						</div>
-					</div>
-
-				</section>
-				<section style="text-align: center">
-					<h2>Insertion</h2>
-					<div class="ui animated fade button" tabindex="0" style="height: 30px">
-						<div class="visible content" style="margin-top: -3px;">Choisir un fichier</div>
-						<div class="hidden content" >
-							JSON ou Excel
-						</div>
-					</div>
-					<div class="ui horizontal divider">
-						Ou
-					</div>
-					<button class="ui button" [routerLink]="['insertion']" fragment="insert-form">Insérer un terme</button>
-					<hr>
-				</section>
-				<router-outlet></router-outlet>
-			</div>
-		</div>
-		<div class="image-back"></div>
-	</div>
-</div>

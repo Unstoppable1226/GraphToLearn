@@ -4,7 +4,7 @@
 
 .input-insert {
 	text-align: center!important; 
-	border-image: url('/assets/images/blur.jpg') 30 30 repeat!important;
+	border-image: url('/assets/images/blur-2.jpg') 30 30 repeat!important;
 	border-image-width: 1!important;
 }
 
@@ -14,6 +14,17 @@
 }
 
 .button-blur:active {
+	background-color: #0c5a4a;
+	color:white;
+}
+
+
+.button-home {
+	background-color: #333;
+	color:white;
+}
+
+.button-home:active {
 	background-color: #0c5a4a;
 	color:white;
 }

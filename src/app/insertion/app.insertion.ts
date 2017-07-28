@@ -16,24 +16,67 @@ declare var $:any; // This is necessary if you want to use jQuery in the app
 export class AppInsertion implements OnInit {
 	public newModule = false;
 	public loading = false;
+	public nameTaken = false;
+	public nameChosen = false;
+	public msgNameTaken = "Ce nom est disponible";
 	public styleModuleNew = AppSettings.WHITEMOREDARK;
 	public styleModuleNewCol = AppSettings.BLACK;
 	public styleModuleEx = AppSettings.GREY;
 	public styleModuleExCol = AppSettings.WHITE;
 	public data = {};
+	public types = [];
+	public modules = [];
+	public contexts = [];
 	public word : string = '';
 	public newModules : string = '';
-	public types = [];
 	public source : string = ""; // Separate with the comma
 	public definition : string = ""; 
 	public explications : string = "";
-	public contexts = [];
-	public modules = [];
+	public items = ['Angular' ,'React'];
 
 	constructor(private _httpService : HttpAPIService, private _alert: AlertsService) {}
 
+	isUnique() {
+		let instance = this;
+		if (instance.word != "") {
+			$('#wordInfo').removeClass('info');
+			$('#wordInfo').addClass('circle');
+			$('#wordInfo').addClass('notched');
+			$('#wordInfo').addClass('loading');
+			instance.nameChosen = true;
+			this._httpService.getEntryJSON(AppSettings.API_WORDS)
+			.subscribe(
+				function(response) {
+					let obj = response.dictionary.entries;
+					let data
+					let count = 0;
+					for (let prop in obj){
+						data = JSON.parse(obj[prop].value);
+						count += instance.word.toLowerCase() == data.name.toLowerCase() ? 1 : 0;
+					}
+					setTimeout(function(){
+						$('#wordInfo').removeClass('circle');
+						$('#wordInfo').removeClass('notched');
+						$('#wordInfo').removeClass('loading');
+						$('#wordInfo').addClass('info');
+					}, 200);
+					instance.nameTaken = count >= 1
+					instance.msgNameTaken = instance.nameTaken ? "Ce nom existe déjà !":  "Ce nom est disponible";
+				}
+			)
+		} else {
+			instance.nameChosen = false;
+		}
+	}
+
+
 	ngAfterViewInit(){
 		$('.ui.dropdown').dropdown();
+		$('#multi-select-modules').dropdown({
+			allowAdditions: true,
+			filterRemoteData: true
+		});
+		this.isUnique();
 	}
 
 	getData(observatory, table) {
@@ -92,8 +135,25 @@ export class AppInsertion implements OnInit {
 			this.loading = true;
 			let instance = this;
 			let modules = this.newModules.split(',');
-			this.insertNewData();
-			let dataInfo = {name : this.word, type: $('#select-types').text(), source : this.source, modules : this.newModules, definition: this.definition, explications : this.explications, context :  $('#select-context').text(), commentary : "", review : ""};
+			let modulesNotNew = "";
+			if(this.newModule) {
+				//this.insertNewData();
+				modulesNotNew = this.newModules;
+			} else {
+				if ($('#multi-select-modules').children('a.ui.label.transition.visible').text() != "") {
+					let listModules = $('#multi-select-modules').children('a.ui.label.transition.visible').text();
+					listModules = listModules.split('[');
+					listModules = listModules[1].split(']');
+					listModules = listModules[0].split('"');
+					for (let i = 0; i <= listModules.length - 1; i++) {
+						modulesNotNew += listModules[i];
+					}
+				} else {
+					modulesNotNew = "";
+				}
+			}
+			
+			let dataInfo = {name : this.word, type: $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text(), source : this.source, modules : modulesNotNew, definition: this.definition, explications : this.explications, context :  $('#select-context').text() == "Aucun" ? "" : $('#select-context').text(), commentary : "", review : ""};
 			this._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name)
 			.subscribe(
 				function(response) { // The communication with the API has matched
@@ -105,6 +165,8 @@ export class AppInsertion implements OnInit {
 				// The communication with the API has not matched
 				function(error) {instance.loading = false; instance._alert.create('error', AppSettings.MSGERROR); },
 			);
+		} else {
+			 this._alert.create('warning', AppSettings.MSGINCOMPLETED);
 		}
 	}
 

@@ -25,6 +25,7 @@
     "classlist.js": "^1.1.20150312",
     "core-js": "^2.4.1",
     "intl": "^1.2.5",
+    "ngx-chips": "^1.4.6",
     "rxjs": "^5.1.0",
     "semantic-ui": "^2.2.10",
     "web-animations-js": "^2.2.5",
