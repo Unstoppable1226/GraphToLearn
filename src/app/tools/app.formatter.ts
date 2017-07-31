@@ -19,6 +19,15 @@ export class Formatter {
 		return tags;
 	}
 
+	randomIntFromInterval(min,max){
+    		return Math.floor(Math.random()*(max-min+1)+min);
+	}
+
+
+	capitalize(string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+
 	getTotalCountWord(array) {
 		let count = 0
 		for (let i = array.length - 1; i >= 0; i--) {

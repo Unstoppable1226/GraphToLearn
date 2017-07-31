@@ -8,23 +8,22 @@
 	border-image-width: 1!important;
 }
 
-.button-blur {
-	background-color: #16a085;
-	color:white;
-}
-
-.button-blur:active {
-	background-color: #0c5a4a;
-	color:white;
-}
-
-
 .button-home {
 	background-color: #333;
 	color:white;
 }
 
 .button-home:active {
+	background-color: #0c5a4a;
+	color:white;
+}
+
+.button-blur {
+	background-color: #16a085;
+	color:white;
+}
+
+.button-blur:active {
 	background-color: #0c5a4a;
 	color:white;
 }

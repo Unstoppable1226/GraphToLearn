@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
+import { Manager3D } from '../3D/app.components3d'
 
 @Component({
 	selector: 'app-search',
@@ -18,15 +19,15 @@ export class AppSearch{
 	public dictionary = [];
 	public context
 
-	constructor(private _route : ActivatedRoute, private _httpservice : HttpAPIService,  private _format : Formatter) {
+	constructor(private _route : ActivatedRoute, private _httpservice : HttpAPIService,  private _format : Formatter, private _manager3d : Manager3D) {
 		let instance = this;
 		instance._route.params.subscribe(routeParams => {
-		  	instance.id = routeParams.id;
-		  	if (instance.id != undefined) {
-			  	_httpservice.getEntryJSON(AppSettings.API_WORDS)
-			  	.subscribe(
-			  		function(response) { 
-				  		let obj = response.dictionary.entries;
+			instance.id = routeParams.id;
+			if (instance.id != undefined) {
+				_httpservice.getEntryJSON(AppSettings.API_WORDS)
+				.subscribe(
+					function(response) { 
+						let obj = response.dictionary.entries;
 						for (let prop in obj){
 							let tag = obj[prop].tags;
 							instance.dictionary.push(obj[prop]);
@@ -36,15 +37,19 @@ export class AppSearch{
 						}
 						instance.createContext();
 					}
-			  	)
-		  	}
+					)
+			}
 		})
+	}
+
+	ngAfterViewInit() {
+		this._manager3d.startEngine('renderCanvas');
 	}
 
 	findVerb(tag) {
 		return tag.endsWith("dre") || tag.endsWith("pre") || 
-				tag.endsWith("er") || tag.endsWith("oir") || tag.endsWith("ir") 
-					|| tag.endsWith("ttre") || tag == 'est' || tag == 'a' || tag.endsWith('é') || tag.endsWith('és') 
+		tag.endsWith("er") || tag.endsWith("oir") || tag.endsWith("ir") 
+		|| tag.endsWith("ttre") || tag == 'est' || tag == 'a' || tag.endsWith('é') || tag.endsWith('és') 
 	}
 
 	findAbreviations(word) {
@@ -151,6 +156,8 @@ export class AppSearch{
 		this.numberUpdates(); // rule 4 (Mise à jour)
 		this.timestampInsertion(); // rule 5 (Date Insertion)
 		if (this.wordSearch.name.includes(" ")) {}
+		this._manager3d.createScene(this.wordSearch, this.context);
+		this._manager3d.runRender();
 	}
 
 

@@ -1,9 +1,14 @@
-<h2 class="ui icon header" style="margin-top:60px; margin-bottom: -200px;  text-align: center!important">
-	<i class="settings icon" style="color:white;"></i>
-	<div class="content" style="color:white;">
-		Résutlat de la recherche
+<hr style="margin-top:-50px; margin-bottom: 80px;">
+
+<div style="width: 100%;text-align: center!important">
+	<div style="width: 95%;display: inline-block;">
+		<h2 class="ui icon header" style="margin-top:-80px; text-align:center!important;margin-bottom: -200px">
+			<div class="content" style="color:white">
+				Résultat de la recherche : {{wordSearch.name}}
+			</div>
+		</h2>
+		<button  style="display:block; margin-top:-32px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home" [routerLink]="['/home']" > <i class="reply icon"></i> Retour <span style="margin-left:8px">|</span><i class="home icon" style="margin-left:10px"></i></button>
+		<br>
+		<canvas id="renderCanvas"></canvas>
 	</div>
-</h2>
-<div>
-	{{ context | json }}
 </div>
