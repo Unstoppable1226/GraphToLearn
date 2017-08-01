@@ -10,6 +10,40 @@
 	background-color: white;
 }
 
+.button-connect{
+	background-image: url(/assets/images/header-blur.png)!important;
+	font-weight: 500!important;
+	color:white!important;
+}
+
+.button-connect:hover{
+	/*background-image: url(/assets/images/blur-button-hover2.PNG)!important;*/
+	font-weight: 800!important;
+}
+
+.button-connect2{
+	background-image: url(/assets/images/header-blur2.png)!important;
+	color:white!important;
+	font-weight: 500!important;
+}
+
+.button-connect2:hover{
+	/*background-image: url(/assets/images/blur-button2-hover.PNG)!important;*/
+	font-weight: 800!important;
+}
+
+.button-connect-modal{
+	background-image: url(/assets/images/blur.jpg)!important;
+}
+
+.button-connect-modal:hover{
+	background-image: url(/assets/images/blur-2.jpg)!important;
+}
+
+.ui.buttons .or[data-text]:before {
+	font-size: 150%;
+}
+
 .image-back {
 	background-image: url(/assets/images/blur.jpg);
 	padding-top: 50px;
@@ -17,4 +51,27 @@
 	width: 100%;
 	left: 0px;
 	bottom: 0px;
+}
+
+.button-blur {
+	background-color: #16a085;
+	color:white;
+}
+
+.button-blur:active {
+	background-color: #0c5a4a;
+	color:white;
+}
+
+.input-insert {
+	text-align: center!important; 
+	border-image: url('/assets/images/blur-2.jpg') 30 30 repeat!important;
+	border-image-width: 1!important;
+}
+
+.ui.secondary.inverted.menu .active.item {
+   	background: rgba(255,255,255,0)!important;
+ 	color: #fff!important;
+ 	font-size: 110%!important;
+ 	border-bottom: 1px solid #333;
 }

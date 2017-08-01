@@ -1,0 +1,61 @@
+<div class="pusher" style="background-image: none!important">
+	<div class="ui inverted vertical masthead center aligned segment" style="padding: 100px;margin-top:0px;top:0px;">
+		<div class="ui text container" >
+			<div style="padding: 50px!important; margin-top:-50px">
+				<h1 class="ui center aligned icon header" style="font-size:550%!important;color:white">
+					{{title}}
+					<div class="sub header" style="color:white">L'outil de recherche intelligente en collaboration avec <span style="font-weight: bold; font-size: 1.2em">Cowaboo </span></div>
+				</h1>
+			</div>
+			<div class="ui buttons">
+				<div class="ui huge primary button button-connect" (click)="connect()">Se connecter<i class="right sign in icon"></i></div>
+				<div class="or" data-text="ou" style="margin-left:5px; margin-right: 5px"></div>
+				<div class="ui huge primary button button-connect2" >Rejoindre la communauté<i class="right users icon"></i></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="ui vertical stripe segment" style="background-color: white!important; padding: 50px">
+		<div class="ui middle aligned stackable grid container">
+			<div class="row">
+				<div class="wide column">
+					<i class="icon handshake" style="font-size: 5em"></i>
+					<h3 class="ui header left" style="margin-top: -5px;">Un outil d'apprentissage </h3>
+					<p>L'outil vous permet d'apprendre de nouvelles défintions grâce à son interface en 3D avec une navigation dynamique.</p>
+					<hr>
+					<div style="float: right;text-align: right!important">
+						<i class="icon world" style="font-size: 5em;margin-top:50px;"></i>
+						<h3 class="ui header" style="margin-top: -5px;">Ouvert à tous </h3>
+						<p>Tout le monde peut rejoindre la communauté de GraphToLearn. Il suffit de cliquer sur rejoindre la communauté.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<div id="modalConnection" class="ui modal">
+	<i class="close icon"></i>
+	<div class="header text-center">
+		Connexion à GraphToLearn
+	</div>
+	<div class="ui middle aligned center aligned grid">
+		<div class="column">
+			<form class="ui large form">
+				<div class="ui stacked segment actions">
+					<div class="field required">
+						<div class="ui left icon input">
+							<i class="lock icon"></i>
+							<input type="password" class="input-insert" name="password" [(ngModel)]="secretKey" [ngModelOptions]="{standalone: true}" placeholder="Secret Key">
+						</div>
+					</div>
+					<div class="ui fluid large approve  teal submit button button-connect-modal" style="margin-left:0px">Se connecter <i class="right sign in icon"></i></div>
+				</div>
+				<div class="ui error message"></div>
+			</form>
+			<div class="ui message">
+				Vous n'êtes pas encore membre ? <a href="">Rejoindre la communauté</a>
+			</div>
+		</div>
+	</div>
+</div>

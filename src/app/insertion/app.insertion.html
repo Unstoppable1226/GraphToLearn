@@ -1,14 +1,13 @@
-<hr style="margin-top:-50px; margin-bottom: 80px;">
-
-<div style="width: 100%;text-align: center!important">
+<app-menu></app-menu>
+<div style="width: 100%;text-align: center!important; margin-top: 10px">
 	<div style="width: 95%;display: inline-block;">
-		<h2 class="ui icon header" style="margin-top:-50px; text-align:center!important;margin-bottom: -200px">
+		<h2 class="ui icon header" style="text-align:center!important;margin-bottom: -200px">
 			<i class="add square icon" style="color:white"></i>
 			<div class="content" style="color:white">
 				Insertion d'un terme
 			</div>
 		</h2>
-		<button  style="display:block; margin-top:-25px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home" [routerLink]="['/home']" > <i class="reply icon"></i> Retour <span style="margin-left:8px">|</span><i class="home icon" style="margin-left:10px"></i></button>
+		<button  style="display:block; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home" [routerLink]="['/home']" > <i class="reply icon"></i> Retour <span style="margin-left:8px">|</span><i class="home icon" style="margin-left:10px"></i></button>
 		<div class="ui icon message"  [hidden]="!loading">
 			<i class="notched circle loading icon"></i>
 			<div class="content">

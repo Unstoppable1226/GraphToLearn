@@ -44,69 +44,124 @@ export class Manager3D {
 		label.addControl(text1); 
 	}
 
+	createInformation(mesh) {
+		// Another GUI on the right
+		this.advancedTextureGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+		this.advancedTextureGUI.layer.layerMask = 5;
+		this.panel3 = new BABYLON.GUI.StackPanel();
+		this.panel3.width = "80%";
+		this.panel3.heigth = "400px";
+		this.panel3.fontSize = "20px";
+		this.panel3.fontFamily = "font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;"
+
+		this.panel3.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+		this.panel3.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+		this.panel3.top = "150"
+
+		this.header = new BABYLON.GUI.TextBlock();
+		this.header.text = "Informations concernant : " + mesh.name;
+		this.header.height = "40px";
+		this.header.color = "black";
+		this.header.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+		this.header.paddingTop = "10px";
+		this.advancedTextureGUI.addControl(this.panel3);
+		this.panel3.addControl(this.header); 
+
+		this.info = new BABYLON.GUI.TextBlock();
+		this.info.text = "Type : " + this.wordSearch.type + "\n" + "Explications : " + "\n" + this.wordSearch.explications;
+		this.info.textWrapping = true;
+		this.info.height = "200px";
+		this.info.color = "#333";
+		this.info.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+		this.info.paddingTop = "10px";
+		this.panel3.addControl(this.info); 
+
+		var result = new BABYLON.GUI.Button("aimer");
+		result.width = "150px"
+		result.height = "50px"
+		// Adding text
+		var textBlock = new BABYLON.GUI.TextBlock(name + "_button", "Aimer");
+		textBlock.textWrapping = true;
+		textBlock.color = "black"
+		textBlock.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+		textBlock.paddingLeft = "25%";
+		result.addControl(textBlock);   
+
+		// Adding image
+		var iconImage = new BABYLON.GUI.Image(name + "_icon", "../assets/images/heart.png");
+		iconImage.width = "40%";
+		iconImage.stretch = BABYLON.GUI.Image.STRETCH_FILL;
+		iconImage.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+		result.addControl(iconImage);            
+
+		this.panel3.addControl(result); // Another GUI on the right
+		this.advancedTextureGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+		this.advancedTextureGUI.layer.layerMask = 5;
+		this.panel3 = new BABYLON.GUI.StackPanel();
+		this.panel3.width = "80%";
+		this.panel3.heigth = "400px";
+		this.panel3.fontSize = "20px";
+		this.panel3.fontFamily = "font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;"
+
+		this.panel3.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+		this.panel3.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+		this.panel3.top = "150"
+
+		this.header = new BABYLON.GUI.TextBlock();
+		this.header.text = "Informations concernant : " + mesh.name;
+		this.header.height = "40px";
+		this.header.color = "black";
+		this.header.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+		this.header.paddingTop = "10px";
+		this.advancedTextureGUI.addControl(this.panel3);
+		this.panel3.addControl(this.header); 
+
+		this.info = new BABYLON.GUI.TextBlock();
+		this.info.text = "Type : " + this.wordSearch.type + "\n" + "Explications : " + "\n" + this.wordSearch.explications;
+		this.info.textWrapping = true;
+		this.info.height = "200px";
+		this.info.color = "#333";
+		this.info.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+		this.info.paddingTop = "10px";
+		this.panel3.addControl(this.info); 
+
+		var result = new BABYLON.GUI.Button("aimer");
+		result.width = "150px"
+		result.height = "50px"
+		// Adding text
+		var textBlock = new BABYLON.GUI.TextBlock(name + "_button", "Aimer");
+		textBlock.textWrapping = true;
+		textBlock.color = "black"
+		textBlock.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+		textBlock.paddingLeft = "25%";
+		result.addControl(textBlock);   
+
+		// Adding image
+		var iconImage = new BABYLON.GUI.Image(name + "_icon", "../assets/images/heart.png");
+		iconImage.width = "40%";
+		iconImage.stretch = BABYLON.GUI.Image.STRETCH_FILL;
+		iconImage.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+		result.addControl(iconImage);            
+
+		this.panel3.addControl(result); 
+	}
+
+	moveCameraToMesh(mesh) {
+		this.camera.lockedTarget = mesh;
+		this.camera.radius = mesh.name == this.wordSearch.name ? 70 : 100; // how far from the object to follow
+		this.camera.maxCameraSpeed = 10
+	}
+
 	registerAction(mesh) {
 		let instance = this;
 		mesh.actionManager = new BABYLON.ActionManager(this.scene);
 		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, (function(mesh) {
 			if (instance.advancedTextureGUI == undefined) {
-				// Another GUI on the right
-				instance.advancedTextureGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-				instance.advancedTextureGUI.layer.layerMask = 5;
-				instance.panel3 = new BABYLON.GUI.StackPanel();
-				instance.panel3.width = "80%";
-				instance.panel3.heigth = "400px";
-				instance.panel3.fontSize = "20px";
-				instance.panel3.fontFamily = "font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;"
-
-				instance.panel3.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-				instance.panel3.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-				instance.panel3.top = "150"
-
-				instance.header = new BABYLON.GUI.TextBlock();
-				instance.header.text = "Informations concernant : " + mesh.name;
-				instance.header.height = "40px";
-				instance.header.color = "black";
-				instance.header.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-				instance.header.paddingTop = "10px";
-				instance.advancedTextureGUI.addControl(instance.panel3);
-				instance.panel3.addControl(instance.header); 
-
-				instance.info = new BABYLON.GUI.TextBlock();
-				instance.info.text = "Type : " + instance.wordSearch.type + "\n" + "Explications : " + "\n" + instance.wordSearch.explications;
-				instance.info.textWrapping = true;
-				instance.info.height = "100px";
-				instance.info.color = "#333";
-				instance.info.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-				instance.info.paddingTop = "10px";
-				instance.panel3.addControl(instance.info); 
-
-				var result = new BABYLON.GUI.Button("aimer");
-				result.width = "150px"
-				result.height = "50px"
-				// Adding text
-				var textBlock = new BABYLON.GUI.TextBlock(name + "_button", "Aimer");
-				textBlock.textWrapping = true;
-				textBlock.color = "black"
-				textBlock.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-				textBlock.paddingLeft = "25%";
-				result.addControl(textBlock);   
-
-				// Adding image
-				var iconImage = new BABYLON.GUI.Image(name + "_icon", "../assets/images/heart.png");
-				iconImage.width = "40%";
-				iconImage.stretch = BABYLON.GUI.Image.STRETCH_FILL;
-				iconImage.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-				result.addControl(iconImage);            
-
-				instance.panel3.addControl(result); 
-
+				instance.createInformation(mesh);
 			} else {
 				instance.header.text = "Informations concernant : " + mesh.name;
 			}
-
-			instance.camera.lockedTarget = mesh;
-			instance.camera.radius = mesh.name == instance.wordSearch.name ? 70 : 30; // how far from the object to follow
-			instance.camera.maxCameraSpeed = 10
+			instance.moveCameraToMesh(mesh)
 			
 		}).bind(this, mesh)));
 	}
@@ -124,9 +179,9 @@ export class Manager3D {
 		var sphere1 = BABYLON.Mesh.CreateSphere(wordSearch.name, 50.0, 15, this.scene);
 
 		var label = new BABYLON.GUI.Rectangle("label for " + sphere1.name);
-		label.background = "transp"
+		label.background = "white"
 		label.height = "30px";
-		label.alpha = 0.5;
+		label.alpha = 2;
 		label.width = "100px";
 		label.cornerRadius = 20;
 		label.thickness = 1;
