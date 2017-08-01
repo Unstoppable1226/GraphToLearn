@@ -5,6 +5,8 @@ import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
 import { AuthService } from '../login/app.authservice';
+import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
+import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 declare var $:any;
 
 @Component({
@@ -20,7 +22,7 @@ export class AppLogin {
 
 	title = AppSettings.TITLE;
 	
-	constructor(private _authservice : AuthService) {
+	constructor(private _authservice : AuthService, private _router: Router, private _alert: AlertsService) {
 		let instance = this;
 		this.object = {
 			closable  : true,
@@ -28,7 +30,18 @@ export class AppLogin {
 			onDeny : function(){ return false; },
 			onApprove : function() {
 				if (instance.secretKey.length > 0) {
-					instance._authservice.connect(instance.secretKey);
+					var resp = instance._authservice.connect(instance.secretKey)
+					.subscribe(function(resp){
+						if (resp.publicAddress == undefined) {
+							return false;
+						} else {
+							$('#modalConnection').modal('hide');
+							localStorage.setItem('currentUser', JSON.stringify(resp.publicAddress));
+							instance._router.navigate(['home']);
+							instance._alert.create('success', AppSettings.MSGWELCOME + " " + resp.email + " !")
+						}
+					})
+					return false;
 				} else {
 					alert("Renseigner le champ")
 					return false;
@@ -36,13 +49,6 @@ export class AppLogin {
 			}
 		}
 	}
-
-	ngAfterViewInit() {
-		$('#modalConnection').modal(this.object)
-	}
-
-	connect() {
-		
-		$('#modalConnection').modal('show');
-	}
+	ngAfterViewInit() {$('#modalConnection').modal(this.object)}
+	connect() {$('#modalConnection').modal('show');}
 }

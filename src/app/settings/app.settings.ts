@@ -8,6 +8,7 @@ export class AppSettings {
 	public static API_OBSERVATORY = AppSettings.API_ENDPOINT + "observatory";
 	public static API_ENTRY = AppSettings.API_ENDPOINT + "entry";
 	public static API_TAGS = AppSettings.API_ENDPOINT + "tags";
+	public static API_USERS = AppSettings.API_ENDPOINT + "user";
 	public static API_WORDS = "Words";
 	public static API_MODULES = "Modules";
 	public static API_TYPES = "Types";
@@ -23,6 +24,7 @@ export class AppSettings {
 	public static MSGSUCCESS = "Les informations ont été inséré avec succès";
 	public static MSGERROR = "Un problème est survenu lors de l'insertion des données, Veuillez réessayer svp !";
 	public static MSGINCOMPLETED = "Vous n'avez pas renseigner tous les champs requis pour l'insertion des données !";
+	public static MSGWELCOME = "Vous êtes connecté sur GraphToLearn, Bienvenue ";
 
 
 	/* Table that contains words that must be deleted by the algorithm when he will create the world for the response*/

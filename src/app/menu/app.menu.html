@@ -4,7 +4,7 @@
 			Accueil <i class="right home icon" style="margin-left:5px"></i>
 		</a>
 		<a class="item" [ngClass]="{'active': active[1]}" (click)="changeActive(1, 'profile')">
-			Profil <i class="right user icon" style="margin-left:5px"></i>
+			{{user.mail}} <i class="right user icon" style="margin-left:5px"></i>
 		</a>
 		<a class="item" [ngClass]="{'active': active[2]}" (click)="changeActive(2, 'revisions')">
 			Mes révisions <i class="right history icon" style="margin-left:5px"></i>

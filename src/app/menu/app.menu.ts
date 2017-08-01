@@ -24,6 +24,7 @@ export class MenuComponent {
 	
 	constructor(private _httpService : HttpAPIService, private _authservice : AuthService, private _router : Router) {
 		this.user = new User();
+		this.user.mail = "joel.marquesd@etu.hesge.ch";
 		this.user.reputation = 3;
 	}
 

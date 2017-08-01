@@ -13,6 +13,11 @@ export class HttpAPIService  {
 			.map((res: Response) => res.json());
 	}
 
+	getUser(secretKey) {
+		return this._http.get(AppSettings.API_USERS + "?secretKey=" + secretKey)
+			.map((res: Response) => res.json());
+	}
+
 	getEntryJSON(observatory) {
 		return this._http.get(AppSettings.API_OBSERVATORY + "?observatoryId=" + observatory)
 			.map((res: Response) => res.json());
