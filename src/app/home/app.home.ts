@@ -5,6 +5,7 @@ import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
 import { AuthService } from '../login/app.authservice';
+
 declare var $:any;
 
 
@@ -21,7 +22,9 @@ export class AppHome{
 	private isConnected = false;
 	title = AppSettings.TITLE;
 	
-	constructor(private _httpService : HttpAPIService, private _authservice : AuthService) {}
+	constructor(private _httpService : HttpAPIService, private _authservice : AuthService) {
+
+	}
 
 	insertWithFile() {
 

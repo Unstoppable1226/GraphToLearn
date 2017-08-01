@@ -7,6 +7,8 @@ import { Formatter } from '../tools/app.formatter';
 import { AuthService } from '../login/app.authservice';
 import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { User } from '../model/user';
+import { UserService } from '../model/user-service';
 declare var $:any;
 
 @Component({
@@ -22,7 +24,7 @@ export class AppLogin {
 
 	title = AppSettings.TITLE;
 	
-	constructor(private _authservice : AuthService, private _router: Router, private _alert: AlertsService) {
+	constructor(private _authservice : AuthService, private _router: Router, private _alert: AlertsService, private _userservice : UserService) {
 		let instance = this;
 		this.object = {
 			closable  : true,
@@ -36,7 +38,12 @@ export class AppLogin {
 							return false;
 						} else {
 							$('#modalConnection').modal('hide');
-							localStorage.setItem('currentUser', JSON.stringify(resp.publicAddress));
+							let user = new User();
+							user.mail = resp.email;
+							user.reputation = 6;
+							user.publicKey = resp.publicKey;
+							instance._userservice.setCurrentUser(user);
+							sessionStorage.setItem('currentUser', window.btoa(resp.publicAddress));
 							instance._router.navigate(['home']);
 							instance._alert.create('success', AppSettings.MSGWELCOME + " " + resp.email + " !")
 						}

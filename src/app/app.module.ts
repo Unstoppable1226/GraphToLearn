@@ -27,6 +27,7 @@ import { Formatter } from './tools/app.formatter';
 import { Manager3D } from './3D/app.components3d';
 import { AuthGuard } from './login/app.authguard';
 import { AuthService } from './login/app.authservice';
+import { UserService } from './model/user-service';
 
 @NgModule({
 	declarations: [
@@ -52,7 +53,8 @@ import { AuthService } from './login/app.authservice';
 		Formatter, 
 		Manager3D, 
 		AuthGuard,
-		AuthService
+		AuthService,
+		UserService
 	],
 	bootstrap: [AppComponent]
 })

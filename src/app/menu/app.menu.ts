@@ -7,6 +7,7 @@ import { Formatter } from '../tools/app.formatter';
 import { AuthService } from '../login/app.authservice';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { User } from '../model/user'
+import { UserService } from '../model/user-service'
 
 declare var $:any;
 
@@ -22,10 +23,13 @@ export class MenuComponent {
 	public active = [true, false, false, false]
 	public user : User
 	
-	constructor(private _httpService : HttpAPIService, private _authservice : AuthService, private _router : Router) {
-		this.user = new User();
-		this.user.mail = "joel.marquesd@etu.hesge.ch";
-		this.user.reputation = 3;
+	constructor(private _httpService : HttpAPIService, private _authservice : AuthService, private _router : Router, private _userservice : UserService) {
+		
+		if (this._userservice.getCurrentUser() == undefined) {
+			
+		} else {
+			this.user = this._userservice.getCurrentUser();
+		}
 	}
 
 	logout() {
