@@ -21,10 +21,28 @@ export class AppLogin {
 	public secretKey = ""
 	public modal
 	public object = {}
+	public loading = false;
 
 	title = AppSettings.TITLE;
+
+
+	getReputation(publicKey : string, resp) { // Get the stellar coins of the user => his reputation
+		let instance = this;
+		this._httpservice.getUserReputation(publicKey)
+		.subscribe(function(response){
+			let user = new User();
+			user.mail = resp.email;
+			user.reputation = !response ? 0 : response;
+			user.publicKey = publicKey;
+			instance._userservice.setCurrentUser(user);
+			sessionStorage.setItem('currentUser', window.btoa(instance.secretKey));
+			instance.loading = false
+			instance._router.navigate(['home']);
+			instance._alert.create('success', AppSettings.MSGWELCOME + " " + resp.email + " !")
+		})
+	}
 	
-	constructor(private _authservice : AuthService, private _router: Router, private _alert: AlertsService, private _userservice : UserService) {
+	constructor(private _authservice : AuthService, private _router: Router, private _alert: AlertsService, private _userservice : UserService, private _httpservice : HttpAPIService) {
 		let instance = this;
 		this.object = {
 			closable  : true,
@@ -38,14 +56,8 @@ export class AppLogin {
 							return false;
 						} else {
 							$('#modalConnection').modal('hide');
-							let user = new User();
-							user.mail = resp.email;
-							user.reputation = 6;
-							user.publicKey = resp.publicKey;
-							instance._userservice.setCurrentUser(user);
-							sessionStorage.setItem('currentUser', window.btoa(resp.publicAddress));
-							instance._router.navigate(['home']);
-							instance._alert.create('success', AppSettings.MSGWELCOME + " " + resp.email + " !")
+							instance.loading = true
+							instance.getReputation(resp.publicAddress, resp)
 						}
 					})
 					return false;

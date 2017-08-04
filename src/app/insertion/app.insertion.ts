@@ -2,6 +2,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { HttpAPIService } from '../api/app.http-service';
 import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 import { AppSettings } from '../settings/app.settings';
+import { UserService } from '../model/user-service';
 import { OnInit } from '@angular/core';
 
 declare var $:any; // This is necessary if you want to use jQuery in the app
@@ -10,7 +11,6 @@ declare var $:any; // This is necessary if you want to use jQuery in the app
 	selector: 'app-insertion',
 	templateUrl: './app.insertion.html',
 	styleUrls: ['./app.insertion.css'],
-	providers: [HttpAPIService]
 })
 
 export class AppInsertion implements OnInit {
@@ -34,7 +34,9 @@ export class AppInsertion implements OnInit {
 	public explications : string = "";
 	public items = ['Angular' ,'React'];
 
-	constructor(private _httpService : HttpAPIService, private _alert: AlertsService) {}
+	constructor(private _httpService : HttpAPIService, private _alert: AlertsService, private _userservice : UserService) {
+		console.log(_userservice.getCurrentUser())
+	}
 
 	isUnique() {
 		let instance = this;

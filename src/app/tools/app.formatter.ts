@@ -36,6 +36,23 @@ export class Formatter {
 		return count
 	}
 
+	getReput(tag, divisions) {
+		for (let i = 0, rep = 1; i < divisions.length - 1; i++, rep++) {
+			if (tag <= divisions[i]) {
+				return rep;
+			}
+		}
+	}
+
+	getDivisions(totalPoints, nbTags) {
+		let stepBy = Math.trunc(totalPoints / nbTags);
+		let max = stepBy * nbTags, divisions = []
+		for (let i = 1; i <= nbTags; i++) {
+			divisions.push((i != nbTags) ? i * stepBy : max + (totalPoints - max)) 
+		}
+		return divisions
+	}
+
 	countSameWord(word, array) {
 		let count = 0
 		for (let i = array.length - 1; i >= 0; i--) {
@@ -59,5 +76,14 @@ export class Formatter {
 			}
 		}
 		return "";
+	}
+
+	getDate(string) {
+		let year = string.substring(0,4)
+		let month = string.substring(4,6)
+		let day = string.substring(6,8)
+		let hours = string.substring(8,10)
+		let minutes = string.substring(10,12)
+		return day + "/" + month + "/" + year + " " + hours +":"+minutes
 	}
 }

@@ -22,14 +22,34 @@ export class MenuComponent {
 	public isConnected = false
 	public active = [true, false, false, false]
 	public user : User
-	
+
 	constructor(private _httpService : HttpAPIService, private _authservice : AuthService, private _router : Router, private _userservice : UserService) {
-		
-		if (this._userservice.getCurrentUser() == undefined) {
-			
+		this.user = new User();
+		this.user= _userservice.getCurrentUser();
+
+
+		/*let instance = this;
+		if (instance._userservice.getCurrentUser() == null) {
+			instance.user = new User()
+			let key
+			try {
+    				key = window.atob(sessionStorage.getItem('currentUser')) // We put here the try and catch because if we dont the method will not catch the exception
+			} catch(e) {
+			    	instance._router.navigate(['welcome']);
+			}
+			_httpService.getUser(key)
+				.subscribe(function(response) {
+					if (response.email == undefined) {
+						instance._router.navigate(['welcome']);
+					} else {
+						instance.user.mail = response.email;
+						instance.user.publicKey = response.publicAddress;
+						instance.getReputation(response.publicAddress)
+					}
+				});
 		} else {
-			this.user = this._userservice.getCurrentUser();
-		}
+			instance.user = instance._userservice.getCurrentUser();
+		}*/
 	}
 
 	logout() {

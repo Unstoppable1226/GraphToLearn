@@ -5,6 +5,10 @@ import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
 import { Manager3D } from '../3D/app.components3d'
+import { User } from '../model/user'
+import { UserService } from '../model/user-service'
+
+declare var dat:any;
 
 @Component({
 	selector: 'app-search',
@@ -15,12 +19,15 @@ import { Manager3D } from '../3D/app.components3d'
 export class AppSearch{
 
 	public id = "";
-	public wordSearch = {name:"", definition : "", explications: ""};
+	public wordSearch = {name:"", definition : "", explications: "", date : "", author: {}};
 	public dictionary = [];
 	public context
+	private user : User
 
-	constructor(private _route : ActivatedRoute, private _httpservice : HttpAPIService,  private _format : Formatter, private _manager3d : Manager3D) {
+	constructor(private _route : ActivatedRoute, private _httpservice : HttpAPIService,  private _format : Formatter, private _manager3d : Manager3D, private _userservice : UserService) {
 		let instance = this;
+		instance.user = instance._userservice.getCurrentUser();
+
 		instance._route.params.subscribe(routeParams => {
 			instance.id = routeParams.id;
 			if (instance.id != undefined) {
@@ -33,11 +40,13 @@ export class AppSearch{
 							instance.dictionary.push(obj[prop]);
 							if (tag.toLowerCase().includes(instance.id.toLowerCase())) {
 								instance.wordSearch = JSON.parse(obj[prop].value);
+								instance.wordSearch.date = instance._format.getDate(obj[prop].date);
+								instance.wordSearch.author = {name : obj[prop].author, search : ""};
 							}
 						}
 						instance.createContext();
 					}
-					)
+				)
 			}
 		})
 	}
@@ -113,29 +122,12 @@ export class AppSearch{
 		}
 	}
 
-	getReputRule1(tag, divisions) {
-		for (let i = 0, rep = 1; i < divisions.length - 1; i++, rep++) {
-			if (tag.count <= divisions[i]) {
-				return rep;
-			}
-		}
-	}
-
-	getDivisions(totalPoints, nbTags) {
-		let stepBy = Math.trunc(totalPoints / nbTags);
-		let max = stepBy * nbTags, divisions = []
-		for (let i = 1; i <= nbTags; i++) {
-			divisions.push((i != nbTags) ? i * stepBy : max + (totalPoints - max)) 
-		}
-		return divisions
-	}
-
 	countExplaination() {
 		let totalPoints = this._format.getTotalCountWord(this.context);
 		let nbTags = this.context.length;
-		let divisions = this.getDivisions(totalPoints, nbTags);
+		let divisions = this._format.getDivisions(totalPoints, nbTags);
 		for (let i = this.context.length - 1; i >= 0; i--) {
-			this.context[i].repRule1 = this.getReputRule1(this.context[i], divisions)
+			this.context[i].repRule1 = this._format.getReput(this.context[i].count, divisions)
 		}
 		this.context.sort(function(a, b){return a.reputRule1 > b.reputRule1;});
 	}
@@ -156,8 +148,9 @@ export class AppSearch{
 		this.numberUpdates(); // rule 4 (Mise à jour)
 		this.timestampInsertion(); // rule 5 (Date Insertion)
 		if (this.wordSearch.name.includes(" ")) {}
-		this._manager3d.createScene(this.wordSearch, this.context);
+			this._manager3d.createScene(this.wordSearch, this.context);
 		this._manager3d.runRender();
+		console.log(this.wordSearch);
 	}
 
 

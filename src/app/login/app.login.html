@@ -19,10 +19,14 @@
 		<div class="ui middle aligned stackable grid container">
 			<div class="row">
 				<div class="wide column">
-					<i class="icon handshake" style="font-size: 5em"></i>
-					<h3 class="ui header left" style="margin-top: -5px;">Un outil d'apprentissage </h3>
-					<p>L'outil vous permet d'apprendre de nouvelles défintions grâce à son interface en 3D avec une navigation dynamique.</p>
-					<hr>
+					<div style="float: left;text-align: left!important;">
+						<i class="icon handshake" style="font-size: 5em"></i>
+						<h3 class="ui header left" style="margin-top: -5px;">Un outil d'apprentissage </h3>
+						<p>L'outil vous permet d'apprendre de nouvelles défintions grâce à son interface en 3D avec une navigation dynamique.</p>
+						<br>
+					</div>
+					
+					<hr style="clear: both!important">
 					<div style="float: right;text-align: right!important">
 						<i class="icon world" style="font-size: 5em;margin-top:50px;"></i>
 						<h3 class="ui header" style="margin-top: -5px;">Ouvert à tous </h3>
@@ -32,7 +36,6 @@
 			</div>
 		</div>
 	</div>
-
 </div>
 <div id="modalConnection" class="ui modal">
 	<i class="close icon"></i>
@@ -58,4 +61,7 @@
 			</div>
 		</div>
 	</div>
+</div>
+<div class="ui active dimmer" *ngIf="loading">
+	<div class="ui indeterminate large text loader" [hidden]="true">Récupération de vos informations, veuillez-patientez svp ...</div>
 </div>

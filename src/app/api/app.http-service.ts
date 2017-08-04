@@ -18,6 +18,11 @@ export class HttpAPIService  {
 			.map((res: Response) => res.json());
 	}
 
+	getUserReputation(pubKey) {
+		return this._http.get(AppSettings.API_USERS + "/balance?public=" + pubKey)
+			.map((res: Response) => res.json());
+	}
+
 	getEntryJSON(observatory) {
 		return this._http.get(AppSettings.API_OBSERVATORY + "?observatoryId=" + observatory)
 			.map((res: Response) => res.json());

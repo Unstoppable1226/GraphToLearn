@@ -26,6 +26,9 @@ export class AppSettings {
 	public static MSGINCOMPLETED = "Vous n'avez pas renseigner tous les champs requis pour l'insertion des données !";
 	public static MSGWELCOME = "Vous êtes connecté sur GraphToLearn, Bienvenue ";
 
+	/* 3D variables */
+	public static MINX : number = 30;
+	public static COLORSSPHERES : Array<string> = ['#0D47A1', '#64B5F6', '#BBDEFB', '#E3F2FD', '#FFFFFF'];
 
 	/* Table that contains words that must be deleted by the algorithm when he will create the world for the response*/
 	public static articles = [ "un", "une", "le", "la", "les", "l'", "d'","de", "du", "des", "à", "au", "aux"]

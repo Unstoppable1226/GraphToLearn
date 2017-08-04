@@ -14,11 +14,7 @@ export class AuthService  {
 
 	constructor (private _http: Http, private _router: Router, private _httpservice : HttpAPIService) {}
 
-	connect(secretKey : string) {
-
-		return this._httpservice.getUser(secretKey)
-			
-    	}
+	connect(secretKey : string) {return this._httpservice.getUser(secretKey)}
 
     	logout() {
     		var el = document.getElementsByClassName('ui dimmer modals page transition hidden'); // Remove other modals
