@@ -35,4 +35,11 @@ export class HttpAPIService  {
 		return this._http.post(AppSettings.API_ENTRY, "secretKey=SDRSUEUEOJAJJG4MC76F2H7FTGYYTFASNCTMEJ7XJFUHFRQG5M2QI5O3%20&observatoryId=" + observatory + "&tags= " + tags + "&value= " + JSON.stringify(dataInfo), options)
 			.map((res: Response) => res.json());
 	}
+	
+	postEntryMetadata(name, value, hashEntry) {
+		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept' : 'application/json'}); // ... Set content type to JSON
+		let options  = new RequestOptions({ headers: headers });
+		return this._http.post(AppSettings.API_ENTRYMETADATA + "metadata%20name=" + name + "&metadata%20value=" + value, "secretKey=SDRSUEUEOJAJJG4MC76F2H7FTGYYTFASNCTMEJ7XJFUHFRQG5M2QI5O3&observatoryId=Words&hash=" + hashEntry, options)
+			.map((res: Response) => res.json());
+	}
 }

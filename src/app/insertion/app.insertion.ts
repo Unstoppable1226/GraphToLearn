@@ -156,13 +156,18 @@ export class AppInsertion implements OnInit {
 			}
 			
 			let dataInfo = {name : this.word, type: $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text(), source : this.source, modules : modulesNotNew, definition: this.definition, explications : this.explications, context :  $('#select-context').text() == "Aucun" ? "" : $('#select-context').text(), commentary : "", review : ""};
-			this._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name)
+			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name)
 			.subscribe(
 				function(response) { // The communication with the API has matched
-					instance.loading = false; 
-					instance._alert.create('success', AppSettings.MSGSUCCESS)
-					data => this.data = data
-					instance.reinit();
+					instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, response) // Put searchClick to 0
+					.subscribe(
+						function(resp) {
+							instance.loading = false;
+							instance._alert.create('success', AppSettings.MSGSUCCESS)
+							data => instance.data = data
+							instance.reinit();
+						}	
+					)
 				},
 				// The communication with the API has not matched
 				function(error) {instance.loading = false; instance._alert.create('error', AppSettings.MSGERROR); },

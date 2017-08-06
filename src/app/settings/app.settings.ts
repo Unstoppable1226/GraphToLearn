@@ -7,12 +7,15 @@ export class AppSettings {
 	public static API_ENDPOINT='http://groups.cowaboo.net/group-graphToLearn/public/api/';
 	public static API_OBSERVATORY = AppSettings.API_ENDPOINT + "observatory";
 	public static API_ENTRY = AppSettings.API_ENDPOINT + "entry";
+	public static API_ENTRYMETADATA = AppSettings.API_ENTRY + "/conf?";
+	
 	public static API_TAGS = AppSettings.API_ENDPOINT + "tags";
 	public static API_USERS = AppSettings.API_ENDPOINT + "user";
 	public static API_WORDS = "Words";
 	public static API_MODULES = "Modules";
 	public static API_TYPES = "Types";
 	public static API_CONTEXT= "Context";
+	public static API_METASEARCHCLICK= "searchClick";
 
 	/* Colors */
 	public static GREY = "#333";
@@ -34,6 +37,7 @@ export class AppSettings {
 	public static articles = [ "un", "une", "le", "la", "les", "l'", "d'","de", "du", "des", "à", "au", "aux"]
 
 	public static connectors = [
+		"ne",
 		"a condition que",
 		"a défaut de",
 		"a moins que",

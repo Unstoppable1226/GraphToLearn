@@ -32,21 +32,25 @@ export class AppSearch{
 			instance.id = routeParams.id;
 			if (instance.id != undefined) {
 				_httpservice.getEntryJSON(AppSettings.API_WORDS)
-				.subscribe(
-					function(response) { 
-						let obj = response.dictionary.entries;
-						for (let prop in obj){
-							let tag = obj[prop].tags;
-							instance.dictionary.push(obj[prop]);
-							if (tag.toLowerCase().includes(instance.id.toLowerCase())) {
+				.subscribe(function(response) { 
+					let obj = response.dictionary.entries;
+					for (let prop in obj){
+						let tag = obj[prop].tags;
+						instance.dictionary.push(obj[prop]);
+						if (tag.toLowerCase().includes(instance.id.toLowerCase())) {
+							/* Il faudrait mettre à jour un compteur pour la recherche */
+							let nbSearch: number = Number(obj[prop].conf.searchClick)
+							nbSearch += 1
+							instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop) // Put searchClick to 0
+							.subscribe(function(resp) {
 								instance.wordSearch = JSON.parse(obj[prop].value);
 								instance.wordSearch.date = instance._format.getDate(obj[prop].date);
 								instance.wordSearch.author = {name : obj[prop].author, search : ""};
-							}
+								instance.createContext();
+							});
 						}
-						instance.createContext();
 					}
-				)
+				})
 			}
 		})
 	}
