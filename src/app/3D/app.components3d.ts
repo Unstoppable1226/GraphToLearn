@@ -206,8 +206,7 @@ export class Manager3D {
 			sphere.position.x = this._format.randomIntFromInterval(-minX,minX)
 			sphere.position.y = this._format.randomIntFromInterval(-minX,minX)
 			sphere.position.z = this._format.randomIntFromInterval(-minX,minX)
-			console.log(tag);
-			console.log(sphere);
+
 			this.createLabel(sphere, tag.position, maxGap);
 			this.registerAction(sphere);
 

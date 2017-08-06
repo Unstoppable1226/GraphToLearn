@@ -19,7 +19,7 @@ declare var dat:any;
 export class AppSearch{
 
 	public id = "";
-	public wordSearch = {name:"", definition : "", explications: "", date : "", author: {}};
+	public wordSearch = {name:"", definition : "", explications: "", date : "", author: {}, searchClick: 0};
 	public dictionary = [];
 	public context
 	private user : User
@@ -44,9 +44,10 @@ export class AppSearch{
 							instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop) // Put searchClick to 0
 							.subscribe(function(resp) {
 								instance.wordSearch = JSON.parse(obj[prop].value);
+								instance.wordSearch.searchClick = nbSearch += 1
 								instance.wordSearch.date = instance._format.getDate(obj[prop].date);
 								instance.wordSearch.author = {name : obj[prop].author, search : ""};
-								instance.createContext();
+								instance.createContext(instance.wordSearch);
 							});
 						}
 					}
@@ -140,10 +141,10 @@ export class AppSearch{
 
 	timestampInsertion() {}
 
-	createContext() {
+	createContext(wordSearch) {
 		this.context = this.sanitizeMeaningForZone();
 		this.context = Array.from(new Set(this.context))
-		let explaination =  this._format.splitter(this.wordSearch.explications, [' '])// remove espaces
+		let explaination =  this._format.splitter(wordSearch.explications, [' '])// remove espaces
 		this.numberTimesApparitions(explaination); // Sort the best tags 'importance by nb of apparition in the meaning of the word searched'
 		this.sortTags()
 		this.countExplaination() // rule 1 (Interne)
@@ -151,10 +152,10 @@ export class AppSearch{
 		//this.searchClicks() // rule 3 (Recherche/Clique)
 		this.numberUpdates(); // rule 4 (Mise à jour)
 		this.timestampInsertion(); // rule 5 (Date Insertion)
-		if (this.wordSearch.name.includes(" ")) {}
-			this._manager3d.createScene(this.wordSearch, this.context);
+		if (wordSearch.name.includes(" ")) {}
+			this._manager3d.createScene(wordSearch, this.context);
 		this._manager3d.runRender();
-		console.log(this.wordSearch);
+		
 	}
 
 
