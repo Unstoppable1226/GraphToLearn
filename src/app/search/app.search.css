@@ -30,3 +30,8 @@
          height: 100%;
          touch-action: none;
 }
+
+.collapse{
+	visibility: collapse!important;
+	height: 0!important;
+}

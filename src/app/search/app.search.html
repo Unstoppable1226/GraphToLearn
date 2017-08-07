@@ -2,14 +2,133 @@
 <div style="width: 100%;text-align: center!important; ">
 	<div style="width: 95%;display: inline-block;">
 		<h2 class="ui icon header" style="margin-top:25px; text-align:center!important;margin-bottom: -200px">
-			<div class="content" style="color:white">
-				Résultat de la recherche : {{wordSearch.name}} <div class="ui label"><i class="search icon"  style="font-size:1.5em"></i> {{wordSearch.searchClick}} fois recherché </div>
+			<div class="content" style="color:#F8F9FB; font-weight:200">
+				Résultat de la recherche : <span style="color:burlywood; font-weight:600">{{wordSearch.name}}</span>
+
+				<div class="ui statistic small" style="margin-left:25px">
+					<div class="value" style="color:darkslategrey!important">
+						{{wordSearch.searchClick}}
+					</div>
+					<div class="label" style="color:#1B1C1D">
+						Vues
+					</div>
+
+				</div>
+
 			</div>
 		</h2>
-		<div class="dg main a" style="width: 300px;position: fixed;right: 0;margin-right: 1%;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;"><div class="close-button" style="width: 300px;height:50px;padding-top: 5px;font-size: 1.3em;line-height:20px!important"><span>Informations sur </span><br>{{wordSearch.name}}</div><div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div><ul style="height: auto;"><li class="cr number" style="height: 35px;line-height: 35px"><div><span class="property-name">Type : </span><div class="c">{{wordSearch.type}}</div></div></li><li class="cr number has-slider" style="height: 35px;line-height: 35px"><div><span class="property-name">Réputation :</span><span class="ui green small circular label">5</span></div></li><li class="cr number" style="height: 35px;line-height: 35px"><div><span class="property-name">Date de création :</span> {{wordSearch.date}}<div class="c"></div></div></li><li class="cr number" style="height: 35px;line-height: 35px">Créé par : <span style="padding-left: 5px">{{wordSearch.author.name}}</span></li></ul><div class="ui labeled button" tabindex="0" ><div class="ui blue button" style="width: 240px;"	><i class="heart icon"></i> J'aime ce contenu </div><a class="ui basic blue left pointing label" style="width: 60px; text-align: center">35</a></div> <div class="ui labeled button" tabindex="1"><div  class="ui red button" style="width: 240px;"><i class="frown icon"></i>Je n'aime pas ce contenu</div><a class="ui basic red left pointing label" style="width: 60px; text-align: center">3</a></div></div>
-		<button  style="display:block; margin-top:-32px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home" [routerLink]="['/home']" > <i class="reply icon"></i> Retour <span style="margin-left:8px">|</span><i class="home icon" style="margin-left:10px"></i></button>
+		<div class="dg main a" style="width: 300px;position: fixed;right: 0;margin-right: 1%;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
+			<div class="close-button" style="width: 300px;height:50px;padding-top: 5px;font-size: 1.3em;line-height:20px!important;user-select: none;"
+			 (click)="hideOrShow($event, 1)">
+				Informations sur <br>{{wordSearch.name}}
+				<div style="float: right; margin-top:-10px!important;font-size: 0.7em">
+					<i class="icon" [ngClass]="{'minus': !collapsedInfos, 'plus': collapsedInfos}"></i>
+				</div>
+			</div>
+			<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
+			<ul style="height: auto;">
+				<li class="cr number" style="height: 35px;line-height: 35px">
+					<div>
+						<span class="property-name">Type : </span>
+						<div class="c">{{wordSearch.type}}</div>
+					</div>
+				</li>
+				<li class="cr number has-slider" style="height: 35px;line-height: 35px">
+					<div>
+						<span class="property-name">Réputation :</span>
+						<div class="ui blue small left pointing label"><strong>5</strong></div>
+					</div>
+				</li>
+				<li class="cr number" style="height: 35px;line-height: 35px">
+					<div>
+						<span class="property-name">Date de création :</span> {{wordSearch.date}}
+						<div class="c"></div>
+					</div>
+				</li>
+				<li class="cr number" style="height: 35px;line-height: 35px">
+					Créé par : <span style="padding-left: 5px">{{wordSearch.author.name}}</span>
+				</li>
+			</ul>
+			<div class="ui labeled button" tabindex="0">
+				<div class="ui blue button" style="width: 240px;">
+					<i class="heart icon"></i> J'aime ce contenu
+				</div>
+				<a class="ui basic blue left pointing label" style="width: 60px; text-align: center">35</a>
+			</div>
+			<div class="ui labeled button" tabindex="1">
+				<div class="ui red button" style="width: 240px;">
+					<i class="frown icon"></i>Je n'aime pas ce contenu
+				</div>
+				<a class="ui basic red left pointing label" style="width: 60px; text-align: center">3</a>
+			</div>
+		</div>
+		<button style="display:block; margin-top:-32px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home"
+		 [routerLink]="['/home']"> 
+			<i class="reply icon"></i> Retour 
+			<span style="margin-left:8px">|</span>
+			<i class="home icon" style="margin-left:10px"></i>
+		</button>
+
 		<br>
 		<canvas id="renderCanvas" style="outline: none;"></canvas>
 	</div>
-	<div class="dg main a" style="width: 700px;left: 50%; margin-left: -350px;position: fixed;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;"><div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important"><span>Explications de </span> {{wordSearch.name}} <div style="float: right; font-size: 0.7em"><i class="window minimize icon"></i></div></div><div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div><ul style="height: auto;"><li class="cr number" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;"><span>{{wordSearch.explications}}</span></li></ul></div>
+	<div class="dg main a" style="width: 59%;left:0;position: fixed;right: 0; margin-right:0px!important;bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
+		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
+		 (click)="hideOrShow($event, 2)">Explications de {{wordSearch.name}}
+			<div style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedMeaning, 'plus': collapsedMeaning}"></i></div>
+		</div>
+		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
+		<ul style="height: auto;">
+			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;"><span>{{wordSearch.explications}}</span></li>
+		</ul>
+	</div>
+	<div class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
+		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
+		 (click)="hideOrShow($event, 3)">Espace commentaires et révisions
+			<div style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedComments, 'plus': collapsedComments}"></i></div>
+		</div>
+		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
+		<ul class="collapse" style="height: auto;">
+			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;">
+				<span>
+					<div class="ui feed">
+						<div class="event">
+							<div class="content" >
+								<div class="summary"  style="color:#eee!important">
+									<a class="user">
+										@Joel Marques
+									</a> a ajouté le terme
+									<div class="date"  style="color:#eee!important">
+									1 Hour Ago
+									</div>
+								</div>
+								<div class="meta">
+									<a class="like"  style="color:#eee!important">
+										<i class="like icon"></i> 4 Likes
+									</a>
+								</div>
+							</div>
+						</div>
+						<div class="event">
+							<div class="content">
+								<div class="summary"  style="color:#eee!important">
+									<a>@Joel Marques</a> a ajouté <a>2 commentaires</a>
+									<button class="ui button small" style="font-size:0.8em; height:25px; margin-left: 10px"> Consulter</button>
+									<div class="date"  style="color:#eee!important">
+									4 days ago
+									</div>
+								</div>
+								<div class="meta">
+									<a class="like"  style="color:#eee!important">
+										<i class="like icon"></i> 1 Like
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</span>
+			</li>
+		</ul>
+	</div>
 </div>

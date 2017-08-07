@@ -9,6 +9,7 @@ import { User } from '../model/user'
 import { UserService } from '../model/user-service'
 
 declare var dat:any;
+declare var $:any;
 
 @Component({
 	selector: 'app-search',
@@ -22,6 +23,9 @@ export class AppSearch{
 	public wordSearch = {name:"", definition : "", explications: "", date : "", author: {}, searchClick: 0};
 	public dictionary = [];
 	public context
+	public collapsedMeaning = false
+	public collapsedInfos = false
+	public collapsedComments = true
 	private user : User
 
 	constructor(private _route : ActivatedRoute, private _httpservice : HttpAPIService,  private _format : Formatter, private _manager3d : Manager3D, private _userservice : UserService) {
@@ -54,6 +58,14 @@ export class AppSearch{
 				})
 			}
 		})
+	}
+
+	hideOrShow(ev, id) {
+		let el = ev.target.className != "close-button" ? ev.target.parentElement.parentElement.parentElement : ev.target.parentElement
+		$(el.children[2]).toggleClass('collapse')
+		if (id == 1) {this.collapsedInfos= !this.collapsedInfos; return}
+		if (id == 2) {this.collapsedMeaning = !this.collapsedMeaning; return}
+		this.collapsedComments = !this.collapsedComments
 	}
 
 	ngAfterViewInit() {
