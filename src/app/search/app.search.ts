@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
 import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
@@ -27,37 +28,41 @@ export class AppSearch{
 	public collapsedInfos = false
 	public collapsedComments = true
 	private user : User
+	public wordSel = {name:"", definition : "", explications: "", date : "", author: {}, searchClick: 0};
 
 	constructor(private _route : ActivatedRoute, private _httpservice : HttpAPIService,  private _format : Formatter, private _manager3d : Manager3D, private _userservice : UserService) {
 		let instance = this;
 		instance.user = instance._userservice.getCurrentUser();
-
 		instance._route.params.subscribe(routeParams => {
 			instance.id = routeParams.id;
 			if (instance.id != undefined) {
 				_httpservice.getEntryJSON(AppSettings.API_WORDS)
-				.subscribe(function(response) { 
-					let obj = response.dictionary.entries;
-					for (let prop in obj){
-						let tag = obj[prop].tags;
-						instance.dictionary.push(obj[prop]);
-						if (tag.toLowerCase().includes(instance.id.toLowerCase())) {
-							/* Il faudrait mettre à jour un compteur pour la recherche */
-							let nbSearch: number = Number(obj[prop].conf.searchClick)
-							nbSearch += 1
-							instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop) // Put searchClick to 0
-							.subscribe(function(resp) {
-								instance.wordSearch = JSON.parse(obj[prop].value);
-								instance.wordSearch.searchClick = nbSearch += 1
-								instance.wordSearch.date = instance._format.getDate(obj[prop].date);
-								instance.wordSearch.author = {name : obj[prop].author, search : ""};
-								instance.createContext(instance.wordSearch);
-							});
-						}
-					}
+				.subscribe(function(response) {
+					instance.initializeWordSearch(instance, response)
 				})
 			}
 		})
+	}
+
+	initializeWordSearch(instance, response) {
+		let obj = response.dictionary.entries;
+		for (let prop in obj){
+			let tag = obj[prop].tags;
+			instance.dictionary.push(obj[prop]);
+			if (tag.toLowerCase().includes(instance.id.toLowerCase())) {
+				/* Il faudrait mettre à jour un compteur pour la recherche */
+				let nbSearch: number = Number(obj[prop].conf.searchClick)
+				nbSearch += 1
+				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop) // Put searchClick to 0
+				.subscribe(function(resp) {
+					instance.wordSearch = JSON.parse(obj[prop].value);
+					instance.wordSearch.searchClick = nbSearch += 1
+					instance.wordSearch.date = instance._format.getDate(obj[prop].date);
+					instance.wordSearch.author = {name : obj[prop].author, search : ""};
+					instance.createContext(instance.wordSearch);
+				});
+			}
+		}
 	}
 
 	hideOrShow(ev, id) {
@@ -139,7 +144,7 @@ export class AppSearch{
 		}
 	}
 
-	countExplaination() {
+	createRep1(wordSearch) {
 		let totalPoints = this._format.getTotalCountWord(this.context);
 		let nbTags = this.context.length;
 		let divisions = this._format.getDivisions(totalPoints, nbTags);
@@ -149,25 +154,39 @@ export class AppSearch{
 		this.context.sort(function(a, b){return a.reputRule1 > b.reputRule1;});
 	}
 
+	createRep2(wordSearch) {
+		console.log(this.context)
+	}
+
 	numberUpdates() {}
 
 	timestampInsertion() {}
 
 	createContext(wordSearch) {
+		let instance = this;
 		this.context = this.sanitizeMeaningForZone();
 		this.context = Array.from(new Set(this.context))
 		let explaination =  this._format.splitter(wordSearch.explications, [' '])// remove espaces
 		this.numberTimesApparitions(explaination); // Sort the best tags 'importance by nb of apparition in the meaning of the word searched'
 		this.sortTags()
-		this.countExplaination() // rule 1 (Interne)
-		//this.reputationP(); // rule 2 (Reputation P)
-		//this.searchClicks() // rule 3 (Recherche/Clique)
-		this.numberUpdates(); // rule 4 (Mise à jour)
-		this.timestampInsertion(); // rule 5 (Date Insertion)
-		if (wordSearch.name.includes(" ")) {}
-			this._manager3d.createScene(wordSearch, this.context);
-		this._manager3d.runRender();
-		
+		this.createRep1(wordSearch) // rule 1 (Interne)
+		for (let index = 0; index < this.context.length; index++) {
+			let element =  this.context[index];
+			this._httpservice.getInfosOnWiki(element.name).subscribe(function(response){
+				element.meaning = response[2][0]
+				element.source = "Wikipédia"
+				if (index == instance.context.length - 1) {
+					instance.createRep2(wordSearch) // rule 3 (Recherche/Clique)
+					instance.numberUpdates(); // rule 4 (Mise à jour)
+					instance.timestampInsertion(); // rule 5 (Date Insertion)
+					instance.wordSel = Object.assign({}, instance.wordSearch);
+					if (wordSearch.name.includes(" ")) {}
+						instance._manager3d.createScene(wordSearch, instance.context, instance.wordSel);
+					instance._manager3d.runRender();
+				}
+			})
+		}
+
 	}
 
 

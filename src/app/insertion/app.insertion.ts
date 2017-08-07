@@ -97,14 +97,7 @@ export class AppInsertion implements OnInit {
 		let instance = this;
 		instance.types.splice(0,instance.types.length);
 		instance.contexts.splice(0,instance.contexts.length);
-		this._httpService.getTagsJSON()
-		.subscribe(
-			function(response) { // The communication with the API has matched
-				console.log(JSON.stringify(response)); // Transform js object into json
-				console.log(response.tag_list.list.Modules); // Get every modules
-				console.log(response.tag_list.list.Types);
-			},
-		)
+
 		this.getData(AppSettings.API_TYPES, instance.types); // Get the data of types
 		this.getData(AppSettings.API_CONTEXT, instance.contexts); // Get the data of contexts
 		this.getData(AppSettings.API_MODULES, instance.modules); // Get the data of contexts

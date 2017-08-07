@@ -11,9 +11,11 @@ export class Manager3D {
 	private engine
 	private scene
 	private wordSearch
+	private wordSel
 	private sphereMaterial
 	private spheres = []
 	private advancedTexture = {addControl: function(label){}}
+
 	private camera
 	private advancedTextureGUI
 	private panel3
@@ -50,8 +52,14 @@ export class Manager3D {
 		label.addControl(text1); 
 	}
 
-	createInformation(mesh) {
+	createInformation(mesh, tag) {
 		// Another GUI on the right
+
+		this.header = null
+		this.info = null
+		delete(this.header);
+		delete(this.info);
+		delete(this.advancedTextureGUI);
 		this.advancedTextureGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 		this.advancedTextureGUI.layer.layerMask = 5;
 		this.panel3 = new BABYLON.GUI.StackPanel();
@@ -74,7 +82,7 @@ export class Manager3D {
 		this.panel3.addControl(this.header); 
 
 		this.info = new BABYLON.GUI.TextBlock();
-		this.info.text = "Type : " + this.wordSearch.type + "\n" + "Explications : " + "\n" + this.wordSearch.explications;
+		this.info.text = "Type : " + this.wordSearch.type + "\n" + "Explications : " + "\n" + (tag == null) ? this.wordSearch.explications : tag.meaning;
 		this.info.textWrapping = true;
 		this.info.height = "200px";
 		this.info.color = "#333";
@@ -101,69 +109,40 @@ export class Manager3D {
 		result.addControl(iconImage);            
 
 		this.panel3.addControl(result); // Another GUI on the right
-		this.advancedTextureGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-		this.advancedTextureGUI.layer.layerMask = 5;
-		this.panel3 = new BABYLON.GUI.StackPanel();
-		this.panel3.width = "80%";
-		this.panel3.heigth = "400px";
-		this.panel3.fontSize = "20px";
-		this.panel3.fontFamily = "font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;"
 
-		this.panel3.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-		this.panel3.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-		this.panel3.top = "150"
-
-		this.header = new BABYLON.GUI.TextBlock();
-		this.header.text = "Informations concernant : " + mesh.name;
-		this.header.height = "40px";
-		this.header.color = "black";
-		this.header.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-		this.header.paddingTop = "10px";
-		this.advancedTextureGUI.addControl(this.panel3);
-		this.panel3.addControl(this.header); 
-
-		this.info = new BABYLON.GUI.TextBlock();
-		this.info.text = "Type : " + this.wordSearch.type + "\n" + "Explications : " + "\n" + this.wordSearch.explications;
-		this.info.textWrapping = true;
-		this.info.height = "200px";
-		this.info.color = "#333";
-		this.info.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-		this.info.paddingTop = "10px";
-		this.panel3.addControl(this.info); 
-
-		var result = new BABYLON.GUI.Button("aimer");
-		result.width = "150px"
-		result.height = "50px"
-		// Adding text
-		var textBlock = new BABYLON.GUI.TextBlock(name + "_button", "Aimer");
-		textBlock.textWrapping = true;
-		textBlock.color = "black"
-		textBlock.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-		textBlock.paddingLeft = "25%";
-		result.addControl(textBlock);   
-
-		// Adding image
-		var iconImage = new BABYLON.GUI.Image(name + "_icon", "../assets/images/heart.png");
-		iconImage.width = "40%";
-		iconImage.stretch = BABYLON.GUI.Image.STRETCH_FILL;
-		iconImage.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-		result.addControl(iconImage);            
-
-		this.panel3.addControl(result); 
 	}
 
 	moveCameraToMesh(mesh) {
 		this.camera.lockedTarget = mesh;
+		console.log(this.camera);
+		   /*var animationPlane = new BABYLON.Animation('anim', 'position.z', 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+		   var keys = [];  
+			  keys.push({ frame: 0, value: this.scene.getMeshByName(name).position.z });
+			  keys.push({ frame: 10, value: this.scene.getMeshByName(name).position.z-3 });
+			keys.push({ frame: 20, value: this.scene.getMeshByName(name).position.z-6 });
+			keys.push({ frame: 30, value: this.scene.getMeshByName(name).position.z-9 });
+			animationPlane.setKeys(keys);this.camera.animations.push(animationPlane);
+			this.scene.beginAnimation(this.camera, 0, 30, true);*/
 		//this.camera.radius = mesh.name == this.wordSearch.name ? 70 : 100; // how far from the object to follow
 		this.camera.maxCameraSpeed = 10
 	}
 
-	registerAction(mesh) {
+	registerAction(mesh, tag) {
 		let instance = this;
 		mesh.actionManager = new BABYLON.ActionManager(this.scene);
 		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, (function(mesh) {
-			instance.advancedTextureGUI == undefined ? instance.createInformation(mesh) :  instance.header.text = "Informations concernant : " + mesh.name;
+
+			/*instance.advancedTextureGUI == undefined ? instance.createInformation(mesh, tag) :  instance.header.text = "Informations concernant : " + mesh.name;
+			instance.info.text = tag == null ? instance.wordSearch.explications : tag.meaning*/
 			instance.moveCameraToMesh(mesh)
+			if (tag == null) {
+				instance.wordSel = Object.assign({}, instance.wordSearch);
+				return
+			}
+			instance.wordSel.name = mesh.name
+			instance.wordSel.explications = tag.meaning;
+			instance.wordSel.source = tag.source;
+			
 		}).bind(this, mesh)));
 	}
 
@@ -208,7 +187,7 @@ export class Manager3D {
 			sphere.position.z = this._format.randomIntFromInterval(-minX,minX)
 
 			this.createLabel(sphere, tag.position, maxGap);
-			this.registerAction(sphere);
+			this.registerAction(sphere, tag);
 
 			line = new BABYLON.GUI.Line();
 			line.alpha = 1;
@@ -221,8 +200,9 @@ export class Manager3D {
 	}
 
 
-	createScene(wordSearch, tags){
+	createScene(wordSearch, tags, wordSel){
 		this.wordSearch = wordSearch;
+		this.wordSel = wordSel;
 		this.scene = new BABYLON.Scene(this.engine);
 		this.scene.clearColor = new BABYLON.Color4(0,0,0,0.0000000000000001); 
 		this.camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, 1.0, 110, BABYLON.Vector3.Zero(),this.scene);
@@ -273,7 +253,7 @@ export class Manager3D {
 		sphere.material = materialSphere1
 		sphere.position.x = 0;
 		sphere.position.y = 20;
-		this.registerAction(sphere);
+		this.registerAction(sphere, null);
 	}
 
 	runRender() {

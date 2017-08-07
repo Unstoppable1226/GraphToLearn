@@ -17,6 +17,14 @@ export class AppSettings {
 	public static API_CONTEXT= "Context";
 	public static API_METASEARCHCLICK= "searchClick";
 
+
+
+	/* API Wikipedia */
+	//https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=Albert%20Einstein&utf8
+	//https://fr.wikipedia.org/w/api.php?action=query&&prop=extracts&titles=Adresse%20IP&format=json&exintro=1
+
+	public static API_WIKI = "http://fr.wikipedia.org/w/api.php?"
+
 	/* Colors */
 	public static GREY = "#333";
 	public static WHITEMOREDARK = "#EEE";
@@ -37,6 +45,18 @@ export class AppSettings {
 	public static articles = [ "un", "une", "le", "la", "les", "l'", "d'","de", "du", "des", "à", "au", "aux"]
 
 	public static connectors = [
+		"permet",
+		"dont",
+		"tous",
+		"quelles",
+		"vont",
+		"va",
+		"sont",
+		"est",
+		"a",
+		"avons",
+		"aura",
+		"répondre",
 		"ne",
 		"a condition que",
 		"a défaut de",

@@ -18,6 +18,11 @@ export class HttpAPIService  {
 			.map((res: Response) => res.json());
 	}
 
+	getInfosOnWiki(search) {
+		return this._http.get(AppSettings.API_WIKI + "action=opensearch&search="+ search +"&limit=3&format=json")
+			.map((res: Response) => res.json())
+	}
+
 	getUserReputation(pubKey) {
 		return this._http.get(AppSettings.API_USERS + "/balance?public=" + pubKey)
 			.map((res: Response) => res.json());
