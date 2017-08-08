@@ -1,12 +1,12 @@
 import { Injectable } from "@angular/core";
-import { Http, Response,  Headers, RequestOptions } from "@angular/http";
+import { Http, Response, Headers, RequestOptions } from "@angular/http";
 import { AppSettings } from '../settings/app.settings';
 
 import 'rxjs/add/operator/map';
 
 @Injectable()
-export class HttpAPIService  {
-	constructor (private _http: Http) {}
+export class HttpAPIService {
+	constructor(private _http: Http) { }
 
 	getTagsJSON() {
 		return this._http.get(AppSettings.API_TAGS)
@@ -19,8 +19,13 @@ export class HttpAPIService  {
 	}
 
 	getInfosOnWiki(search) {
-		return this._http.get(AppSettings.API_WIKI + "action=opensearch&search="+ search +"&limit=3&format=json")
-			.map((res: Response) => res.json())
+		return this._http.get(AppSettings.API_WIKI + "action=opensearch&search=" + search + "&srprop&" + "&limit=3&format=json")
+		.map((res: Response) => res.json())
+	}
+
+	getRevisionsOnWiki(search) {
+		return this._http.get(AppSettings.API_WIKI + "action=query&prop=revisions&titles=" + search + "&format=json")
+		.map((res: Response) => res.json())
 	}
 
 	getUserReputation(pubKey) {
@@ -34,16 +39,16 @@ export class HttpAPIService  {
 	}
 
 	postEntryJSON(dataInfo, observatory, tags) {
-		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept' : 'application/json'}); // ... Set content type to JSON
-     		let options  = new RequestOptions({ headers: headers });
+		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let options = new RequestOptions({ headers: headers });
 
 		return this._http.post(AppSettings.API_ENTRY, "secretKey=SDRSUEUEOJAJJG4MC76F2H7FTGYYTFASNCTMEJ7XJFUHFRQG5M2QI5O3%20&observatoryId=" + observatory + "&tags= " + tags + "&value= " + JSON.stringify(dataInfo), options)
 			.map((res: Response) => res.json());
 	}
-	
+
 	postEntryMetadata(name, value, hashEntry) {
-		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept' : 'application/json'}); // ... Set content type to JSON
-		let options  = new RequestOptions({ headers: headers });
+		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let options = new RequestOptions({ headers: headers });
 		return this._http.post(AppSettings.API_ENTRYMETADATA + "metadata%20name=" + name + "&metadata%20value=" + value, "secretKey=SDRSUEUEOJAJJG4MC76F2H7FTGYYTFASNCTMEJ7XJFUHFRQG5M2QI5O3&observatoryId=Words&hash=" + hashEntry, options)
 			.map((res: Response) => res.json());
 	}

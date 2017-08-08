@@ -9,8 +9,8 @@ import { Manager3D } from '../3D/app.components3d'
 import { User } from '../model/user'
 import { UserService } from '../model/user-service'
 
-declare var dat:any;
-declare var $:any;
+declare var dat: any;
+declare var $: any;
 
 @Component({
 	selector: 'app-search',
@@ -18,35 +18,35 @@ declare var $:any;
 	styleUrls: ['./app.search.css'],
 })
 
-export class AppSearch{
+export class AppSearch {
 
 	public id = "";
-	public wordSearch = {name:"", definition : "", explications: "", date : "", author: {}, searchClick: 0};
+	public wordSearch = { name: "", definition: "", explications: "", date: "", author: {}, searchClick: 0 };
 	public dictionary = [];
 	public context
 	public collapsedMeaning = false
 	public collapsedInfos = false
 	public collapsedComments = true
-	private user : User
-	public wordSel = {name:"", definition : "", explications: "", date : "", author: {}, searchClick: 0};
+	private user: User
+	public wordSel = { name: "", definition: "", explications: "", date: "", author: {}, searchClick: 0 };
 
-	constructor(private _route : ActivatedRoute, private _httpservice : HttpAPIService,  private _format : Formatter, private _manager3d : Manager3D, private _userservice : UserService) {
+	constructor(private _route: ActivatedRoute, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService) {
 		let instance = this;
 		instance.user = instance._userservice.getCurrentUser();
 		instance._route.params.subscribe(routeParams => {
 			instance.id = routeParams.id;
 			if (instance.id != undefined) {
 				_httpservice.getEntryJSON(AppSettings.API_WORDS)
-				.subscribe(function(response) {
-					instance.initializeWordSearch(instance, response)
-				})
+					.subscribe(function (response) {
+						instance.initializeWordSearch(instance, response)
+					})
 			}
 		})
 	}
 
 	initializeWordSearch(instance, response) {
 		let obj = response.dictionary.entries;
-		for (let prop in obj){
+		for (let prop in obj) {
 			let tag = obj[prop].tags;
 			instance.dictionary.push(obj[prop]);
 			if (tag.toLowerCase().includes(instance.id.toLowerCase())) {
@@ -54,13 +54,13 @@ export class AppSearch{
 				let nbSearch: number = Number(obj[prop].conf.searchClick)
 				nbSearch += 1
 				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop) // Put searchClick to 0
-				.subscribe(function(resp) {
-					instance.wordSearch = JSON.parse(obj[prop].value);
-					instance.wordSearch.searchClick = nbSearch += 1
-					instance.wordSearch.date = instance._format.getDate(obj[prop].date);
-					instance.wordSearch.author = {name : obj[prop].author, search : ""};
-					instance.createContext(instance.wordSearch);
-				});
+					.subscribe(function (resp) {
+						instance.wordSearch = JSON.parse(obj[prop].value);
+						instance.wordSearch.searchClick = nbSearch += 1
+						instance.wordSearch.date = instance._format.getDate(obj[prop].date);
+						instance.wordSearch.author = { name: obj[prop].author, search: "" };
+						instance.createContext(instance.wordSearch);
+					});
 			}
 		}
 	}
@@ -68,8 +68,8 @@ export class AppSearch{
 	hideOrShow(ev, id) {
 		let el = ev.target.className != "close-button" ? ev.target.parentElement.parentElement.parentElement : ev.target.parentElement
 		$(el.children[2]).toggleClass('collapse')
-		if (id == 1) {this.collapsedInfos= !this.collapsedInfos; return}
-		if (id == 2) {this.collapsedMeaning = !this.collapsedMeaning; return}
+		if (id == 1) { this.collapsedInfos = !this.collapsedInfos; return }
+		if (id == 2) { this.collapsedMeaning = !this.collapsedMeaning; return }
 		this.collapsedComments = !this.collapsedComments
 	}
 
@@ -78,9 +78,9 @@ export class AppSearch{
 	}
 
 	findVerb(tag) {
-		return tag.endsWith("dre") || tag.endsWith("pre") || 
-		tag.endsWith("er") || tag.endsWith("oir") || tag.endsWith("ir") 
-		|| tag.endsWith("ttre") || tag == 'est' || tag == 'a' || tag.endsWith('é') || tag.endsWith('és') 
+		return tag.endsWith("dre") || tag.endsWith("pre") ||
+			tag.endsWith("er") || tag.endsWith("oir") || tag.endsWith("ir")
+			|| tag.endsWith("ttre") || tag == 'est' || tag == 'a' || tag.endsWith('é') || tag.endsWith('és')
 	}
 
 	findAbreviations(word) {
@@ -114,13 +114,13 @@ export class AppSearch{
 		let regex = new RegExp(this.wordSearch.definition, 'gmi');
 		text = text.replace(regex, "");
 		for (var i = table.length - 1; i >= 0; i--) {
-			regex = new RegExp( " "+table[i]+ " ", 'gmi'); // we delete all the worlds that are not important
+			regex = new RegExp(" " + table[i] + " ", 'gmi'); // we delete all the worlds that are not important
 			text = text.replace(regex, " ");
 		}
 		text = text.replace(/Le |La |Les |\(les |Si | l'| d'| qu'|\" | \"/g, " ");
-		text = text.replace(/ \(|\)./g," ");
+		text = text.replace(/ \(|\)./g, " ");
 		text = text.replace(/l\'/gi, "");
-		let tags =  this._format.splitter(text, [',', ' ', '. ', ':', ' - ', ';', '\n']);
+		let tags = this._format.splitter(text, [',', ' ', '. ', ':', ' - ', ';', '\n']);
 		tags = this.verbSelection(tags);
 		return tags;
 	}
@@ -131,16 +131,16 @@ export class AppSearch{
 		for (var i = this.context.length - 1; i >= 0; i--) {
 			name = this.context[i]
 			count = this._format.countSameWord(name, explaination);
-			this.context[i] = {'name' : name, 'count' : count}
+			this.context[i] = { 'name': name, 'count': count }
 		}
-		
+
 	}
 
 	sortTags() {
-		this.context.sort(function(a, b){return a.count > b.count;}); // Sort
+		this.context.sort(function (a, b) { return a.count > b.count; }); // Sort
 		if (this.context.length > 15) {
 			let length = this.context.length
-			this.context = this.context.slice(length-15, length); // Take the 15 lasts 
+			this.context = this.context.slice(length - 15, length); // Take the 15 lasts 
 		}
 	}
 
@@ -151,40 +151,46 @@ export class AppSearch{
 		for (let i = this.context.length - 1; i >= 0; i--) {
 			this.context[i].repRule1 = this._format.getReput(this.context[i].count, divisions)
 		}
-		this.context.sort(function(a, b){return a.reputRule1 > b.reputRule1;});
+		this.context.sort(function (a, b) { return a.reputRule1 > b.reputRule1; });
 	}
 
 	createRep2(wordSearch) {
 		console.log(this.context)
 	}
 
-	numberUpdates() {}
+	numberUpdates() { }
 
-	timestampInsertion() {}
+	timestampInsertion(context) {
+		console.log(context);
+	}
 
 	createContext(wordSearch) {
 		let instance = this;
 		this.context = this.sanitizeMeaningForZone();
 		this.context = Array.from(new Set(this.context))
-		let explaination =  this._format.splitter(wordSearch.explications, [' '])// remove espaces
+		let explaination = this._format.splitter(wordSearch.explications, [' '])// remove espaces
 		this.numberTimesApparitions(explaination); // Sort the best tags 'importance by nb of apparition in the meaning of the word searched'
 		this.sortTags()
 		this.createRep1(wordSearch) // rule 1 (Interne)
 		for (let index = 0; index < this.context.length; index++) {
-			let element =  this.context[index];
-			this._httpservice.getInfosOnWiki(element.name).subscribe(function(response){
-				element.meaning = response[2][0]
+			let element = this.context[index];
+			this._httpservice.getInfosOnWiki(element.name).subscribe(function (res) {
+				element.meaning = res[2][0]
 				element.source = "Wikipédia"
+			})
+			this._httpservice.getRevisionsOnWiki(element.name).subscribe(function (response) {
+				console.log(response.query.pages)
 				if (index == instance.context.length - 1) {
 					instance.createRep2(wordSearch) // rule 3 (Recherche/Clique)
 					instance.numberUpdates(); // rule 4 (Mise à jour)
-					instance.timestampInsertion(); // rule 5 (Date Insertion)
+					instance.timestampInsertion(instance.context); // rule 5 (Date Insertion)
 					instance.wordSel = Object.assign({}, instance.wordSearch);
-					if (wordSearch.name.includes(" ")) {}
-						instance._manager3d.createScene(wordSearch, instance.context, instance.wordSel);
+					if (wordSearch.name.includes(" ")) { }
+					instance._manager3d.createScene(wordSearch, instance.context, instance.wordSel);
 					instance._manager3d.runRender();
 				}
 			})
+			
 		}
 
 	}

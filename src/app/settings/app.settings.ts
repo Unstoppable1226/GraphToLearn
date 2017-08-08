@@ -41,6 +41,10 @@ export class AppSettings {
 	public static MINX : number = 30;
 	public static COLORSSPHERES : Array<string> = ['#0D47A1', '#64B5F6', '#BBDEFB', '#E3F2FD', '#FFFFFF'];
 
+	/* Reputation Rules */
+	public static COEFRULES : Array<number> = [2.5, 2, 1.5, 1, 0.5]
+	public static TIMESTAMPRULE : Array<Object> = [{number : 3, reputation : 10}, {number : 7, reputation : 8},{number : 30, reputation : 6},{number : 90, reputation : 4},{number : 90, reputation : 2}, {number : 360, reputation : 0}]
+
 	/* Table that contains words that must be deleted by the algorithm when he will create the world for the response*/
 	public static articles = [ "un", "une", "le", "la", "les", "l'", "d'","de", "du", "des", "à", "au", "aux"]
 
