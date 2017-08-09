@@ -26,12 +26,41 @@
 }
 
 #renderCanvas {
-         width: 100%;
-         height: 100%;
-         touch-action: none;
+	width: 100%;
+	height: 610px!important;
+	touch-action: none;
 }
 
 .collapse{
 	visibility: collapse!important;
 	height: 0!important;
+}
+
+.collapse-actions{
+	width: 40px!important;
+}
+
+.collapse-actions-buttons{
+	visibility: hidden!important
+}
+
+.close-button-actions{
+	transition: opacity .1s linear;
+	user-select: none;
+	background-color:#000!important; 
+	width:40px!important;
+	height:225px; 
+	color:white;
+	font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;
+	font-size: 1.1em;
+	padding-top:15px;
+	cursor: pointer;
+}
+
+.close-button-actions:hover{
+	background-color: #111!important;
+}
+
+.ui.circular.button:hover {
+	border:2px solid #2185D0;
 }

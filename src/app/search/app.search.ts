@@ -11,6 +11,7 @@ import { UserService } from '../model/user-service'
 
 declare var dat: any;
 declare var $: any;
+declare var moment:any;
 
 @Component({
 	selector: 'app-search',
@@ -21,14 +22,15 @@ declare var $: any;
 export class AppSearch {
 
 	public id = "";
-	public wordSearch = { name: "", definition: "", explications: "", date: "", author: {}, searchClick: 0 };
+	public wordSearch = { name: "", definition: "", explications: "", date: "", author: {}, searchClick: 0 , totalReput : 0};
 	public dictionary = [];
 	public context
 	public collapsedMeaning = false
 	public collapsedInfos = false
 	public collapsedComments = true
+	public collapsedActions = true
 	private user: User
-	public wordSel = { name: "", definition: "", explications: "", date: "", author: {}, searchClick: 0 };
+	public wordSel = { name: "", definition: "", explications: "", date: "", author: {}, searchClick: 0, totalReput : 0};
 
 	constructor(private _route: ActivatedRoute, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService) {
 		let instance = this;
@@ -70,6 +72,14 @@ export class AppSearch {
 		$(el.children[2]).toggleClass('collapse')
 		if (id == 1) { this.collapsedInfos = !this.collapsedInfos; return }
 		if (id == 2) { this.collapsedMeaning = !this.collapsedMeaning; return }
+		if (id == 4) {
+			$(ev.target.parentElement).toggleClass('collapse-actions')
+			$(ev.target.parentElement.children[0]).toggleClass('collapse-actions-buttons')
+			$(ev.target.parentElement.children[1]).toggleClass('collapse-actions-buttons')
+			$(ev.target.parentElement.children[2]).toggleClass('collapse-actions-buttons')
+			this.collapsedActions = !this.collapsedActions; 
+			return 
+		}
 		this.collapsedComments = !this.collapsedComments
 	}
 
@@ -108,6 +118,18 @@ export class AppSearch {
 		return tags;
 	}
 
+	searchSimilar(el, tags, i) {
+		for (var index = 0; index < tags.length; index++) {
+			var element = tags[index];
+			if (index != i) {
+				if (element.toLowerCase().startsWith(el.toLowerCase())) {
+					return index
+				}
+			}
+		}
+		return -1;
+	}
+
 	sanitizeMeaningForZone() {
 		let text = this.wordSearch.explications;
 		let table = AppSettings.articles.concat(AppSettings.connectors);
@@ -122,6 +144,16 @@ export class AppSearch {
 		text = text.replace(/l\'/gi, "");
 		let tags = this._format.splitter(text, [',', ' ', '. ', ':', ' - ', ';', '\n']);
 		tags = this.verbSelection(tags);
+		tags = this._format.cleanArray(tags);
+
+		for (var index = 0; index < tags.length; index++) {
+			var el = tags[index]
+			tags[index] = el[el.length-1] != '.' ? el : el.substring(0, el.length-1)
+			var pos = this.searchSimilar(el.substring(0,el.length-1), tags, index)
+			if (pos != -1) {
+				tags.splice(pos, 1)
+			}
+		}
 		return tags;
 	}
 
@@ -149,41 +181,71 @@ export class AppSearch {
 		let nbTags = this.context.length;
 		let divisions = this._format.getDivisions(totalPoints, nbTags);
 		for (let i = this.context.length - 1; i >= 0; i--) {
-			this.context[i].repRule1 = this._format.getReput(this.context[i].count, divisions)
+			this.context[i].repRule1 = this._format.getReput(this.context[i].count, divisions) * AppSettings.COEFRULES[0]
 		}
 		this.context.sort(function (a, b) { return a.reputRule1 > b.reputRule1; });
 	}
 
-	createRep2(wordSearch) {
-		console.log(this.context)
-	}
+	createRep2(wordSearch) {}
 
 	numberUpdates() { }
 
-	timestampInsertion(context) {
-		console.log(context);
+	timestampInsertion(nbDays) {
+		var idRule = 5
+		while(nbDays < AppSettings.TIMESTAMPRULE[idRule][0]) {
+			idRule--;
+		}
+		return {nbDays : nbDays, reputation : (AppSettings.TIMESTAMPRULE[idRule][1] * AppSettings.COEFRULES[4])}
+	}
+
+	getTimestamp(timestamp, today, context) {
+		var start = moment(timestamp)
+		var end = today
+		var nbDays = end.diff(start, 'days') // Get number of days
+		 // rule 5 (Date Insertion)
+		return this.timestampInsertion(nbDays);
+	}
+
+	countTotalReputation(context) {
+		for (var index = 0; index < context.length; index++) {
+			context[index].totalReput = (context[index].repRule1 +  context[index].repRule2 + context[index].repRule3 + context[index].repRule4)
+			context[index].totalReput += context[index].repRule5.reputation;
+		}
 	}
 
 	createContext(wordSearch) {
+		let today = moment()
 		let instance = this;
 		this.context = this.sanitizeMeaningForZone();
 		this.context = Array.from(new Set(this.context))
 		let explaination = this._format.splitter(wordSearch.explications, [' '])// remove espaces
 		this.numberTimesApparitions(explaination); // Sort the best tags 'importance by nb of apparition in the meaning of the word searched'
 		this.sortTags()
-		this.createRep1(wordSearch) // rule 1 (Interne)
+		
 		for (let index = 0; index < this.context.length; index++) {
 			let element = this.context[index];
+			
+			//element.name = element.name[element.name.length-1] != '.' ? element.name : element.name.substring(0,element.name.length-1)
+			element.totalReput = 0;
+			element.repRule1 = 0;
+			element.repRule2 = 0;
+			element.repRule3 = 0;
+			element.repRule4 = 0;
+			element.repRule5 = {nbDays : null, reputation : 0};
 			this._httpservice.getInfosOnWiki(element.name).subscribe(function (res) {
 				element.meaning = res[2][0]
 				element.source = "Wikipédia"
 			})
 			this._httpservice.getRevisionsOnWiki(element.name).subscribe(function (response) {
-				console.log(response.query.pages)
+				let results = response.query.pages
+				let id = Object.keys(response.query.pages)
+				element.repRule5 = id[0] == '-1' ? {nbDays : null, reputation : 0} : instance.getTimestamp(results[id[0]].revisions[0].timestamp, today, instance.context)
 				if (index == instance.context.length - 1) {
+					instance.createRep1(wordSearch) // rule 1 (Interne)
 					instance.createRep2(wordSearch) // rule 3 (Recherche/Clique)
 					instance.numberUpdates(); // rule 4 (Mise à jour)
-					instance.timestampInsertion(instance.context); // rule 5 (Date Insertion)
+					
+					instance.countTotalReputation(instance.context)
 					instance.wordSel = Object.assign({}, instance.wordSearch);
 					if (wordSearch.name.includes(" ")) { }
 					instance._manager3d.createScene(wordSearch, instance.context, instance.wordSel);

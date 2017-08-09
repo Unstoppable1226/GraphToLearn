@@ -21,7 +21,7 @@ export class AppSettings {
 
 	/* API Wikipedia */
 	//https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=Albert%20Einstein&utf8
-	//https://fr.wikipedia.org/w/api.php?action=query&&prop=extracts&titles=Adresse%20IP&format=json&exintro=1
+	//https://fr.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Adresse%20IP&format=json&exintro=1
 
 	public static API_WIKI = "http://fr.wikipedia.org/w/api.php?"
 
@@ -38,17 +38,21 @@ export class AppSettings {
 	public static MSGWELCOME = "Vous êtes connecté sur GraphToLearn, Bienvenue ";
 
 	/* 3D variables */
-	public static MINX : number = 30;
+	public static MINX : number = 40;
 	public static COLORSSPHERES : Array<string> = ['#0D47A1', '#64B5F6', '#BBDEFB', '#E3F2FD', '#FFFFFF'];
 
 	/* Reputation Rules */
 	public static COEFRULES : Array<number> = [2.5, 2, 1.5, 1, 0.5]
-	public static TIMESTAMPRULE : Array<Object> = [{number : 3, reputation : 10}, {number : 7, reputation : 8},{number : 30, reputation : 6},{number : 90, reputation : 4},{number : 90, reputation : 2}, {number : 360, reputation : 0}]
+	public static TIMESTAMPRULE : Array<number[]> = [[0,10],[3,8],[7,6],[30,4],[90,2],[360,0]]
 
 	/* Table that contains words that must be deleted by the algorithm when he will create the world for the response*/
 	public static articles = [ "un", "une", "le", "la", "les", "l'", "d'","de", "du", "des", "à", "au", "aux"]
 
 	public static connectors = [
+		"plus",
+		"moins",
+		"exemple",
+		"seule",
 		"permet",
 		"dont",
 		"tous",

@@ -119,6 +119,7 @@ export class Manager3D {
 		var startRadius = this.camera.radius;
 		var translate = new BABYLON.Animation("camTranslate", "target.z", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 		var radius = new BABYLON.Animation("camAlpha", "radius", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+
 		var keys = [{ frame: 0, value: startPos }, { frame: 30, value: mesh }];
 		var keys2 = [{ frame: 0, value: startRadius }, { frame: 30, value: 70 }];
 		translate.setKeys(keys);
@@ -152,7 +153,6 @@ export class Manager3D {
 		var pos = this.getLabelByName(mesh, 'label')
 		var label = this.advancedTexture._rootContainer.children[pos]
 		label.alpha = 1
-		console.log()
 		/*var label = this.advancedTexture.getMeshByName("label" + mesh.name)
 		console.log(label)*/
 	}
@@ -165,24 +165,29 @@ export class Manager3D {
 			/*instance.advancedTextureGUI == undefined ? instance.createInformation(mesh, tag) :  instance.header.text = "Informations concernant : " + mesh.name;
 			instance.info.text = tag == null ? instance.wordSearch.explications : tag.meaning*/
 			instance.moveCameraToMesh(mesh)
+			console.log(tag);
 			if (tag == null) {
-				instance.wordSel = Object.assign({}, instance.wordSearch);
+				instance.wordSel.name = instance.wordSearch.name
+				instance.wordSel.explications = instance.wordSearch.explications;
+				instance.wordSel.source = instance.wordSearch.source;
+				instance.wordSel.totalReput = 0;
 				return
 			}
 			instance.wordSel.name = mesh.name
 			instance.wordSel.explications = tag.meaning;
 			instance.wordSel.source = tag.source;
+			instance.wordSel.totalReput = tag.totalReput;
 
 		}).bind(this, mesh)));
 	}
 
 	createPosition(): number {
 		let totalPoints = 0, maxGap = 1, nbSpheres = this.spheres.length; // The maximum between the other words, so it will be maxGap positions
-		for (let i = this.spheres.length - 1; i >= 0; i--) { totalPoints += this.spheres[i].tag.repRule1 } // Get total points of reputation
+		for (let i = this.spheres.length - 1; i >= 0; i--) { totalPoints += this.spheres[i].tag.totalReput } // Get total points of reputation
 
 		let divisions = this._format.getDivisions(totalPoints, nbSpheres); // Get the divisions filled by the totalPoints
 		for (let i = this.spheres.length - 1; i >= 0; i--) {
-			this.spheres[i].tag.position = this._format.getReput(this.spheres[i].tag.repRule1, divisions)
+			this.spheres[i].tag.position = this._format.getReput(this.spheres[i].tag.totalReput, divisions)
 		}
 		for (let i = this.spheres.length - 1; i >= 0; i--) {
 			if (this.spheres[i].tag.position > maxGap) {
@@ -283,7 +288,7 @@ export class Manager3D {
 		materialSphere1.diffuseColor = new BABYLON.Color3.FromHexString("#16a085");
 		sphere.material = materialSphere1
 		sphere.position.x = 0;
-		sphere.position.y = 20;
+		sphere.position.y = 15;
 		this.registerAction(sphere, null);
 	}
 

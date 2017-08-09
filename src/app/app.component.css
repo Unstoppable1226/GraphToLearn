@@ -75,3 +75,7 @@
  	font-size: 110%!important;
  	border-bottom: 1px solid #333;
 }
+
+#container{
+	min-height: 100%!important;
+}

@@ -36,7 +36,7 @@
 				<li class="cr number has-slider" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name">Réputation :</span>
-						<div class="ui blue small left pointing label"><strong>5</strong></div>
+						<div class="ui blue small left pointing label"><strong>{{wordSel.totalReput}}</strong></div>
 					</div>
 				</li>
 				<li class="cr number" style="height: 35px;line-height: 35px">
@@ -72,6 +72,19 @@
 		<br>
 		<canvas id="renderCanvas" style="outline: none;"></canvas>
 	</div>
+	<div class="collapse-actions" style="position:fixed;top:200px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
+		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;">
+			<i class="icon pencil"></i>
+		</button>
+		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top: 95px;margin-left: 52px;">
+			<i class="icon comments"></i>
+		</button>
+		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top:160px;margin-left: 52px;">
+			<i class="icon delete"></i>
+		</button>
+		<div class="close-button-actions" (click)="hideOrShow($event, 4)">A<br>C<br>T<br>I<br>O<br>N<br>S<br><i style="margin-top:50px;margin-left:3px;font-size:0.8em!important" class="icon" [ngClass]="{'minus': !collapsedActions, 'plus': collapsedActions}"> </i></div>
+	</div>
+
 	<div class="dg main a" style="width: 59%;left:0;position: fixed;right: 0; margin-right:0px!important;bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
 		 (click)="hideOrShow($event, 2)">Explications de {{wordSel.name}}
@@ -79,7 +92,7 @@
 		</div>
 		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
 		<ul style="height: auto;">
-			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;"><span>{{wordSel.explications}} [Source : {{wordSel.source}}]</span></li>
+			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;"><span style="font-size: 1.1em!important;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">{{wordSel.explications}} [Source : {{wordSel.source}}]</span></li>
 		</ul>
 	</div>
 	<div class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
