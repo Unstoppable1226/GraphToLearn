@@ -1,11 +1,14 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { AppComponent } from '../app.component';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
+
+import { AppComponent } from '../app.component';
 import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
 import { Manager3D } from '../3D/app.components3d'
+
+import { Entry } from '../model/entry'
 import { User } from '../model/user'
 import { UserService } from '../model/user-service'
 
@@ -247,6 +250,7 @@ export class AppSearch {
 					
 					instance.countTotalReputation(instance.context)
 					instance.wordSel = Object.assign({}, instance.wordSearch);
+					console.log(instance.context)
 					if (wordSearch.name.includes(" ")) { }
 					instance._manager3d.createScene(wordSearch, instance.context, instance.wordSel);
 					instance._manager3d.runRender();

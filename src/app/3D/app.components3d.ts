@@ -157,27 +157,23 @@ export class Manager3D {
 		console.log(label)*/
 	}
 
+	updateInfos(mesh, data, meaning) {
+		this.wordSel.name = mesh.name
+		this.wordSel.explications = meaning;
+		this.wordSel.source = data.source;
+		this.wordSel.totalReput = data.totalReput;
+	}
+
 	registerAction(mesh, tag) {
 		let instance = this;
 		mesh.actionManager = new BABYLON.ActionManager(this.scene);
 		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, (function (mesh) {
-
-			/*instance.advancedTextureGUI == undefined ? instance.createInformation(mesh, tag) :  instance.header.text = "Informations concernant : " + mesh.name;
-			instance.info.text = tag == null ? instance.wordSearch.explications : tag.meaning*/
 			instance.moveCameraToMesh(mesh)
-			console.log(tag);
 			if (tag == null) {
-				instance.wordSel.name = instance.wordSearch.name
-				instance.wordSel.explications = instance.wordSearch.explications;
-				instance.wordSel.source = instance.wordSearch.source;
-				instance.wordSel.totalReput = 0;
+				this.updateInfos(mesh, instance.wordSearch, instance.wordSearch.explications)
 				return
 			}
-			instance.wordSel.name = mesh.name
-			instance.wordSel.explications = tag.meaning;
-			instance.wordSel.source = tag.source;
-			instance.wordSel.totalReput = tag.totalReput;
-
+			this.updateInfos(mesh, tag, tag.meaning)
 		}).bind(this, mesh)));
 	}
 
@@ -205,6 +201,7 @@ export class Manager3D {
 			if (i == pos) { return maxX / i }
 		}
 	}
+	
 
 	putSpheresOnScene(maxGap, label1) {
 		let space = 10, sphere, tag, minX, maxX, line;
