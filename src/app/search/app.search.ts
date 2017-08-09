@@ -25,15 +25,17 @@ declare var moment:any;
 export class AppSearch {
 
 	public id = "";
-	public wordSearch = { name: "", definition: "", explications: "", date: "", author: {}, searchClick: 0 , totalReput : 0};
-	public dictionary = [];
+	public wordSearch : Entry = new Entry()// The that we have searched
+	public wordSel: Entry = new Entry() // The word that is selected on the context
+
+	public dictionary = []
 	public context
+	public contextEntrys : Array<Entry> = []
 	public collapsedMeaning = false
 	public collapsedInfos = false
 	public collapsedComments = true
 	public collapsedActions = true
 	private user: User
-	public wordSel = { name: "", definition: "", explications: "", date: "", author: {}, searchClick: 0, totalReput : 0};
 
 	constructor(private _route: ActivatedRoute, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService) {
 		let instance = this;
@@ -60,9 +62,9 @@ export class AppSearch {
 				nbSearch += 1
 				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop) // Put searchClick to 0
 					.subscribe(function (resp) {
-						instance.wordSearch = JSON.parse(obj[prop].value);
-						instance.wordSearch.searchClick = nbSearch += 1
-						instance.wordSearch.date = instance._format.getDate(obj[prop].date);
+						instance.wordSearch.setData(JSON.parse(obj[prop].value));
+						instance.wordSearch.searchClick = nbSearch
+						instance.wordSearch.timestampCreation = instance._format.getDate(obj[prop].date);
 						instance.wordSearch.author = { name: obj[prop].author, search: "" };
 						instance.createContext(instance.wordSearch);
 					});
@@ -134,7 +136,7 @@ export class AppSearch {
 	}
 
 	sanitizeMeaningForZone() {
-		let text = this.wordSearch.explications;
+		let text = this.wordSearch.meaning;
 		let table = AppSettings.articles.concat(AppSettings.connectors);
 		let regex = new RegExp(this.wordSearch.definition, 'gmi');
 		text = text.replace(regex, "");
@@ -163,33 +165,31 @@ export class AppSearch {
 	numberTimesApparitions(explaination) {
 		let name
 		let count
-		for (var i = this.context.length - 1; i >= 0; i--) {
-			name = this.context[i]
-			count = this._format.countSameWord(name, explaination);
-			this.context[i] = { 'name': name, 'count': count }
+		for (var i = this.contextEntrys.length - 1; i >= 0; i--) {
+			count = this._format.countSameWord(this.contextEntrys[i].name, explaination);
+			this.contextEntrys[i].count = count;
 		}
-
 	}
 
 	sortTags() {
-		this.context.sort(function (a, b) { return a.count > b.count; }); // Sort
-		if (this.context.length > 15) {
-			let length = this.context.length
-			this.context = this.context.slice(length - 15, length); // Take the 15 lasts 
+		this.contextEntrys.sort(function (a: Entry, b : Entry) { return a.count - b.count; }); // Sort
+		if (this.contextEntrys.length > 15) {
+			let length = this.contextEntrys.length
+			this.contextEntrys = this.contextEntrys.slice(length - 15, length); // Take the 15 lasts 
 		}
 	}
 
-	createRep1(wordSearch) {
-		let totalPoints = this._format.getTotalCountWord(this.context);
-		let nbTags = this.context.length;
+	createRep1(wordSearch, context) {
+		let totalPoints = this._format.getTotalCountWord(context);
+		let nbTags = context.length;
 		let divisions = this._format.getDivisions(totalPoints, nbTags);
-		for (let i = this.context.length - 1; i >= 0; i--) {
-			this.context[i].repRule1 = this._format.getReput(this.context[i].count, divisions) * AppSettings.COEFRULES[0]
+		for (let i = context.length - 1; i >= 0; i--) {
+			context[i].repRule1 = this._format.getReput(context[i].count, divisions) * AppSettings.COEFRULES[0]
 		}
-		this.context.sort(function (a, b) { return a.reputRule1 > b.reputRule1; });
+		context.sort(function (a, b) { return a.reputRule1 > b.reputRule1; });
 	}
 
-	createRep2(wordSearch) {}
+	createRep2(wordSearch, context) {}
 
 	numberUpdates() { }
 
@@ -211,8 +211,9 @@ export class AppSearch {
 
 	countTotalReputation(context) {
 		for (var index = 0; index < context.length; index++) {
-			context[index].totalReput = (context[index].repRule1 +  context[index].repRule2 + context[index].repRule3 + context[index].repRule4)
-			context[index].totalReput += context[index].repRule5.reputation;
+			context[index].totalReput = (context[index].repRule1 +  
+				context[index].repRule2 + context[index].repRule3 
+				+ context[index].repRule4 + context[index].repRule5)
 		}
 	}
 
@@ -221,12 +222,18 @@ export class AppSearch {
 		let instance = this;
 		this.context = this.sanitizeMeaningForZone();
 		this.context = Array.from(new Set(this.context))
-		let explaination = this._format.splitter(wordSearch.explications, [' '])// remove espaces
-		this.numberTimesApparitions(explaination); // Sort the best tags 'importance by nb of apparition in the meaning of the word searched'
-		this.sortTags()
+
+		for (var index = 0; index < this.context.length; index++) {
+			var el = new Entry();
+			el.name = this.context[index]
+			this.contextEntrys.push(el)
+		}
+		let explaination = this._format.splitter(wordSearch.meaning, [' '])// remove espaces
+		this.numberTimesApparitions(explaination)
+		this.sortTags() // Sort the best tags 'importance by nb of apparition in the meaning of the word searched'
 		
-		for (let index = 0; index < this.context.length; index++) {
-			let element = this.context[index];
+		for (let index = 0; index < this.contextEntrys.length; index++) {
+			let element = this.contextEntrys[index];
 			
 			//element.name = element.name[element.name.length-1] != '.' ? element.name : element.name.substring(0,element.name.length-1)
 			element.totalReput = 0;
@@ -234,25 +241,37 @@ export class AppSearch {
 			element.repRule2 = 0;
 			element.repRule3 = 0;
 			element.repRule4 = 0;
-			element.repRule5 = {nbDays : null, reputation : 0};
+			element.repRule5 = 0;
 			this._httpservice.getInfosOnWiki(element.name).subscribe(function (res) {
 				element.meaning = res[2][0]
 				element.source = "Wikipédia"
+				
 			})
 			this._httpservice.getRevisionsOnWiki(element.name).subscribe(function (response) {
 				let results = response.query.pages
 				let id = Object.keys(response.query.pages)
-				element.repRule5 = id[0] == '-1' ? {nbDays : null, reputation : 0} : instance.getTimestamp(results[id[0]].revisions[0].timestamp, today, instance.context)
-				if (index == instance.context.length - 1) {
-					instance.createRep1(wordSearch) // rule 1 (Interne)
-					instance.createRep2(wordSearch) // rule 3 (Recherche/Clique)
-					instance.numberUpdates(); // rule 4 (Mise à jour)
+				let obj = {nbDays : 0, reputation : 0}
+				if (id[0] != '-1') {
+					obj = instance.getTimestamp(results[id[0]].revisions[0].timestamp, today, instance.contextEntrys)
+				}
+				element.repRule5 = obj.reputation
+				element.lastUpdatedNbDays = obj.nbDays
+				if (index == instance.contextEntrys.length - 1) {
+					console.log(instance.contextEntrys)
+					/*
+					for (var cpt = instance.contextEntrys.length - 1; cpt >= 0 ; cpt--) {
+						if (instance.contextEntrys[cpt].meaning == "" || instance.contextEntrys[cpt].meaning == undefined && instance.contextEntrys.length > 5) {instance.contextEntrys.splice(cpt, 1)}
+					}*/
+					console.log(instance.contextEntrys)
+					instance.createRep1(wordSearch, instance.contextEntrys) // rule 1 (Interne)
+					instance.createRep2(wordSearch, instance.contextEntrys) // rule 3 (Recherche/Clique)
+					//instance.numberUpdates(); // rule 4 (Mise à jour)
 					
-					instance.countTotalReputation(instance.context)
+					instance.countTotalReputation(instance.contextEntrys)
 					instance.wordSel = Object.assign({}, instance.wordSearch);
-					console.log(instance.context)
+					//console.log(instance.context)
 					if (wordSearch.name.includes(" ")) { }
-					instance._manager3d.createScene(wordSearch, instance.context, instance.wordSel);
+					instance._manager3d.createScene(wordSearch, instance.contextEntrys, instance.wordSel);
 					instance._manager3d.runRender();
 				}
 			})

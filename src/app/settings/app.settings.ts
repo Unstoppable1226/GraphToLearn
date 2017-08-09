@@ -49,6 +49,7 @@ export class AppSettings {
 	public static articles = [ "un", "une", "le", "la", "les", "l'", "d'","de", "du", "des", "à", "au", "aux"]
 
 	public static connectors = [
+		"entre",
 		"plus",
 		"moins",
 		"exemple",

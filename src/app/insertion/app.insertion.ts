@@ -1,9 +1,12 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { HttpAPIService } from '../api/app.http-service';
-import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
-import { AppSettings } from '../settings/app.settings';
-import { UserService } from '../model/user-service';
 import { OnInit } from '@angular/core';
+import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
+
+import { HttpAPIService } from '../api/app.http-service';
+import { AppSettings } from '../settings/app.settings';
+
+import { Entry } from '../model/entry'
+import { UserService } from '../model/user-service';
 
 declare var $:any; // This is necessary if you want to use jQuery in the app
 
@@ -31,7 +34,10 @@ export class AppInsertion implements OnInit {
 	public newModules : string = '';
 	public source : string = ""; // Separate with the comma
 	public definition : string = ""; 
-	public explications : string = "";
+	public meaning : string = "";
+
+
+
 	public items = ['Angular' ,'React'];
 
 	constructor(private _httpService : HttpAPIService, private _alert: AlertsService, private _userservice : UserService) {
@@ -120,7 +126,7 @@ export class AppInsertion implements OnInit {
 		this.word = "";
 		this.source = ""; // Separate with the comma
 		this.definition = ""; 
-		this.explications = "";
+		this.meaning = "";
 		this.newModules = "";
 		this.ngOnInit();
 	}
@@ -148,7 +154,7 @@ export class AppInsertion implements OnInit {
 				}
 			}
 			
-			let dataInfo = {name : this.word, type: $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text(), source : this.source, modules : modulesNotNew, definition: this.definition, explications : this.explications, context :  $('#select-context').text() == "Aucun" ? "" : $('#select-context').text(), commentary : "", review : ""};
+			let dataInfo = {name : this.word, type: $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text(), source : this.source, modules : modulesNotNew, definition: this.definition, meaning : this.meaning, context :  $('#select-context').text() == "Aucun" ? "" : $('#select-context').text(), commentary : "", review : ""};
 			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name)
 			.subscribe(
 				function(response) { // The communication with the API has matched

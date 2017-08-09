@@ -33,15 +33,40 @@
 						<div class="c">{{wordSel.type}}</div>
 					</div>
 				</li>
-				<li class="cr number has-slider" style="height: 35px;line-height: 35px">
+				<li *ngIf="wordSel.definition != ''" class="cr number" style="height: 35px;line-height: 35px">
+					<div>
+						<span class="property-name">Définition : </span>
+						<div class="c">{{wordSel.definition}}</div>
+					</div>
+				</li>
+				<li *ngIf="wordSel.name != wordSearch.name" class="cr number has-slider" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name">Réputation :</span>
 						<div class="ui blue small left pointing label"><strong>{{wordSel.totalReput}}</strong></div>
 					</div>
 				</li>
-				<li class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="wordSel.modules != ''" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
-						<span class="property-name">Date de création :</span> {{wordSel.date}}
+						<span class="property-name">Modules : </span>
+						<div class="c">{{wordSel.modules}}</div>
+					</div>
+				</li>
+				<li *ngIf="wordSel.context != ''" class="cr number" style="height: 35px;line-height: 35px">
+					<div>
+						<span class="property-name">Contexte : </span>
+						<div class="c">{{wordSel.context}}</div>
+					</div>
+				</li>
+				<li *ngIf="wordSel.timestampCreation != ''" class="cr number" style="height: 35px;line-height: 35px">
+					<div>
+						<span class="property-name">Date de création :</span> {{wordSel.timestampCreation}}
+						<div class="c"></div>
+					</div>
+				</li>
+
+				<li *ngIf="wordSel.lastUpdatedNbDays != 0" class="cr number" style="height: 35px;line-height: 35px">
+					<div>
+						<span class="property-name">Modifié :</span> Il y a {{wordSel.lastUpdatedNbDays}} jours
 						<div class="c"></div>
 					</div>
 				</li>
@@ -53,13 +78,13 @@
 				<div class="ui blue button" style="width: 240px;">
 					<i class="heart icon"></i> J'aime ce contenu
 				</div>
-				<a class="ui basic blue left pointing label" style="width: 60px; text-align: center">35</a>
+				<a class="ui basic blue left pointing label" style="width: 60px; text-align: center">{{wordSel.like}}</a>
 			</div>
 			<div class="ui labeled button" tabindex="1">
 				<div class="ui red button" style="width: 240px;">
 					<i class="frown icon"></i>Je n'aime pas ce contenu
 				</div>
-				<a class="ui basic red left pointing label" style="width: 60px; text-align: center">3</a>
+				<a class="ui basic red left pointing label" style="width: 60px; text-align: center">{{wordSel.dislike}}</a>
 			</div>
 		</div>
 		<button style="display:block; margin-top:-32px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home"
@@ -92,7 +117,7 @@
 		</div>
 		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
 		<ul style="height: auto;">
-			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;"><span style="font-size: 1.1em!important;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">{{wordSel.explications}} [Source : {{wordSel.source}}]</span></li>
+			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;"><span style="font-size: 1.1em!important;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">{{wordSel.meaning}} [Source : {{wordSel.source}}]</span></li>
 		</ul>
 	</div>
 	<div class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">

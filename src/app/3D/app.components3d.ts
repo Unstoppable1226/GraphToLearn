@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Formatter } from '../tools/app.formatter'
 import { AppSettings } from '../settings/app.settings'
 
+import { Entry } from '../model/entry'
+
 declare var BABYLON: any;
 declare var Button: any;
 
@@ -10,8 +12,8 @@ export class Manager3D {
 	private canvas
 	private engine
 	private scene
-	private wordSearch
-	private wordSel
+	private wordSearch : Entry
+	private wordSel : Entry
 	private sphereMaterial
 	private spheres = []
 	private advancedTexture = { addControl: function (label) { } , getMeshByName: function(string) {}, _rootContainer : {children: []}}
@@ -82,7 +84,7 @@ export class Manager3D {
 		this.panel3.addControl(this.header);
 
 		this.info = new BABYLON.GUI.TextBlock();
-		this.info.text = "Type : " + this.wordSearch.type + "\n" + "Explications : " + "\n" + (tag == null) ? this.wordSearch.explications : tag.meaning;
+		this.info.text = "Type : " + this.wordSearch.type + "\n" + "Explications : " + "\n" + (tag == null) ? this.wordSearch.meaning : tag.meaning;
 		this.info.textWrapping = true;
 		this.info.height = "200px";
 		this.info.color = "#333";
@@ -157,11 +159,15 @@ export class Manager3D {
 		console.log(label)*/
 	}
 
-	updateInfos(mesh, data, meaning) {
+	updateInfos(mesh, data) {
 		this.wordSel.name = mesh.name
-		this.wordSel.explications = meaning;
+		this.wordSel.meaning = data.meaning;
 		this.wordSel.source = data.source;
 		this.wordSel.totalReput = data.totalReput;
+		this.wordSel.definition = data.definition;
+		this.wordSel.modules = data.modules
+		this.wordSel.lastUpdatedNbDays = data.lastUpdatedNbDays;
+		this.wordSel.timestampCreation = data.timestampCreation;
 	}
 
 	registerAction(mesh, tag) {
@@ -170,10 +176,10 @@ export class Manager3D {
 		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, (function (mesh) {
 			instance.moveCameraToMesh(mesh)
 			if (tag == null) {
-				this.updateInfos(mesh, instance.wordSearch, instance.wordSearch.explications)
+				this.updateInfos(mesh, instance.wordSearch)
 				return
 			}
-			this.updateInfos(mesh, tag, tag.meaning)
+			this.updateInfos(mesh, tag)
 		}).bind(this, mesh)));
 	}
 

@@ -54,7 +54,7 @@ export class AppHome{
 						let itemObj = JSON.parse(item);
 						responseSearch.results.push({
 							title       : itemObj.name,
-							description : itemObj.explications,
+							description : itemObj.meaning,
 							url         : 'http://localhost:4200/search/' + itemObj.name
 						});
 					});
