@@ -23,6 +23,11 @@ export class Entry {
     totalReput : number = 0;
     like: number = 0;
     dislike: number = 0;
+    parent: string = "";
+    commentary : string = "";
+    review : string = "";
+    ict : string = "";
+    cpte : string = "";
 
 
     setData(obj) {

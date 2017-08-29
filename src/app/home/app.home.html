@@ -4,7 +4,7 @@
 		<h1 class="ui inverted header" style="font-size: 350%">
 			{{title}}
 		</h1>
-		<h2>L'outil de recherche intelligente en collaboration avec <a href="http://project.cowaboo.net/login" >Cowaboo<i style="font-size:0.5em!important;display:inline-block!important" class="copyright icon"></i></a></h2>
+		<h2>L'outil de recherche intelligente en collaboration avec <a href="http://project.cowaboo.net/login">Cowaboo<i style="font-size:0.5em!important;display:inline-block!important" class="copyright icon"></i></a></h2>
 	</div>
 </div>
 <div class="text-center margin-top-xl" style="height: 100%">
@@ -13,8 +13,8 @@
 			<input type="radio" id="tab1" name="tab-control" checked>
 			<input type="radio" id="tab2" name="tab-control">
 			<ul>
-				<li title="Rechercher un terme" >
-					<label for="tab1" role="button" routerLink="/home" >
+				<li title="Rechercher un terme">
+					<label for="tab1" role="button" routerLink="/home">
 						<svg viewBox="0 0 24 24"><path d="M17.7,16.1c-0.9,0-1.7-0.3-2.3-1c-0.6-0.6-1-1.4-1-2.3c0-0.9,0.3-1.7,1-2.3c0.6-0.6,1.4-1,2.3-1
 							c0.9,0,1.7,0.3,2.3,1c0.6,0.6,1,1.4,1,2.3c0,0.9-0.3,1.7-1,2.3C19.4,15.8,18.5,16.1,17.7,16.1z M21.7,8.8c-1.1-1.1-2.5-1.7-4-1.7
 							c-1.5,0-2.9,0.6-4,1.7c-1.1,1.1-1.7,2.5-1.7,4c0,0.9,0.2,1.7,0.6,2.5L8,20c-0.7,0.7-0.7,1.8,0,2.5C8.4,22.8,8.8,23,9.3,23
@@ -33,24 +33,24 @@
 				</li>
 			</ul>
 
-			<div class="slider"><div class="indicator"></div></div>
+			<div class="slider">
+				<div class="indicator"></div>
+			</div>
 			<div class="content">
 				<section style="text-align: center">
 					<h2>Rechercher</h2>
-					<div class="inline field" >
+					<div class="inline field">
 						<div class="ui bottom pointing label">
-							Rechercher une définition sur 
+							Rechercher une définition sur
 						</div>
 					</div>
-					<i class="database icon"></i>
-					IPFS
-					<i class="wikipedia icon" style="margin-left: 20px"></i>
-					Wikipedia
+					<i class="database icon"></i> IPFS
+					<i class="wikipedia icon" style="margin-left: 20px"></i> Wikipedia
 					<br>
 					<br>
-					<div class="ui fluid big category search searchWord" >
+					<div class="ui fluid big category search searchWord">
 						<div class="ui icon input" style="width: 80%;margin-top:20px;border:2px solid #333; border-radius:100%">
-							<input style="text-align:center; color:black!important" class="prompt" type="text" [(ngModel)]="searchWord"  placeholder="Rechercher ...">
+							<input style="text-align:center; color:black!important" class="prompt" type="text" [(ngModel)]="searchWord" placeholder="Rechercher ...">
 							<i class="search icon"></i>
 						</div>
 					</div>
@@ -58,9 +58,9 @@
 				</section>
 				<section style="text-align: center">
 					<h2>Insertion</h2>
-					<div class="ui animated fade button" tabindex="0" style="height: 30px">
+					<div class="ui animated fade button" tabindex="0" style="height: 30px" (click)="insertWithFile()">
 						<div class="visible content" style="margin-top: -3px;">Insérer depuis un fichier <i class="upload icon"></i></div>
-						<div class="hidden content" >
+						<div class="hidden content">
 							JSON ou Excel
 						</div>
 					</div>
@@ -74,5 +74,21 @@
 
 		</div>
 		<div class="image-back"></div>
+	</div>
+</div>
+<div id="modalInsertion" class="ui modal">
+	<i class="close icon"></i>
+	<div class="header text-center">
+		Insertion depuis un fichier
+	</div>
+	<div style="padding:50px" class="text-center">
+		<div class="js input-file-container">
+			<input class="js input-file" id="my-file" type="file" (change)="fileChanged()">
+			<label for="my-file" class="js input-file-trigger" tabindex="0">Choisir un fichier...</label>
+		</div>
+		<p class="js file-return">Aucun fichier choisi</p>
+		<hr>
+		<br>
+		<button class="ui button button-blur" (click)="saveInsertFile()">Lancer l'insertion <i class="plus icon" style="margin-left: 10px"></i></button>
 	</div>
 </div>
