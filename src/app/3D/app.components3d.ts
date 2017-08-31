@@ -59,15 +59,15 @@ export class Manager3D {
 
 		this.header = null
 		this.info = null
-		delete (this.header);
-		delete (this.info);
-		delete (this.advancedTextureGUI);
-		this.advancedTextureGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-		this.advancedTextureGUI.layer.layerMask = 5;
-		this.panel3 = new BABYLON.GUI.StackPanel();
-		this.panel3.width = "80%";
-		this.panel3.heigth = "400px";
-		this.panel3.fontSize = "20px";
+		delete (this.header)
+		delete (this.info)
+		delete (this.advancedTextureGUI)
+		this.advancedTextureGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI")
+		this.advancedTextureGUI.layer.layerMask = 5
+		this.panel3 = new BABYLON.GUI.StackPanel()
+		this.panel3.width = "80%"
+		this.panel3.heigth = "400px"
+		this.panel3.fontSize = "20px"
 		this.panel3.fontFamily = "font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;"
 
 		this.panel3.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -135,9 +135,9 @@ export class Manager3D {
 		let labels = this.advancedTexture._rootContainer.children
 		var pos = -1
 		for (var i = 0; i < labels.length; i++) {
-			var element = labels[i];
-			if (labels[i].name == type +mesh.name) {
-				pos = i;
+			var element = labels[i]
+			if (labels[i].name == type + mesh.name) {
+				pos = i
 			} else {
 				labels[i].alpha = 0.5
 			}
@@ -147,9 +147,7 @@ export class Manager3D {
 
 	moveCameraToMesh(mesh) {
 		/*this.camera.lockedTarget = mesh;*/
-
-
-		this.camera.setTarget(mesh);
+		this.camera.setTarget(mesh)
 		this.moveCamera(mesh)
 		this.camera.maxCameraSpeed = 10
 		var pos = this.getLabelByName(mesh, 'label')
@@ -258,7 +256,12 @@ export class Manager3D {
 		this.createMainMesh(sphere1, label1);
 
 		for (var i = tags.length - 1; i >= 0; i--) {
-			this.spheres.push({ sphere: BABYLON.Mesh.CreateSphere(this._format.capitalize(tags[i].name), 50.0, (2 + tags[i].repRule1), this.scene), tag: tags[i] });
+			this.spheres.push(
+				{ 
+					sphere: BABYLON.Mesh.CreateSphere(this._format.capitalize(tags[i].name), 50.0, (2 + tags[i].repRule1), this.scene), 
+					tag: tags[i] 
+				}
+			);
 		}
 
 		let maxGap = this.createPosition();

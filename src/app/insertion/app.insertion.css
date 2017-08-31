@@ -4,8 +4,9 @@
 
 .input-insert {
 	text-align: center!important; 
-	border-image: url('/assets/images/blur-2.jpg') 30 30 repeat!important;
+	/*border-image: url('/assets/images/blur-2.jpg') 30 30 repeat!important;*/
 	border-image-width: 1!important;
+	margin-bottom: 18px!important;
 }
 
 .button-home {

@@ -6,7 +6,8 @@ import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
 import { AuthService } from '../login/app.authservice';
 import { UserService } from '../model/user-service';
-import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Rx';
 
 declare var $: any;
 
@@ -23,6 +24,7 @@ export class AppHome {
 	content = [];
 	private isConnected = false;
 	title = AppSettings.TITLE;
+	timeEstimated = ""
 
 	constructor(private _httpService: HttpAPIService, private _authservice: AuthService, private _userservice: UserService) {
 		console.log(this._userservice.getCurrentUser());
@@ -30,14 +32,27 @@ export class AppHome {
 
 	insertWithFile() {
 		$('#modalInsertion').modal('show');
+		this._httpService.getEntryJSON(AppSettings.API_WORDS)
+		.subscribe(function(res){
+			console.log(Object.keys(res.dictionary.entries).length)
+		})
 	}
 
 	fileChanged() {
+		let instance = this;
 		var file = (<HTMLInputElement>document.getElementById("my-file")).files[0];		
 		$('p.file-return').text(file.name)
+		var fileReader = new FileReader();
+		fileReader.readAsText(file);
+		//try to read file, this part does not work at all, need a solution
+		fileReader.onload = function(e) {
+			var obj = JSON.parse(this.result)
+			console.log(obj)
+			instance.timeEstimated = "~ " + Math.floor(obj.data.length / 12) + " minutes"
+		}
 	}
 
-	saveInsertFile() {
+	saveInsertFile() {		
 		let instance = this;
 		var file = (<HTMLInputElement>document.getElementById("my-file")).files[0];
 		var fileReader = new FileReader();
@@ -49,19 +64,48 @@ export class AppHome {
 			if (data == undefined) {
 				alert('Attention data doit être le premier objet présent')
 			} else {
-				for (var index = 0; index < data.length; index++) {
-					var element = data[index];
-					instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name)
-						.subscribe(function(res) {// The communication with the API has matched
-							instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, res) // Put searchClick to 0
-							.subscribe(
-								function(resp) {
-									console.log(resp)
-									console.log(index)
-								}	
-							)
-						})
-				}
+				instance._httpService.getEntryJSON(AppSettings.API_WORDS)
+					.subscribe(function(res){
+						console.log(Object.keys(res.dictionary.entries).length)
+						let obj = res.dictionary.entries
+						let i = 0;
+						for (let prop in obj) {
+							(function(index) {
+								i++
+								var element = data[index];
+								setTimeout(function() { 
+									let tag = obj[prop].tags;
+									instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, prop)
+										.subscribe(function(res) {console.log(res)})
+								}, i * 5000);
+							})(i);
+						}
+					})
+					/*
+				let tab = []
+				
+				for (var i = 0; i < data.length; i++) {
+					(function(index) {
+						var element = data[index];
+						setTimeout(function() { 
+							instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name)
+							.subscribe(function(res) {
+								console.log(res)
+							})
+						}, i * 5000);
+					})(i);
+				}*/
+				/*Observable.forkJoin(tab).subscribe(t=> {
+					console.log(t)
+					for (var i = 0; i < t.length; i++) {
+						console.log("valeur" + t[i])
+						instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, t[i])
+							.subscribe(function(res){
+								console.log(res)
+							}) 
+					}
+				});*/
+			
 			}
 		}
 	}
@@ -80,17 +124,18 @@ export class AppHome {
 						let obj = response.dictionary.entries;
 						for (let prop in obj) {
 							let tag = obj[prop].tags;
-							console.log(tag);
 							if (tag.toLowerCase().includes(instance.searchWord.toLowerCase())) {
 								instance.content.push(obj[prop].value);
 							}
 						}
 						instance.content.forEach(function (item) {
 							let itemObj = JSON.parse(item);
+							itemObj.modules = itemObj.modules.replace(/.0/g,"")
+							let modules = itemObj.modules.length > 1 ? " [" + (isNaN(parseInt(itemObj.modules)) ? itemObj.modules : itemObj.modules) + "]" : ""
 							responseSearch.results.push({
-								title: itemObj.name,
+								title: itemObj.name + modules,
 								description: itemObj.meaning,
-								url: 'http://localhost:4200/search/' + itemObj.name
+								url: 'http://localhost:4200/search/' + itemObj.name.replace(/\s/g,"")
 							});
 						});
 						console.log(responseSearch);

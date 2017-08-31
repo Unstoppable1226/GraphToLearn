@@ -16,17 +16,17 @@ export class AuthGuard implements CanActivate  {
 	constructor (private _http: Http, private router: Router, private _httpservice : HttpAPIService, private _userservice : UserService) {}
 
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-	        let instance = this;
-		let result = false;
+	    let instance = this
+		let result = false
 	 	if (sessionStorage.getItem('currentUser')) {
-	            	// logged in so return true
-	            	let key
-	            	try {
-    				key = window.atob(sessionStorage.getItem('currentUser'))
-    				return true;
+			// logged in so return true
+			let key
+			try {
+				key = window.atob(sessionStorage.getItem('currentUser'))
+				return true
 			} catch(e) {}
-	        }
-	        instance.router.navigate(['welcome']);
-        	return false;
-    	}
+		}
+		instance.router.navigate(['welcome']);
+		return false
+	}
 }
