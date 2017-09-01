@@ -16,6 +16,7 @@ export class AppSettings {
 	public static API_TYPES = "Types";
 	public static API_CONTEXT= "Context";
 	public static API_METASEARCHCLICK= "searchClick";
+	public static URL_SEARCH = 'http://localhost:4200/search/'
 
 
 

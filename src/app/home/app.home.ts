@@ -50,6 +50,15 @@ export class AppHome {
 			console.log(obj)
 			instance.timeEstimated = "~ " + Math.floor(obj.data.length / 12) + " minutes"
 		}
+	} 
+
+	getSame(name1, a2) {
+		for(let x = 0; x < a2.length; x++) {
+			if (name1.toLowerCase() == a2[x].name.toLowerCase().trim()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	saveInsertFile() {		
@@ -69,7 +78,33 @@ export class AppHome {
 						console.log(Object.keys(res.dictionary.entries).length)
 						let obj = res.dictionary.entries
 						let i = 0;
+						let a2 = []
 						for (let prop in obj) {
+							a2.push(JSON.parse(obj[prop].value))
+						}
+
+						let tab = []
+						for (let i = 0; i < data.length; i++) {
+							
+							if (!instance.getSame(data[i].name.trim(), a2)) {								
+								tab.push(data[i])
+							}
+						}
+						console.log(tab)
+						for (var cpt = 0; cpt < tab.length; cpt++) {
+							(function(index) {
+								var element = tab[index];
+								setTimeout(function() { 
+									instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name)
+									.subscribe(function(res) {
+										console.log(res)
+									})
+								},cpt * 5000);
+							})(cpt);
+						}
+						
+						//.concat(instance.difference(a2, data));
+						/*for (let prop in obj) {
 							(function(index) {
 								i++
 								var element = data[index];
@@ -79,7 +114,7 @@ export class AppHome {
 										.subscribe(function(res) {console.log(res)})
 								}, i * 5000);
 							})(i);
-						}
+						}*/
 					})
 					/*
 				let tab = []
@@ -135,14 +170,14 @@ export class AppHome {
 							responseSearch.results.push({
 								title: itemObj.name + modules,
 								description: itemObj.meaning,
-								url: 'http://localhost:4200/search/' + itemObj.name.replace(/\s/g,"")
+								url: AppSettings.URL_SEARCH + itemObj.name.replace(/\s/g,"%s")
 							});
 						});
 						console.log(responseSearch);
 						return responseSearch;
 					}
 				},
-				minCharacters: 1
+				minCharacters: 2
 			});
 	}
 }
