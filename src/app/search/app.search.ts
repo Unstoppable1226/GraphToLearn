@@ -27,7 +27,7 @@ export class AppSearch {
 	public id = "";
 	public wordSearch : Entry = new Entry()// The that we have searched
 	public wordSel: Entry = new Entry() // The word that is selected on the context
-
+	public hashWordSel : string = ""
 	public dictionary = []
 	public context
 	public contextEntrys : Array<Entry> = []
@@ -36,12 +36,19 @@ export class AppSearch {
 	public collapsedComments = true
 	public collapsedActions = true
 	private user: User
+	private likes = []
+	private dislikes = []
+	private canLike : boolean = false;
+	private canDislike : boolean = false;
 
 	constructor(private _route: ActivatedRoute, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService) {
 		let instance = this;
 		instance.user = instance._userservice.getCurrentUser();
 		instance._route.params.subscribe(routeParams => {
 			instance.id = routeParams.id;
+			instance.id = instance.id.replace(AppSettings.FORWARD_SLACH, "/");
+			instance.id = instance.id.replace(AppSettings.OPEN_PARENTHESIS, "(");
+			instance.id = instance.id.replace(AppSettings.CLOSE_PARENTHESIS, ")");
 			if (instance.id != undefined) {
 				_httpservice.getEntryJSON(AppSettings.API_WORDS)
 					.subscribe(function (response) {
@@ -49,6 +56,85 @@ export class AppSearch {
 					})
 			}
 		})
+	}
+
+	like() { this.likeDislike(AppSettings.API_METALIKE, this.likes, this.canLike, 0, this.wordSearch.like) }
+
+	dislike() { this.likeDislike(AppSettings.API_METADISLIKE, this.dislikes, this.canDislike, 1, this.wordSearch.dislike) }
+
+	likeDislike(metadata, variable, can, nb, objectIncDec) {
+		let instance = this;
+		if (can) {
+			if (nb == 0) {
+				instance.likes.push(instance._userservice.getCurrentUser().mail)
+			} else {
+				instance.dislikes.push(instance._userservice.getCurrentUser().mail)
+			}
+			instance._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? instance.likes : instance.dislikes), instance.hashWordSel)
+			.subscribe(function(res) {
+				console.log(res)
+				if (nb == 0) {
+					instance.wordSearch.like.number += 1
+					instance.canLike = false
+				} else {
+					instance.wordSearch.dislike.number += 1
+					instance.canDislike = false
+				}
+			})
+		} else {
+			if (nb == 0) {
+				instance.likes.splice(instance.likes.indexOf(instance._userservice.getCurrentUser().mail), 1)
+			} else {
+				instance.dislikes.splice(instance.dislikes.indexOf(instance._userservice.getCurrentUser().mail), 1)
+			}
+			instance._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? instance.likes : instance.dislikes), instance.hashWordSel)
+			.subscribe(function(res) {
+				console.log(res)
+				if (nb == 0) {
+					instance.wordSearch.like.number -= 1
+					instance.canLike = true
+				} else {
+					instance.wordSearch.dislike.number -= 1
+					instance.canDislike = true
+				}
+			})
+		}
+	}
+
+	findUser(tabLikes) {
+		let user = this._userservice.getCurrentUser()
+		for (let i = 0; i < tabLikes.length; i++) {
+			if (user.mail.toLowerCase() == tabLikes[i].toLowerCase()) {
+				return true;
+			}
+		}
+		return false
+	}
+
+	constructLikeDislike(tab, nb, can) {
+		console.log(tab)
+		if (tab == undefined) {
+			can = true;
+		} else {
+			if (nb == 0) {
+				try {
+					this.likes = JSON.parse(tab)
+				} catch(e) {
+					this.likes = tab
+				}
+				can = !this.findUser(this.likes)
+				this.wordSearch.like.number = this.likes.length;
+			} else {
+				try {
+					this.dislikes = JSON.parse(tab)
+				} catch(e) {
+					this.dislikes = tab
+				}
+				can = !this.findUser(this.dislikes)
+				this.wordSearch.dislike.number = this.dislikes.length;
+			}
+		}
+		return can;
 	}
 
 	initializeWordSearch(instance, response) {
@@ -62,6 +148,9 @@ export class AppSearch {
 				nbSearch += 1
 				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop) // Put searchClick to 0
 					.subscribe(function (resp) {
+						instance.hashWordSel = prop;
+						instance.canLike = instance.constructLikeDislike(obj[prop].conf.like, 0 ,instance.canLike)
+						instance.canDislike = instance.constructLikeDislike(obj[prop].conf.dislike, 1, instance.canDislike)
 						instance.wordSearch.setData(JSON.parse(obj[prop].value));
 						instance.wordSearch.searchClick = nbSearch
 						instance.wordSearch.timestampCreation = instance._format.getDate(obj[prop].date);

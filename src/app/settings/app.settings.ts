@@ -16,9 +16,14 @@ export class AppSettings {
 	public static API_TYPES = "Types";
 	public static API_CONTEXT= "Context";
 	public static API_METASEARCHCLICK= "searchClick";
+	public static API_METALIKE= "like";
+	public static API_METADISLIKE= "dislike";
+
+	/* URL */
 	public static URL_SEARCH = 'http://localhost:4200/search/'
-
-
+	public static FORWARD_SLACH = "ForwardSlash"
+	public static OPEN_PARENTHESIS = "OpenParenthesis"
+	public static CLOSE_PARENTHESIS = "CloseParenthesis"
 
 	/* API Wikipedia */
 	//https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=Albert%20Einstein&utf8

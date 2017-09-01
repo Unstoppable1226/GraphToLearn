@@ -21,8 +21,8 @@ export class Entry {
     repRule4: number = 0;
     repRule5: number = 0;
     totalReput : number = 0;
-    like: number = 0;
-    dislike: number = 0;
+    like: {number: number, author: string} = {number: 0, author: ""};
+    dislike:  {number: number, author: string} = {number: 0, author: ""};
     parent: string = "";
     commentary : string = "";
     review : string = "";

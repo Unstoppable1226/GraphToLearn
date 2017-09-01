@@ -167,10 +167,14 @@ export class AppHome {
 							let itemObj = JSON.parse(item);
 							itemObj.modules = itemObj.modules.replace(/.0/g,"")
 							let modules = itemObj.modules.length > 1 ? " [" + (isNaN(parseInt(itemObj.modules)) ? itemObj.modules : itemObj.modules) + "]" : ""
+							
+							let name = itemObj.name.replace(/\//g, AppSettings.FORWARD_SLACH);
+							name = name.replace(/\(/g, AppSettings.OPEN_PARENTHESIS).replace(/\)/g, AppSettings.CLOSE_PARENTHESIS)
+							name = name.replace(/\s/g,"%20")
 							responseSearch.results.push({
 								title: itemObj.name + modules,
 								description: itemObj.meaning,
-								url: AppSettings.URL_SEARCH + itemObj.name.replace(/\s/g,"%s")
+								url: AppSettings.URL_SEARCH + name
 							});
 						});
 						console.log(responseSearch);
