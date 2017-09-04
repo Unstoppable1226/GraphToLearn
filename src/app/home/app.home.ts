@@ -52,7 +52,7 @@ export class AppHome {
 		}
 	} 
 
-	getSame(name1, a2) {
+	exists(name1, a2) {
 		for(let x = 0; x < a2.length; x++) {
 			if (name1.toLowerCase() == a2[x].name.toLowerCase().trim()) {
 				return true;
@@ -77,16 +77,16 @@ export class AppHome {
 					.subscribe(function(res){
 						console.log(Object.keys(res.dictionary.entries).length)
 						let obj = res.dictionary.entries
-						let i = 0;
+						/*let i = 0;
+						
 						let a2 = []
 						for (let prop in obj) {
 							a2.push(JSON.parse(obj[prop].value))
 						}
-
+						//console.log(a2)
 						let tab = []
 						for (let i = 0; i < data.length; i++) {
-							
-							if (!instance.getSame(data[i].name.trim(), a2)) {								
+							if (!instance.exists(data[i].name.trim(), a2)) {								
 								tab.push(data[i])
 							}
 						}
@@ -101,10 +101,9 @@ export class AppHome {
 									})
 								},cpt * 5000);
 							})(cpt);
-						}
+						} 
 						
-						//.concat(instance.difference(a2, data));
-						/*for (let prop in obj) {
+						for (let prop in obj) {
 							(function(index) {
 								i++
 								var element = data[index];
@@ -114,32 +113,32 @@ export class AppHome {
 										.subscribe(function(res) {console.log(res)})
 								}, i * 5000);
 							})(i);
-						}*/
-					})
-					/*
-				let tab = []
+						} */
 				
-				for (var i = 0; i < data.length; i++) {
-					(function(index) {
-						var element = data[index];
-						setTimeout(function() { 
-							instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name)
-							.subscribe(function(res) {
-								console.log(res)
-							})
-						}, i * 5000);
-					})(i);
-				}*/
-				/*Observable.forkJoin(tab).subscribe(t=> {
-					console.log(t)
-					for (var i = 0; i < t.length; i++) {
-						console.log("valeur" + t[i])
-						instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, t[i])
-							.subscribe(function(res){
-								console.log(res)
-							}) 
-					}
-				});*/
+						let tab = []
+						
+						for (var i = 0; i < data.length; i++) {
+							(function(index) {
+								var element = data[index];
+								setTimeout(function() { 
+									instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name)
+									.subscribe(function(res) {
+										console.log(res)
+									})
+								}, i * 5000);
+							})(i);
+						}
+						/*Observable.forkJoin(tab).subscribe(t=> {
+							console.log(t)
+							for (var i = 0; i < t.length; i++) {
+								console.log("valeur" + t[i])
+								instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, t[i])
+									.subscribe(function(res){
+										console.log(res)
+									}) 
+							}
+						});*/
+					})	
 			
 			}
 		}
@@ -165,7 +164,7 @@ export class AppHome {
 						}
 						instance.content.forEach(function (item) {
 							let itemObj = JSON.parse(item);
-							itemObj.modules = itemObj.modules.replace(/.0/g,"")
+							itemObj.modules = itemObj.modules.replace(/\.0/g,"")
 							let modules = itemObj.modules.length > 1 ? " [" + (isNaN(parseInt(itemObj.modules)) ? itemObj.modules : itemObj.modules) + "]" : ""
 							
 							let name = itemObj.name.replace(/\//g, AppSettings.FORWARD_SLACH);
@@ -181,7 +180,7 @@ export class AppHome {
 						return responseSearch;
 					}
 				},
-				minCharacters: 2
+				minCharacters: 1
 			});
 	}
 }

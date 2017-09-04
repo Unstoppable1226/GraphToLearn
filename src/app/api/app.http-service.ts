@@ -46,6 +46,13 @@ export class HttpAPIService {
 			.map((res: Response) => res.json());
 	}
 
+	postBalance(publicKeySender, secretKeySender, publicKeyDestination, amount) {
+		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let options = new RequestOptions({ headers: headers });
+		return this._http.post(AppSettings.API_TRANSFER, "public=GCCUZPWFVLOLVVVZLPHIR4PHDCFSBA7CFSE5YFFH4QCEYYWSWD22TNQA&secretKey=SDRSUEUEOJAJJG4MC76F2H7FTGYYTFASNCTMEJ7XJFUHFRQG5M2QI5O3&destination=" + publicKeyDestination + "&amount= " + amount, options)
+		.map((res: Response) => res.json());
+	}
+
 	postEntryMetadata(name, value, hashEntry) {
 		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
 		let options = new RequestOptions({ headers: headers });

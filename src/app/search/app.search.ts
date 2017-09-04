@@ -25,6 +25,8 @@ declare var moment:any;
 export class AppSearch {
 
 	public id = "";
+	public loading = false
+	public loading2 = false
 	public wordSearch : Entry = new Entry()// The that we have searched
 	public wordSel: Entry = new Entry() // The word that is selected on the context
 	public hashWordSel : string = ""
@@ -40,9 +42,19 @@ export class AppSearch {
 	private dislikes = []
 	private canLike : boolean = false;
 	private canDislike : boolean = false;
+	private canVote : boolean = false;
+	private allModules = []
+	private modulesOfWord = []
 
 	constructor(private _route: ActivatedRoute, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService) {
 		let instance = this;
+		instance._httpservice.getEntryJSON(AppSettings.API_MODULES)
+		.subscribe(function(modules) {
+			let obj = modules.dictionary.entries;
+			for (let prop in obj) {
+				instance.allModules.push(JSON.parse(obj[prop].value))
+			}
+		})
 		instance.user = instance._userservice.getCurrentUser();
 		instance._route.params.subscribe(routeParams => {
 			instance.id = routeParams.id;
@@ -64,6 +76,12 @@ export class AppSearch {
 
 	likeDislike(metadata, variable, can, nb, objectIncDec) {
 		let instance = this;
+		if (nb==0) {
+			instance.loading = true
+		} else {
+			instance.loading2 = true
+		}
+		
 		if (can) {
 			if (nb == 0) {
 				instance.likes.push(instance._userservice.getCurrentUser().mail)
@@ -75,10 +93,17 @@ export class AppSearch {
 				console.log(res)
 				if (nb == 0) {
 					instance.wordSearch.like.number += 1
+					
 					instance.canLike = false
+					instance.loading = false
+					instance._httpservice.postBalance("","","GCCMX3IZXDPO3CLPDMTMBH73PNY3HSTQBJWCIVTPVUJCWL7FBYEXAXO4", (1 -(0.25 * 0)))
+						.subscribe(function(balance){
+							console.log(balance)
+						})
 				} else {
 					instance.wordSearch.dislike.number += 1
 					instance.canDislike = false
+					instance.loading2 = false
 				}
 			})
 		} else {
@@ -93,9 +118,11 @@ export class AppSearch {
 				if (nb == 0) {
 					instance.wordSearch.like.number -= 1
 					instance.canLike = true
+					instance.loading = false
 				} else {
 					instance.wordSearch.dislike.number -= 1
 					instance.canDislike = true
+					instance.loading2 = false
 				}
 			})
 		}
@@ -137,26 +164,44 @@ export class AppSearch {
 		return can;
 	}
 
+	getSameModule(word) {
+		var element;
+		for (var index = 0; index < this.allModules.length; index++) {
+			element = this.allModules[index];
+			if (element.id == word) {
+				this.modulesOfWord.push(element)
+			}
+		}
+	}
+
 	initializeWordSearch(instance, response) {
 		let obj = response.dictionary.entries;
 		for (let prop in obj) {
 			let tag = obj[prop].tags;
 			instance.dictionary.push(obj[prop]);
-			if (tag.toLowerCase().includes(instance.id.toLowerCase())) {
+			if (tag.trim().toLowerCase() == "||"+instance.id.trim().toLowerCase()+"||") {
 				/* Il faudrait mettre à jour un compteur pour la recherche */
 				let nbSearch: number = Number(obj[prop].conf.searchClick)
 				nbSearch += 1
+				instance.hashWordSel = prop;
+				instance.canLike = instance.constructLikeDislike(obj[prop].conf.like, 0 ,instance.canLike)
+				instance.canDislike = instance.constructLikeDislike(obj[prop].conf.dislike, 1, instance.canDislike)
+				instance.wordSearch.setData(JSON.parse(obj[prop].value));
+				instance.wordSearch.searchClick = nbSearch
+				instance.wordSearch.timestampCreation = instance._format.getDate(obj[prop].date);
+				instance.wordSearch.author = { name: obj[prop].author, search: "" };
+				instance.canVote = instance.wordSearch.author.name.trim().toLowerCase() != instance._userservice.getCurrentUser().mail.trim().toLowerCase()
+				instance.wordSearch.modules.id = instance.wordSearch.modules.id.replace(/\.0/g, "")
+				console.log(instance.allModules)
+				instance.wordSearch.modules.id = instance.wordSearch.modules.id.split(',')
+				console.log(instance.wordSearch.modules.id)
+				for(let i = 0; i< instance.wordSearch.modules.id.length; i++) {
+					instance.getSameModule(instance.wordSearch.modules.id[i].trim())
+				}
+				console.log(instance.modulesOfWord)
+				instance.createContext(instance.wordSearch);
 				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop) // Put searchClick to 0
-					.subscribe(function (resp) {
-						instance.hashWordSel = prop;
-						instance.canLike = instance.constructLikeDislike(obj[prop].conf.like, 0 ,instance.canLike)
-						instance.canDislike = instance.constructLikeDislike(obj[prop].conf.dislike, 1, instance.canDislike)
-						instance.wordSearch.setData(JSON.parse(obj[prop].value));
-						instance.wordSearch.searchClick = nbSearch
-						instance.wordSearch.timestampCreation = instance._format.getDate(obj[prop].date);
-						instance.wordSearch.author = { name: obj[prop].author, search: "" };
-						instance.createContext(instance.wordSearch);
-					});
+					.subscribe(function (resp) {});
 			}
 		}
 	}
@@ -179,6 +224,7 @@ export class AppSearch {
 
 	ngAfterViewInit() {
 		this._manager3d.startEngine('renderCanvas');
+		$('#popupReputation').popup()
 	}
 
 	findVerb(tag) {
@@ -360,6 +406,7 @@ export class AppSearch {
 					instance.wordSel = Object.assign({}, instance.wordSearch);
 					//console.log(instance.context)
 					if (wordSearch.name.includes(" ")) { }
+					console.log(instance.wordSel)
 					instance._manager3d.createScene(wordSearch, instance.contextEntrys, instance.wordSel);
 					instance._manager3d.runRender();
 				}

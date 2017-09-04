@@ -8,9 +8,11 @@ export class AppSettings {
 	public static API_OBSERVATORY = AppSettings.API_ENDPOINT + "observatory";
 	public static API_ENTRY = AppSettings.API_ENDPOINT + "entry";
 	public static API_ENTRYMETADATA = AppSettings.API_ENTRY + "/conf?";
-	
-	public static API_TAGS = AppSettings.API_ENDPOINT + "tags";
 	public static API_USERS = AppSettings.API_ENDPOINT + "user";
+	public static API_TRANSFER = AppSettings.API_USERS + "/transfer?";
+
+	public static API_TAGS = AppSettings.API_ENDPOINT + "tags";
+	
 	public static API_WORDS = "Words";
 	public static API_MODULES = "Modules";
 	public static API_TYPES = "Types";

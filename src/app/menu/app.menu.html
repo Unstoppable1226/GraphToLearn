@@ -1,4 +1,4 @@
-<div class="ui inverted segment" style="padding: 0.3em!important;">
+<div class="ui inverted segment" style="padding: 0.3em!important;margin-bottom:0px!important">
 	<div class="ui inverted secondary menu right">
 		<a class="item" [ngClass]="{'active': active[0]}" (click)="changeActive(0, 'home')">
 			Accueil <i class="right home icon" style="margin-left:5px"></i>
@@ -13,10 +13,28 @@
 			Gestion membres<i class="right history icon" style="margin-left:5px"></i>
 		</a>
 		<a class="item right">
-			Ma réputation <a class="ui blue circular label">{{user.reputation}}</a>
+			Ma réputation <a class="ui red circular label" [ngClass]="{'blue': user.reputation > -1 }">{{user.reputation}}</a>
 		</a>
 		<a class="item right" (click)="logout()">
 			Se déconnecter <i class="right sign out icon" style="margin-left:5px"></i>
 		</a>
 	</div>
+	
+</div>
+<div class="ui mini modal">
+    <div class="header">
+       Déconnexion
+    </div>
+    <div class="content">
+      <p>Voulez-vous vraiment vous déconnecter ?</p>
+    </div>
+    <div class="actions">
+      <div class="ui negative button">
+        Non
+      </div>
+      <div class="ui positive right labeled icon button">
+        Oui
+        <i class="checkmark icon"></i>
+      </div>
+    </div>
 </div>

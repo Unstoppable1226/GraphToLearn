@@ -211,6 +211,9 @@ export class Manager3D {
 		let space = 10, sphere, tag, minX, maxX, line;
 		for (let i = 0; i <= this.spheres.length - 1; i++) {
 			tag = this.spheres[i].tag;
+			if (tag.position == undefined) {
+				tag.position = 1
+			}
 			sphere = this.spheres[i].sphere;
 			sphere.material = this.sphereMaterial;
 			minX = this.getXFromPosition(tag.position, maxGap)
@@ -278,7 +281,7 @@ export class Manager3D {
 		label.background = "#1B1C1D"
 		label.height = "30px";
 		label.alpha = 1;
-		label.width = "100px";
+		label.width = sphere.name.length >= 11 ? "200px" : "100px";
 		label.cornerRadius = 20;
 		label.thickness = 1;
 		label.linkOffsetY = 30;

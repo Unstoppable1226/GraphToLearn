@@ -2,7 +2,7 @@ export class Entry {
     name: string = "";
     type: string = "";
     source: string = "";
-    modules: string = "";
+    modules: {id: string, name: string} = {id: "", name: ""};
     definition: string = "";
     timestampCreation: string = "";
     timestampUpdate: string = "";
@@ -10,7 +10,7 @@ export class Entry {
     hierarchy: string = "";
     meaning: string = "";
     context: string = "";
-    author: {} = { name: "", search: "" };
+    author: {name: string, search : string} = { name: "", search: "" };
     searchClick: number = 0;
     count: number = 0;
     position: number = 0;
@@ -37,6 +37,6 @@ export class Entry {
         this.name = obj.name;
         this.source = obj.source;
         this.type = obj.type;
-        this.modules = obj.modules;
+        this.modules = {id:obj.modules,name: ""};
     }
 }
