@@ -11,6 +11,7 @@ import { Manager3D } from '../3D/app.components3d'
 import { Entry } from '../model/entry'
 import { User } from '../model/user'
 import { UserService } from '../model/user-service'
+import { HistorySearchService } from '../model/history-search'
 
 declare var dat: any;
 declare var $: any;
@@ -46,8 +47,10 @@ export class AppSearch {
 	private allModules = []
 	private modulesOfWord = []
 
-	constructor(private _route: ActivatedRoute, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService) {
+	constructor(private _route: ActivatedRoute, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch : HistorySearchService) {
 		let instance = this;
+		console.log(this._historysearch.getLastSearches())
+		
 		instance._httpservice.getEntryJSON(AppSettings.API_MODULES)
 		.subscribe(function(modules) {
 			let obj = modules.dictionary.entries;
@@ -55,13 +58,14 @@ export class AppSearch {
 				instance.allModules.push(JSON.parse(obj[prop].value))
 			}
 		})
-		instance.user = instance._userservice.getCurrentUser();
+		instance.user = instance._userservice.getCurrentUser()
 		instance._route.params.subscribe(routeParams => {
 			instance.id = routeParams.id;
 			instance.id = instance.id.replace(AppSettings.FORWARD_SLACH, "/");
 			instance.id = instance.id.replace(AppSettings.OPEN_PARENTHESIS, "(");
 			instance.id = instance.id.replace(AppSettings.CLOSE_PARENTHESIS, ")");
 			if (instance.id != undefined) {
+				instance._historysearch.addSearch(instance.id)
 				_httpservice.getEntryJSON(AppSettings.API_WORDS)
 					.subscribe(function (response) {
 						instance.initializeWordSearch(instance, response)
@@ -88,18 +92,24 @@ export class AppSearch {
 			} else {
 				instance.dislikes.push(instance._userservice.getCurrentUser().mail)
 			}
-			instance._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? instance.likes : instance.dislikes), instance.hashWordSel)
+			
+			instance._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? instance.likes : instance.dislikes), instance.hashWordSel, instance._userservice.getCurrentUser().secretKey)
 			.subscribe(function(res) {
 				console.log(res)
 				if (nb == 0) {
 					instance.wordSearch.like.number += 1
-					
 					instance.canLike = false
 					instance.loading = false
-					instance._httpservice.postBalance("","","GCCMX3IZXDPO3CLPDMTMBH73PNY3HSTQBJWCIVTPVUJCWL7FBYEXAXO4", (1 -(0.25 * 0)))
-						.subscribe(function(balance){
-							console.log(balance)
-						})
+					instance._httpservice.getUsers()
+					.subscribe(
+						data => {
+							instance._httpservice.postBalance(instance._userservice.getCurrentUser().publicKey,instance._userservice.getCurrentUser().secretKey, data.user_list.list[instance.wordSel.author.name], (1 -(0.25 * 0)))
+							.subscribe(function(balance){
+								console.log(balance)
+							})
+						},
+						error => {}
+					)
 				} else {
 					instance.wordSearch.dislike.number += 1
 					instance.canDislike = false
@@ -112,7 +122,7 @@ export class AppSearch {
 			} else {
 				instance.dislikes.splice(instance.dislikes.indexOf(instance._userservice.getCurrentUser().mail), 1)
 			}
-			instance._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? instance.likes : instance.dislikes), instance.hashWordSel)
+			instance._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? instance.likes : instance.dislikes), instance.hashWordSel, instance._userservice.getCurrentUser().secretKey)
 			.subscribe(function(res) {
 				console.log(res)
 				if (nb == 0) {
@@ -169,6 +179,10 @@ export class AppSearch {
 		for (var index = 0; index < this.allModules.length; index++) {
 			element = this.allModules[index];
 			if (element.id == word) {
+				element.reputation = Math.floor(Math.random() * 10) + 1  
+				element.color = element.reputation >= 7 ? "#16ab39" :  element.reputation > 4 ? "#eaae00" : "#db2828"
+				element.animationLeft = "loading-" + (element.reputation >= 5 ? (element.reputation - 5)*2: 0) +" 0.5s linear forwards"
+				element.animationRight = "loading-" + (element.reputation >= 5 ? 10 : element.reputation * 2) + " 0.5s linear forwards"
 				this.modulesOfWord.push(element)
 			}
 		}
@@ -193,14 +207,33 @@ export class AppSearch {
 				instance.canVote = instance.wordSearch.author.name.trim().toLowerCase() != instance._userservice.getCurrentUser().mail.trim().toLowerCase()
 				instance.wordSearch.modules.id = instance.wordSearch.modules.id.replace(/\.0/g, "")
 				console.log(instance.allModules)
-				instance.wordSearch.modules.id = instance.wordSearch.modules.id.split(',')
+
+				instance.wordSearch.modules.id = instance.wordSearch.modules.id.includes(',') ? instance.wordSearch.modules.id.split(',') : instance.wordSearch.modules.id.split('-')
+
 				console.log(instance.wordSearch.modules.id)
 				for(let i = 0; i< instance.wordSearch.modules.id.length; i++) {
 					instance.getSameModule(instance.wordSearch.modules.id[i].trim())
 				}
 				console.log(instance.modulesOfWord)
+				let tab : Array<string>= []
+				instance._httpservice.getEntryJSON(AppSettings.API_HISTORY)
+				.subscribe(
+					data => {
+						instance._historysearch.lastSearches = data.dictionary.conf[instance._userservice.currentUser.mail]
+						if (!data.dictionary.conf[instance._userservice.currentUser.mail].includes(instance.wordSearch.name)) {
+							console.log(instance._historysearch)
+							if (instance._historysearch.lastSearches == "[]") {
+								instance._historysearch.lastSearches = []
+							}
+							instance._historysearch.addSearch(instance.wordSearch.name)
+						}
+						instance._httpservice.postObservatoryMetadata(instance._userservice.currentUser.mail, JSON.stringify(instance._historysearch.getLastSearches()), AppSettings.API_HISTORY, instance._userservice.currentUser.secretKey)
+						.subscribe(function(response){console.log(response);})
+					},
+					error => {}
+				)
 				instance.createContext(instance.wordSearch);
-				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop) // Put searchClick to 0
+				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop, instance._userservice.getCurrentUser().secretKey) // Put searchClick to 0
 					.subscribe(function (resp) {});
 			}
 		}

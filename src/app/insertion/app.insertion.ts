@@ -7,6 +7,7 @@ import { AppSettings } from '../settings/app.settings';
 
 import { Entry } from '../model/entry'
 import { UserService } from '../model/user-service';
+import { HistorySearchService } from '../model/history-search';
 
 declare var $:any; // This is necessary if you want to use jQuery in the app
 
@@ -28,7 +29,7 @@ export class AppInsertion implements OnInit {
 	public styleModuleExCol = AppSettings.WHITE;
 	public data = {};
 	public types = [];
-	public modules = [];
+	public modules : Array<any> = [];
 	public contexts = [];
 	public word : string = '';
 	public newModules : string = '';
@@ -40,8 +41,9 @@ export class AppInsertion implements OnInit {
 
 	public items = ['Angular' ,'React'];
 
-	constructor(private _httpService : HttpAPIService, private _alert: AlertsService, private _userservice : UserService) {
+	constructor(private _httpService : HttpAPIService, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {
 		console.log(_userservice.getCurrentUser())
+		console.log(_historysearch.getLastSearches())
 	}
 
 	isUnique() {
@@ -87,14 +89,14 @@ export class AppInsertion implements OnInit {
 		this.isUnique();
 	}
 
-	getData(observatory, table) {
+	getData(observatory, table : Array<any>) {
+		let instance = this;
 		this._httpService.getEntryJSON(observatory)
 		.subscribe(
 			function(response) { // The communication with the API has matched
 				console.log(response); // Transform js object into json
-				console.log(response.dictionary.entries);
 				let obj = response.dictionary.entries;
-				for (let prop in obj){ table.push(obj[prop])}
+				for (let prop in obj){ table.push(table == instance.modules ? JSON.parse(obj[prop].value) : obj[prop]);}
 			},
 		)
 	}
@@ -103,7 +105,7 @@ export class AppInsertion implements OnInit {
 		let instance = this;
 		instance.types.splice(0,instance.types.length);
 		instance.contexts.splice(0,instance.contexts.length);
-
+		instance.modules.splice(0,instance.contexts.length);
 		this.getData(AppSettings.API_TYPES, instance.types); // Get the data of types
 		this.getData(AppSettings.API_CONTEXT, instance.contexts); // Get the data of contexts
 		this.getData(AppSettings.API_MODULES, instance.modules); // Get the data of contexts
@@ -117,7 +119,7 @@ export class AppInsertion implements OnInit {
 		let instance = this;
 		if (this.newModule) {
 			let modules = instance.newModules.split(',');
-			this._httpService.postEntryJSON(modules, AppSettings.API_MODULES, instance.newModules)
+			this._httpService.postEntryJSON(modules, AppSettings.API_MODULES, instance.newModules, instance._userservice.getCurrentUser().secretKey)
 			.subscribe()
 		}
 	}
@@ -133,8 +135,9 @@ export class AppInsertion implements OnInit {
 
 	saveInsertion() {
 		if (this.validated()) {
-			this.loading = true;
 			let instance = this;
+			this.loading = true;
+			
 			let modules = this.newModules.split(',');
 			let modulesNotNew = "";
 			if(this.newModule) {
@@ -155,10 +158,10 @@ export class AppInsertion implements OnInit {
 			}
 			
 			let dataInfo = {name : this.word, type: $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text(), source : this.source, modules : modulesNotNew, definition: this.definition, meaning : this.meaning, context :  $('#select-context').text() == "Aucun" ? "" : $('#select-context').text(), commentary : "", review : ""};
-			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name)
+			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name, instance._userservice.getCurrentUser().secretKey)
 			.subscribe(
 				function(response) { // The communication with the API has matched
-					instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, response) // Put searchClick to 0
+					instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, response, instance._userservice.getCurrentUser().secretKey) // Put searchClick to 0
 					.subscribe(
 						function(resp) {
 							instance.loading = false;

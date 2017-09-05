@@ -7,19 +7,25 @@ export class AppSettings {
 	public static API_ENDPOINT='http://groups.cowaboo.net/group-graphToLearn/public/api/';
 	public static API_OBSERVATORY = AppSettings.API_ENDPOINT + "observatory";
 	public static API_ENTRY = AppSettings.API_ENDPOINT + "entry";
-	public static API_ENTRYMETADATA = AppSettings.API_ENTRY + "/conf?";
 	public static API_USERS = AppSettings.API_ENDPOINT + "user";
+
+	public static API_OBSERVATORYMETADATA = AppSettings.API_OBSERVATORY + "/conf?";
+	public static API_ENTRYMETADATA = AppSettings.API_ENTRY + "/conf?";
 	public static API_TRANSFER = AppSettings.API_USERS + "/transfer?";
 
 	public static API_TAGS = AppSettings.API_ENDPOINT + "tags";
 	
 	public static API_WORDS = "Words";
 	public static API_MODULES = "Modules";
+	public static API_HISTORY = "History";
 	public static API_TYPES = "Types";
 	public static API_CONTEXT= "Context";
+
 	public static API_METASEARCHCLICK= "searchClick";
 	public static API_METALIKE= "like";
 	public static API_METADISLIKE= "dislike";
+	public static API_METAHISTORYSEARCH= "historySearch";
+
 
 	/* URL */
 	public static URL_SEARCH = 'http://localhost:4200/search/'
@@ -44,11 +50,17 @@ export class AppSettings {
 	public static MSGERROR = "Un problème est survenu lors de l'insertion des données, Veuillez réessayer svp !";
 	public static MSGINCOMPLETED = "Vous n'avez pas renseigner tous les champs requis pour l'insertion des données !";
 	public static MSGWELCOME = "Vous êtes connecté sur GraphToLearn, Bienvenue ";
-
+	public static MSGMAILSUCCESS = "Votre compte a été créé, vous allez recevoir sous peu vos informations par mail et dès que votre demande d'adhésion sera accepté vous en serez informé";
+	public static MSG_ERROR_MAIL_EMPTY = "Veuillez renseigner le champ Mail ! ";
+	public static MSG_ERROR_SECRETKEY_EMPTY = "Veuillez renseigner le champ Secret Key ! ";
+	public static MSG_ERROR_MAIL_TAKEN = "Attention, un utilisateur avec cet email existe déjà !";
+	public static MSG_ERROR_CREATE_USER = "Attention, un problème est survenu lors de la création du compte, veuillez réessayer !";
+	public static MSG_ERROR_LOG_IN = "La secret key donnée est incorrecte !";
 	/* 3D variables */
 	public static MINX : number = 40;
-	public static COLORSSPHERES : Array<string> = ['#0D47A1', '#64B5F6', '#BBDEFB', '#E3F2FD', '#FFFFFF'];
-
+	
+	//public static COLORSSPHERES : Array<string> = ['#0D47A1', '#64B5F6', '#BBDEFB', '#E3F2FD', '#FFFFFF'];
+	public static COLORSSPHERES : Array<string> = ['#95a5a6', '#95a5a6', '#95a5a6', '#95a5a6', '#95a5a6'];
 	/* Reputation Rules */
 	public static COEFRULES : Array<number> = [2.5, 2, 1.5, 1, 0.5]
 	public static TIMESTAMPRULE : Array<number[]> = [[0,10],[3,8],[7,6],[30,4],[90,2],[360,0]]

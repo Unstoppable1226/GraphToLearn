@@ -12,7 +12,7 @@ import 'rxjs/add/operator/map';
 export class UserService  {
 
 	private isConnected = false
-	private currentUser : User
+	public currentUser : User
 
 	constructor (private _http: Http, private _router: Router, private _httpservice : HttpAPIService) {}
 
@@ -26,18 +26,14 @@ export class UserService  {
 
 	getReputation(publicKey : string) { // Get the stellar coins of the user => his reputation
 		let instance = this;
-		this._httpservice.getUserReputation(publicKey)
-		.subscribe(function(response){
-			instance.currentUser.reputation = !response ? 0 : response;
-			return instance.currentUser;
-		})
+		return instance._httpservice.getUserReputation(publicKey)
 	}
 
 	getCurrentUser() {
 		let instance = this;
 		console.log(this.currentUser);
 		if (this.currentUser == undefined) {
-			instance.currentUser = new User()
+			this.currentUser = new User()
 			let key
 			try {
 				key = window.atob(sessionStorage.getItem('currentUser')) // We put here the try and catch because if we dont the method will not catch the exception
@@ -51,11 +47,16 @@ export class UserService  {
 				} else {
 					instance.currentUser.mail = response.email;
 					instance.currentUser.publicKey = response.publicAddress;
-					return instance.getReputation(response.publicAddress)
+					instance.currentUser.secretKey = key;
+					instance.getReputation(response.publicAddress)
+					.subscribe(function(resp){
+						instance.currentUser.reputation = !resp ? 0 : resp;
+						return instance.currentUser;
+					})
 				}
 			});
 		} else {
-			return this.currentUser;
+			return instance.currentUser;
 		}
 	}
 

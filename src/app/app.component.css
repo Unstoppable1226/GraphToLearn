@@ -1,3 +1,6 @@
+.body{
+	font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;
+}
 .text-center{
 	text-align:center;
 }
@@ -8,6 +11,12 @@
 
 .blur-background{
 	background-color: white;
+}
+
+.error-message {
+	font-size: 0.9em!important;
+    color: #d95c5c!important;
+    font-weight: 600!important;
 }
 
 .button-connect{

@@ -56,7 +56,7 @@ export class Formatter {
 	countSameWord(word, array) {
 		let count = 0
 		for (let i = array.length - 1; i >= 0; i--) {
-			count += (array[i].toLowerCase().includes(word.toLowerCase()) ? 1 : 0)
+			count += (array[i].trim().toLowerCase().includes(word.trim().toLowerCase()) ? 1 : 0)
 		}
 		return count
 	}

@@ -281,7 +281,7 @@ export class Manager3D {
 		label.background = "#1B1C1D"
 		label.height = "30px";
 		label.alpha = 1;
-		label.width = sphere.name.length >= 11 ? "200px" : "100px";
+		label.width = sphere.name.length >= 30 ? "400px" : sphere.name.length >= 20 ? "300px" : sphere.name.length >= 11 ? "200px" : "100px";
 		label.cornerRadius = 20;
 		label.thickness = 1;
 		label.linkOffsetY = 30;
@@ -294,7 +294,7 @@ export class Manager3D {
 		label.addControl(text1);
 
 		var materialSphere1 = new BABYLON.StandardMaterial("texture1", this.scene);
-		materialSphere1.diffuseColor = new BABYLON.Color3.FromHexString("#16a085");
+		materialSphere1.diffuseColor = new BABYLON.Color3.FromHexString("#0D47A1");
 		sphere.material = materialSphere1
 		sphere.position.x = 0;
 		sphere.position.y = 15;

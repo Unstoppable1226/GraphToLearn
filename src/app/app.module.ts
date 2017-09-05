@@ -28,6 +28,7 @@ import { Manager3D } from './3D/app.components3d';
 import { AuthGuard } from './login/app.authguard';
 import { AuthService } from './login/app.authservice';
 import { UserService } from './model/user-service';
+import { HistorySearchService } from './model/history-search';
 
 @NgModule({
 	declarations: [
@@ -54,7 +55,8 @@ import { UserService } from './model/user-service';
 		Manager3D, 
 		AuthGuard,
 		AuthService,
-		UserService
+		UserService,
+		HistorySearchService,
 	],
 	bootstrap: [AppComponent]
 })

@@ -75,7 +75,7 @@
 					<i class="dropdown icon"></i>
 					<div class="default text" id="input-modules">Sélectionner les modules</div>
 					<div class="menu">
-						<div class="item" *ngFor="let module of modules; let i = index"  data-value="{i}">{{module.value}}</div>
+						<div class="item" *ngFor="let module of modules; let i = index"  data-value="{i}">{{module.id}} - {{module.name}}</div>
 					</div>
 				</div>
 				<div [hidden]="!newModule" class="ui icon input" style="margin-top:5px">

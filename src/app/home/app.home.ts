@@ -95,7 +95,7 @@ export class AppHome {
 							(function(index) {
 								var element = tab[index];
 								setTimeout(function() { 
-									instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name)
+									instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name, instance._userservice.getCurrentUser().secretKey)
 									.subscribe(function(res) {
 										console.log(res)
 									})
@@ -109,7 +109,7 @@ export class AppHome {
 								var element = data[index];
 								setTimeout(function() { 
 									let tag = obj[prop].tags;
-									instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, prop)
+									instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, prop, instance._userservice.getCurrentUser().secretKey)
 										.subscribe(function(res) {console.log(res)})
 								}, i * 5000);
 							})(i);
@@ -121,7 +121,7 @@ export class AppHome {
 							(function(index) {
 								var element = data[index];
 								setTimeout(function() { 
-									instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name)
+									instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name, instance._userservice.getCurrentUser().secretKey)
 									.subscribe(function(res) {
 										console.log(res)
 									})
@@ -132,7 +132,7 @@ export class AppHome {
 							console.log(t)
 							for (var i = 0; i < t.length; i++) {
 								console.log("valeur" + t[i])
-								instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, t[i])
+								instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, t[i], instance._userservice.getCurrentUser().secretKey)
 									.subscribe(function(res){
 										console.log(res)
 									}) 

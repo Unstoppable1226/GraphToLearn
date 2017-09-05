@@ -2,6 +2,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { AppSettings } from './settings/app.settings';
 import { AuthGuard } from './login/app.authguard';
 import { UserService } from './model/user-service';
+import { HistorySearchService } from './model/history-search';
 
 declare var $:any;
 
@@ -9,11 +10,11 @@ declare var $:any;
 	selector: 'app-root',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css'],
-	providers: [UserService]
 })
 
 export class AppComponent {
 	title = AppSettings.TITLE;
 
-	constructor(private _authguard : AuthGuard, private _userservice: UserService) {}
+	constructor(protected _authguard : AuthGuard, public _userservice: UserService, public _historysearch : HistorySearchService) {}
+
 }
