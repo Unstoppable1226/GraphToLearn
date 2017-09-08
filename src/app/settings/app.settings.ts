@@ -60,7 +60,7 @@ export class AppSettings {
 	public static MINX : number = 40;
 	
 	//public static COLORSSPHERES : Array<string> = ['#0D47A1', '#64B5F6', '#BBDEFB', '#E3F2FD', '#FFFFFF'];
-	public static COLORSSPHERES : Array<string> = ['#95a5a6', '#95a5a6', '#95a5a6', '#95a5a6', '#95a5a6'];
+	public static COLORSSPHERES : Array<string> = ['#21ba45', '#21ba45', '#21ba45', '#21ba45', '#21ba45'];
 	/* Reputation Rules */
 	public static COEFRULES : Array<number> = [2.5, 2, 1.5, 1, 0.5]
 	public static TIMESTAMPRULE : Array<number[]> = [[0,10],[3,8],[7,6],[30,4],[90,2],[360,0]]

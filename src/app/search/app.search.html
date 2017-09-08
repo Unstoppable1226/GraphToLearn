@@ -6,16 +6,16 @@
 		<div style="background-color:#0D47A1; width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Terme recherché</span>
 		<div style="background-color:#95a5a6; width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Mot clé</span>
 		<div style="background-color:#d35400; width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Module</span>
-		<div style="background-color:#f39c12; width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Autres termes</span>
+		<div style="background-color:#21ba45; width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Autres termes</span>
 	</div>
 	<div style="width: 95%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">
 		<h2 class="ui icon header" style="margin-top:25px; text-align:center!important;margin-bottom: -200px">
 			<div class="content" style="color:#F8F9FB; font-weight:200">
-				Résultat de la recherche : <span style="color:burlywood; font-weight:600">{{wordSearch.name}}</span>
+				Résultat de la recherche : <span style="color:burlywood; font-weight:600">{{wordSel.name}}</span>
 
 				<div class="ui statistic small" style="margin-left:25px">
 					<div class="value" style="color:#1B1C1D">
-						{{wordSearch.searchClick}}
+						{{wordSel.searchClick}}
 					</div>
 					<div class="label" style="color:#1B1C1D">
 						Vues
@@ -27,7 +27,7 @@
 
 		<div id="style-15" class="scrollbar" style="position: fixed;top: 500px;left: 0px;width: 400px; max-width:400px;overflow-y: scroll;max-height: 115px">
 			<a class="ui pointing below label" style="color: #eee; background-color:#1B1C1D;text-align: center;font-size: 1em;font-weight: 600;margin-right: 0px;display:block; margin-bottom:-5px">Réputation dans les modules</a>
-			<div *ngFor="let mod of modulesOfWord; let i = index" class="ui statistic small" style="margin-left:25px">
+			<div *ngFor="let mod of wordSel.modulesReputation; let i = index" class="ui statistic small" style="margin-left:25px">
 				<div class="label" style="color:#1B1C1D">
 					<div class="cusprogress" [ngStyle]="{'color': mod.color}" >
 						<span class="cusprogress-left">
@@ -36,13 +36,13 @@
 						<span class="cusprogress-right">
 											<span class="cusprogress-bar" [ngStyle]="{'animation': mod.animationRight}"></span>
 						</span>
-						<div class="cusprogress-value">{{mod.reputation}}/10<br></div>
+						<div class="cusprogress-value">{{mod.totalReput}}/{{totalPoints}}<br></div>
 					</div>
-					<span style="margin-top:10px!important; font-size:1.2em"> {{mod.id}}</span>
+					<span style="margin-top:10px!important; font-size:1.2em"> {{mod.id.id}}</span>
 				</div>
 			</div>
 		</div>
-
+		
 		<div class="dg main a" style="width: 300px;position: fixed; top:250px; right: 0;margin-right: 0px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 			<div class="close-button" style="width: 300px;height:50px;padding-top: 5px;font-size: 1.3em;line-height:20px!important;user-select: none;"
 			 (click)="hideOrShow($event, 1)">
@@ -65,13 +65,13 @@
 						<div class="c">{{wordSel.definition}}</div>
 					</div>
 				</li>
-				<li *ngIf="wordSel.name != wordSearch.name" class="cr number has-slider" style="height: 35px;line-height: 35px">
+				<!--<li *ngIf="wordSel.name != wordSearch.name" class="cr number has-slider" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name">Réputation :</span>
 						<div id="popupReputation" data-html="<div class='header'>User Rating</div><div class='content'><div class='ui star rating'><i class='active icon'></i><i class='active icon'></i><i class='active icon'></i><i class='icon'></i><i class='icon'></i></div></div>"
 						 class="ui blue small left pointing label"><strong>{{wordSel.totalReput}}</strong></div>
 					</div>
-				</li>
+				</li>-->
 				<li *ngIf="wordSel.modules.id != '' || wordSel.modules.id != ' '" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name">Modules : </span>

@@ -164,8 +164,12 @@ export class Manager3D {
 		this.wordSel.totalReput = data.totalReput;
 		this.wordSel.definition = data.definition;
 		this.wordSel.modules = data.modules
+		this.wordSel.searchClick = data.searchClick
+		this.wordSel.like = data.like
+		this.wordSel.dislike = data.dislike
 		this.wordSel.lastUpdatedNbDays = data.lastUpdatedNbDays;
 		this.wordSel.timestampCreation = data.timestampCreation;
+		this.wordSel.modulesReputation = data.modulesReputation;
 	}
 
 	registerAction(mesh, tag) {
@@ -239,12 +243,14 @@ export class Manager3D {
 	}
 
 
-	createScene(wordSearch, tags, wordSel) {
+	createScene(wordSearch, tags, wordSel, modules) {
 		this.wordSearch = wordSearch;
 		this.wordSel = wordSel;
+		console.log(tags)
+		
 		this.scene = new BABYLON.Scene(this.engine);
 		this.scene.clearColor = new BABYLON.Color4(0, 0, 0, 0.0000000000000001);
-		this.camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, 1.0, 110, BABYLON.Vector3.Zero(), this.scene);
+		this.camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, 1.0, 125, BABYLON.Vector3.Zero(), this.scene);
 		//this.camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, -8, -80), this.scene);
 		this.camera.attachControl(this.canvas, true);
 		this.scene.collisionsEnabled = false;
@@ -252,17 +258,33 @@ export class Manager3D {
 		var hemi = new BABYLON.HemisphericLight("toto");
 		var sphereMaterial = new BABYLON.StandardMaterial();
 		this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
-
+		let i = 0;
 		var sphere1 = BABYLON.Mesh.CreateSphere(wordSearch.name, 50.0, 15, this.scene);
 		var label1 = new BABYLON.GUI.Rectangle("label" + sphere1.name);
+		for (let props in modules) {
+			var element = modules[props];
+			var sphere = BABYLON.Mesh.CreateSphere(element.id, 80.0, 25 , this.scene);
+			var label = new BABYLON.GUI.Rectangle("label" + sphere.name);
+			this.createMainMesh(sphere, label, (-50 * Object.keys(modules).length + (i * 100)), 50, "#d35400");
+			var line = new BABYLON.GUI.Line('line' + element.name);
+			line.alpha = 1;
+			line.color = "black";
+			line.lineWidth = 1.5;
+			this.advancedTexture.addControl(line);
+			line.linkWithMesh(sphere);
+			line.connectedControl = label1;
+			i++;
+		}
+		
 
-		this.createMainMesh(sphere1, label1);
+		this.createMainMesh(sphere1, label1, 0, 15, "#0D47A1");
 
-		for (var i = tags.length - 1; i >= 0; i--) {
+		
+		for (var cpt = tags.length - 1; cpt >= 0; cpt--) {
 			this.spheres.push(
 				{ 
-					sphere: BABYLON.Mesh.CreateSphere(this._format.capitalize(tags[i].name), 50.0, (2 + tags[i].repRule1), this.scene), 
-					tag: tags[i] 
+					sphere: BABYLON.Mesh.CreateSphere(this._format.capitalize(tags[cpt].name), 50.0, (2 + tags[cpt].repRule1), this.scene), 
+					tag: tags[cpt] 
 				}
 			);
 		}
@@ -277,7 +299,7 @@ export class Manager3D {
 		*/
 	}
 
-	createMainMesh(sphere, label) {
+	createMainMesh(sphere, label, posX, posY, color) {
 		label.background = "#1B1C1D"
 		label.height = "30px";
 		label.alpha = 1;
@@ -294,10 +316,10 @@ export class Manager3D {
 		label.addControl(text1);
 
 		var materialSphere1 = new BABYLON.StandardMaterial("texture1", this.scene);
-		materialSphere1.diffuseColor = new BABYLON.Color3.FromHexString("#0D47A1");
+		materialSphere1.diffuseColor = new BABYLON.Color3.FromHexString(color);
 		sphere.material = materialSphere1
-		sphere.position.x = 0;
-		sphere.position.y = 15;
+		sphere.position.x = posX;
+		sphere.position.y = posY;
 		this.registerAction(sphere, null);
 	}
 

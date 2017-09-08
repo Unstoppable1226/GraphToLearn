@@ -28,6 +28,9 @@ export class Entry {
     review : string = "";
     ict : string = "";
     cpte : string = "";
+    modulesReputation: Array<any> = []
+    animationLeft : string = "";
+    animationRight : string = "";
 
 
     setData(obj) {

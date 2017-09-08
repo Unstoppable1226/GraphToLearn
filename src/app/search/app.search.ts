@@ -45,7 +45,8 @@ export class AppSearch {
 	private canDislike : boolean = false;
 	private canVote : boolean = false;
 	private allModules = []
-	private modulesOfWord = []
+	private modulesOfWord = {}
+	private totalPoints = 0
 
 	constructor(private _route: ActivatedRoute, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch : HistorySearchService) {
 		let instance = this;
@@ -183,7 +184,32 @@ export class AppSearch {
 				element.color = element.reputation >= 7 ? "#16ab39" :  element.reputation > 4 ? "#eaae00" : "#db2828"
 				element.animationLeft = "loading-" + (element.reputation >= 5 ? (element.reputation - 5)*2: 0) +" 0.5s linear forwards"
 				element.animationRight = "loading-" + (element.reputation >= 5 ? 10 : element.reputation * 2) + " 0.5s linear forwards"
-				this.modulesOfWord.push(element)
+				this.modulesOfWord[element.id] = element
+			}
+		}
+	}
+
+	getAllWordsOfModules(response) {
+		let obj = response.dictionary.entries;
+		let entry
+		let objInsert
+		for (let prop in this.modulesOfWord) {
+			var element = this.modulesOfWord[prop];
+			element.allterms = [];
+		}
+
+		for (let prop in obj) {
+			entry = JSON.parse(obj[prop].value)
+			for (let props in this.modulesOfWord) {
+				var element = this.modulesOfWord[props];
+				if (entry.modules.includes(element.id.trim())) {
+					objInsert = new Entry()
+					objInsert.setData(JSON.parse(obj[prop].value));
+					objInsert.searchClick = obj[prop].conf[AppSettings.API_METASEARCHCLICK] == undefined ? 0 : obj[prop].conf[AppSettings.API_METASEARCHCLICK]
+					objInsert.timestampCreation = this._format.getDate(obj[prop].date);
+					objInsert.author = { name: obj[prop].author, search: "" };
+					element.allterms.push(objInsert)
+				}
 			}
 		}
 	}
@@ -214,7 +240,15 @@ export class AppSearch {
 				for(let i = 0; i< instance.wordSearch.modules.id.length; i++) {
 					instance.getSameModule(instance.wordSearch.modules.id[i].trim())
 				}
-				console.log(instance.modulesOfWord)
+				
+				instance.getAllWordsOfModules(response) 
+				/*
+				for (var index = 0; index < instance.modulesOfWord.length; index++) {
+					var element = instance.modulesOfWord[index];
+					instance._httpservice.postObservatoryMetadata(element.id, JSON.stringify(element.allterms), AppSettings.API_WORDS, instance._userservice.currentUser.secretKey)
+					.subscribe(function(response){console.log(response);})
+				}*/
+
 				let tab : Array<string>= []
 				instance._httpservice.getEntryJSON(AppSettings.API_HISTORY)
 				.subscribe(
@@ -330,34 +364,90 @@ export class AppSearch {
 		return tags;
 	}
 
-	numberTimesApparitions(explaination) {
+	numberTimesApparitions(explaination, arrayEntrys) {
 		let name
 		let count
-		for (var i = this.contextEntrys.length - 1; i >= 0; i--) {
-			count = this._format.countSameWord(this.contextEntrys[i].name, explaination);
-			this.contextEntrys[i].count = count;
+		for (var i = arrayEntrys.length - 1; i >= 0; i--) {
+			count = this._format.countSameWord(arrayEntrys[i].name, explaination);
+			arrayEntrys[i].count = count;
 		}
 	}
 
-	sortTags() {
-		this.contextEntrys.sort(function (a: Entry, b : Entry) { return a.count - b.count; }); // Sort
-		if (this.contextEntrys.length > 15) {
-			let length = this.contextEntrys.length
-			this.contextEntrys = this.contextEntrys.slice(length - 15, length); // Take the 15 lasts 
+	sortTags(arrayEntrys) {
+		arrayEntrys.sort(function (a: Entry, b : Entry) { return a.count - b.count; }); // Sort
+		if (arrayEntrys.length > 15) {
+			let length = arrayEntrys.length
+			arrayEntrys = arrayEntrys.slice(length - 15, length); // Take the 15 lasts 
 		}
+		return arrayEntrys
 	}
 
-	createRep1(wordSearch, context) {
-		let totalPoints = this._format.getTotalCountWord(context);
-		let nbTags = context.length;
+	createRep1(wordSearch, entrys) {
+		let totalPoints = this._format.getTotalCountWord(entrys);
+		let nbTags = entrys.length;
 		let divisions = this._format.getDivisions(totalPoints, nbTags);
-		for (let i = context.length - 1; i >= 0; i--) {
-			context[i].repRule1 = this._format.getReput(context[i].count, divisions) * AppSettings.COEFRULES[0]
+		for (let i = entrys.length - 1; i >= 0; i--) {
+			entrys[i].repRule1 = this._format.getReput(entrys[i].count, divisions) * AppSettings.COEFRULES[0]
 		}
-		context.sort(function (a, b) { return a.reputRule1 > b.reputRule1; });
+		entrys.sort(function (a, b) { return a.reputRule1 > b.reputRule1; });
 	}
 
-	createRep2(wordSearch, context) {}
+	createRep1Entrys(moduleName, entrys) {
+		let totalPoints = this._format.getTotalCountEntry(entrys, moduleName);
+		let nbTags = entrys.length;
+		let divisions = this._format.getDivisions(totalPoints, nbTags);
+		for (let i = entrys.length - 1; i >= 0; i--) {
+			for (var index = 0; index < entrys[i].modulesReputation.length; index++) {
+				var element =  entrys[i].modulesReputation[index];
+				if (moduleName.trim() == element.id.id.trim()) {
+					element.repRule1 = this._format.getReput(element.count, divisions) * AppSettings.COEFRULES[0]
+				}
+			}
+		}
+	}
+/*
+	createRep1WordSearch(moduleName, wordSearch) {
+		let totalPoints = this._format.getTotalCountEntry(entrys, moduleName);
+		let nbTags = entrys.length;
+		let divisions = this._format.getDivisions(totalPoints, nbTags);
+		for (var index = 0; index < entrys[i].modulesReputation.length; index++) {
+			var element =  entrys[i].modulesReputation[index];
+			if (moduleName.trim() == element.id.id.trim()) {
+				element.repRule1 = this._format.getReput(element.count, divisions) * AppSettings.COEFRULES[0]
+			}
+		}
+	}*/
+
+	createRep2(moduleName, listUsers, entries) {
+		for (var index = 0; index < entries.length; index++) {
+			for (var i = 0; i < entries[index].modulesReputation.length; i++) {
+				var el = entries[index].modulesReputation[i];
+				if (el.id.id.trim() == moduleName) {
+					this._httpservice.getUserReputation(listUsers[entries[index].author.name])
+						.subscribe(
+							data => {
+								console.log(data);
+							}
+						) 
+				}
+			}
+			
+		}
+	}
+
+	createRep3(moduleName, entries) {
+		let totalPoints = this._format.getTotalSearchClick(entries, moduleName);
+		let nbTags = entries.length;
+		let divisions = this._format.getDivisions(totalPoints, nbTags);
+		for (let i = entries.length - 1; i >= 0; i--) {
+			for (var index = 0; index < entries[i].modulesReputation.length; index++) {
+				var element =  entries[i].modulesReputation[index];
+				if (moduleName.trim() == element.id.id.trim()) {
+					element.repRule3 = this._format.getReput(element.count, divisions) * AppSettings.COEFRULES[2]
+				}
+			}
+		}
+	}
 
 	numberUpdates() { }
 
@@ -384,21 +474,138 @@ export class AppSearch {
 				+ context[index].repRule4 + context[index].repRule5)
 		}
 	}
+	countTotalReputationForModule(entries) {
+		for (var index = 0; index < entries.length; index++) {
+			var el = entries[index].modulesReputation
+			for (var i = 0; i < el.length;i++) {
+				el[i].totalReput = (el[i].repRule1 +  
+					el[i].repRule2 + el[i].repRule3 
+					+ el[i].repRule4 + el[i].repRule5)
+			}
+			
+		}
+	}
+
+	constructReputationForModule(element, modules) {
+		for (var index = 0; index < modules.length; index++) {
+			var module = modules[index];
+			if (module.trim() != "") {
+				if (this.modulesOfWord[module.trim()] != undefined) {
+					var object = {id : this.modulesOfWord[module], repRule1 : 0,repRule2 : 0,repRule3 : 0,repRule4 : 0,repRule5 : 0,totalReput : 0, count: 0}
+					object.count = this._format.countSameWord(element.name, this.modulesOfWord[module].goals.split(' '))
+					element.count += object.count
+					element.modulesReputation.push(object)
+				}
+			}
+			
+		}
+	}
+
+	getReputationTotal(el) {
+		let count = 0
+		for (var index = 0; index < el.modulesReputation.length; index++) {
+			var element = el.modulesReputation[index];
+			count += element.count;
+		}
+		return count;
+	}
 
 	createContext(wordSearch) {
 		let today = moment()
 		let instance = this;
+		console.log(wordSearch)
+
+		var allEntries : Array<Entry>= []
+		
+		for (let prop in this.modulesOfWord) {
+			var module = this.modulesOfWord[prop];
+			allEntries = allEntries.concat(module.allterms)
+		}
+		allEntries = this._format.uniqueEntries(allEntries, 'name')		
+		
+		for (var index = 0; index < allEntries.length; index++) {
+			var element = allEntries[index];
+			element.modules.id = element.modules.id.replace(/\.0/g, " ")
+			var mod = element.modules.id.replace(/\,/g, " ").replace(/\-/g, " ")
+			var modu = mod.split(' ')
+			this.constructReputationForModule(element, modu)
+		}
+
+		allEntries = this.sortTags(allEntries)
+
+		this.constructReputationForModule(wordSearch, wordSearch.modules.id)
+
+		allEntries.push(wordSearch)
+
+		for (let prop in this.modulesOfWord) {
+			var el = this.modulesOfWord[prop];
+			this.createRep1Entrys(el.id, allEntries)
+			//this.createRep2(el.id, allEntries)
+			/*instance._httpservice.getUsers()
+			.subscribe(
+				data => {
+					this.createRep2(el.id, data.user_list.list, allEntries)
+				},
+				error => {}
+			)*/
+			this.createRep3(el.id, allEntries)
+		}
+		this.countTotalReputationForModule(allEntries)
+		console.log(allEntries)
+		var wordSelected
+		for (var index = 0; index < allEntries.length; index++) {
+			var element = allEntries[index];
+			if (element.name == wordSearch.name) {
+				wordSelected = element
+				allEntries.slice(index, 1)
+			}
+		}
+		console.log(instance.wordSel)
+		instance.wordSearch = Object.assign({}, wordSelected)
+		instance.wordSel = Object.assign({}, instance.wordSearch);
+
+		var totalPoints = instance.getReputationTotal(instance.wordSearch)
+		for (var index = 0; index < allEntries.length; index++) {
+			var element = allEntries[index];
+			var points =  instance.getReputationTotal(element)
+			console.log(points)
+			if (points > totalPoints) {
+				totalPoints = points
+			}
+		}
+
+		this.totalPoints = totalPoints
+
+
+		
+		for (var index = 0; index < allEntries.length; index++) {
+			var element = allEntries[index];
+			for (var i = 0; i < element.modulesReputation.length; i++) {
+				var ele = element.modulesReputation[i];
+				var half = Math.floor(((ele.totalReput * 10) / this.totalPoints))
+				console.log(half)
+				ele.color = half >= 7 ? "#16ab39" :  half > 4 ? "#eaae00" : "#db2828"
+				ele.animationLeft = "loading-" + /*(half >= 5 ? (half - 5)*2: 0)*/ 0 +" 0.5s linear forwards"
+				ele.animationRight = "loading-" + /*(half >= 5 ? 10 : half * 2)*/ 5 + " 0.5s linear forwards"
+			}
+			
+		}
+
+		instance._manager3d.createScene(wordSearch, allEntries, instance.wordSel, instance.modulesOfWord);
+		instance._manager3d.runRender();
+		/*
+		
 		this.context = this.sanitizeMeaningForZone();
 		this.context = Array.from(new Set(this.context))
-
 		for (var index = 0; index < this.context.length; index++) {
 			var el = new Entry();
 			el.name = this.context[index]
 			this.contextEntrys.push(el)
 		}
 		let explaination = this._format.splitter(wordSearch.meaning, [' '])// remove espaces
-		this.numberTimesApparitions(explaination)
-		this.sortTags() // Sort the best tags 'importance by nb of apparition in the meaning of the word searched'
+		this.numberTimesApparitions(explaination, this.contextEntrys)
+		console.log(this.contextEntrys)
+		this.sortTags(this.contextEntrys) // Sort the best tags 'importance by nb of apparition in the meaning of the word searched'
 		
 		for (let index = 0; index < this.contextEntrys.length; index++) {
 			let element = this.contextEntrys[index];
@@ -413,7 +620,6 @@ export class AppSearch {
 			this._httpservice.getInfosOnWiki(element.name).subscribe(function (res) {
 				element.meaning = res[2][0]
 				element.source = "Wikipédia"
-				
 			})
 			this._httpservice.getRevisionsOnWiki(element.name).subscribe(function (response) {
 				let results = response.query.pages
@@ -425,12 +631,11 @@ export class AppSearch {
 				element.repRule5 = obj.reputation
 				element.lastUpdatedNbDays = obj.nbDays
 				if (index == instance.contextEntrys.length - 1) {
-					console.log(instance.contextEntrys)
 					/*
 					for (var cpt = instance.contextEntrys.length - 1; cpt >= 0 ; cpt--) {
 						if (instance.contextEntrys[cpt].meaning == "" || instance.contextEntrys[cpt].meaning == undefined && instance.contextEntrys.length > 5) {instance.contextEntrys.splice(cpt, 1)}
 					}*/
-					console.log(instance.contextEntrys)
+		/*			console.log(instance.contextEntrys)
 					instance.createRep1(wordSearch, instance.contextEntrys) // rule 1 (Interne)
 					instance.createRep2(wordSearch, instance.contextEntrys) // rule 3 (Recherche/Clique)
 					//instance.numberUpdates(); // rule 4 (Mise à jour)
@@ -439,14 +644,14 @@ export class AppSearch {
 					instance.wordSel = Object.assign({}, instance.wordSearch);
 					//console.log(instance.context)
 					if (wordSearch.name.includes(" ")) { }
-					console.log(instance.wordSel)
-					instance._manager3d.createScene(wordSearch, instance.contextEntrys, instance.wordSel);
+
+					instance._manager3d.createScene(wordSearch, instance.contextEntrys, instance.wordSel, instance.modulesOfWord);
 					instance._manager3d.runRender();
 				}
 			})
-			
+		
 		}
-
+		*/
 	}
 
 

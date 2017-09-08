@@ -36,6 +36,32 @@ export class Formatter {
 		return count
 	}
 
+	getTotalCountEntry(entrys, nameModule) {
+		let count = 0
+		for (let i = entrys.length - 1; i >= 0; i--) {
+			for (var index = 0; index < entrys[i].modulesReputation.length; index++) {
+				var element = entrys[i].modulesReputation[index];
+				if (nameModule.trim() == element.id.id.trim()) {
+					count += element.count
+				}
+			}	
+		}
+		return count
+	}
+
+	getTotalSearchClick(entries, nameModule) {
+		let count = 0
+		for (let i = entries.length - 1; i >= 0; i--) {
+			for (var index = 0; index < entries[i].modulesReputation.length; index++) {
+				var element = entries[i].modulesReputation[index];
+				if (nameModule.trim() == element.id.id.trim()) {
+					count += entries[i].searchClick
+				}
+			}	
+		}
+		return count
+	}
+
 	getReput(tag, divisions) {
 		for (let i = 0, rep = 1; i < divisions.length - 1; i++ , rep++) {
 			if (tag <= divisions[i]) {
@@ -60,6 +86,13 @@ export class Formatter {
 		}
 		return count
 	}
+
+	uniqueEntries(a, param) {
+		return a.filter(function(item, pos, array){
+            return array.map(function(mapItem){ return mapItem[param]; }).indexOf(item[param]) === pos;
+        })
+	}
+
 
 	getDefinition(tag, dictionary) {
 		let el

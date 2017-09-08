@@ -69,13 +69,7 @@ export class AppLogin {
 							if (data.publicAddress == undefined) {
 								return false;
 							} else {
-								let mail : string = data.email
-								let tab : Array<string>= []
-								let historySearch = {}
-								historySearch[mail] = []
-								console.log(historySearch)
-								instance._httpservice.postObservatoryMetadata(data.email, JSON.stringify(tab), AppSettings.API_HISTORY, instance.secretKey)
-									.subscribe(function(response){console.log(response)})
+								
 								$('#modalConnection').modal('hide');
 								instance.loading = true
 								instance.getReputation(data.publicAddress, data)
