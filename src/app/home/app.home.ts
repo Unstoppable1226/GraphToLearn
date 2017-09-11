@@ -8,6 +8,7 @@ import { AuthService } from '../login/app.authservice';
 import { UserService } from '../model/user-service';
 //import { Observable } from 'rxjs/Observable';
 import { Observable } from 'rxjs/Rx';
+import { Router} from '@angular/router';
 
 declare var $: any;
 
@@ -26,8 +27,9 @@ export class AppHome {
 	title = AppSettings.TITLE;
 	timeEstimated = ""
 
-	constructor(private _httpService: HttpAPIService, private _authservice: AuthService, private _userservice: UserService) {
+	constructor(private _httpService: HttpAPIService, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
 		console.log(this._userservice.getCurrentUser());
+		
 	}
 
 	insertWithFile() {
@@ -173,14 +175,17 @@ export class AppHome {
 							responseSearch.results.push({
 								title: itemObj.name + modules,
 								description: itemObj.meaning,
-								url: AppSettings.URL_SEARCH + name
+								name: itemObj.name
+								/*url: AppSettings.URL_SEARCH + name*/
 							});
 						});
-						console.log(responseSearch);
 						return responseSearch;
 					}
 				},
-				minCharacters: 1
+				minCharacters: 1,
+				onSelect(result, response) {
+					instance._router.navigate(['search/' + result.name])
+				}
 			});
 	}
 }

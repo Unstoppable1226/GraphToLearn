@@ -16,7 +16,8 @@ export class Manager3D {
 	private wordSel : Entry
 	private sphereMaterial
 	private spheres = []
-	private advancedTexture = { addControl: function (label) { } , getMeshByName: function(string) {}, _rootContainer : {children: []}}
+	private advancedTexture : any
+	private lines = []
 
 	private camera
 	private advancedTextureGUI
@@ -28,7 +29,8 @@ export class Manager3D {
 
 	startEngine(nameElement) {
 		this.canvas = document.getElementById(nameElement);
-		this.engine = new BABYLON.Engine(this.canvas, true);
+		this.engine = new BABYLON.Engine(this.canvas, false);
+		
 	}
 
 	createLabel(mesh, position, maxGap) {
@@ -45,6 +47,7 @@ export class Manager3D {
 		label.cornerRadius = 20;
 		label.thickness = 1;
 		label.linkOffsetY = 30;
+		this.lines.push(label)
 		this.advancedTexture.addControl(label);
 		label.linkWithMesh(mesh);
 
@@ -236,28 +239,47 @@ export class Manager3D {
 			line.alpha = 1;
 			line.color = "#1678c2";
 			line.lineWidth = 0.5;
+
 			this.advancedTexture.addControl(line);
+			this.lines.push(line)
 			line.linkWithMesh(sphere);
 			line.connectedControl = label1;
 		}
 	}
 
+	refreshScene() {
+		
+		
+	}
 
 	createScene(wordSearch, tags, wordSel, modules) {
 		this.wordSearch = wordSearch;
 		this.wordSel = wordSel;
-		console.log(tags)
-		
 		this.scene = new BABYLON.Scene(this.engine);
 		this.scene.clearColor = new BABYLON.Color4(0, 0, 0, 0.0000000000000001);
 		this.camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, 1.0, 125, BABYLON.Vector3.Zero(), this.scene);
-		//this.camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, -8, -80), this.scene);
 		this.camera.attachControl(this.canvas, true);
 		this.scene.collisionsEnabled = false;
 		this.camera.checkCollisions = false;
+		if (this.advancedTexture == undefined) {
+			this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
+		} else {
+			this.advancedTexture.dispose();
+			this.scene.dispose();
+			//this.
+			this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
+		}
+		
+
+		
+		
+		
+		//this.camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, -8, -80), this.scene);
+		
+		
 		var hemi = new BABYLON.HemisphericLight("toto");
 		var sphereMaterial = new BABYLON.StandardMaterial();
-		this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
+		
 		let i = 0;
 		var sphere1 = BABYLON.Mesh.CreateSphere(wordSearch.name, 50.0, 15, this.scene);
 		var label1 = new BABYLON.GUI.Rectangle("label" + sphere1.name);
@@ -265,8 +287,9 @@ export class Manager3D {
 			var element = modules[props];
 			var sphere = BABYLON.Mesh.CreateSphere(element.id, 80.0, 25 , this.scene);
 			var label = new BABYLON.GUI.Rectangle("label" + sphere.name);
-			this.createMainMesh(sphere, label, (-50 * Object.keys(modules).length + (i * 100)), 50, "#d35400");
+			this.createMainMesh(sphere, label, (-50 * Object.keys(modules).length + (i * 100)), 50, AppSettings.COL_MODULE);
 			var line = new BABYLON.GUI.Line('line' + element.name);
+			this.lines.push(line)
 			line.alpha = 1;
 			line.color = "black";
 			line.lineWidth = 1.5;
@@ -277,7 +300,7 @@ export class Manager3D {
 		}
 		
 
-		this.createMainMesh(sphere1, label1, 0, 15, "#0D47A1");
+		this.createMainMesh(sphere1, label1, 0, 15, AppSettings.COL_SEARCH_TERM);
 
 		
 		for (var cpt = tags.length - 1; cpt >= 0; cpt--) {

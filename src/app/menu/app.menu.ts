@@ -23,36 +23,16 @@ export class MenuComponent {
 	public isConnected = false
 	public active = [true, false, false, false]
 	public user: User
+	public colSearchTerm = AppSettings.COL_SEARCH_TERM
+	public colKeyWords = AppSettings.COL_KEY_WORDS
+	public colModule = AppSettings.COL_MODULE
+	public colOtherTerms = AppSettings.COL_OTHER_TERMS
 	public historySearch = []
 	
 	constructor(private _httpService: HttpAPIService, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch : HistorySearchService) {
 		this.user = new User();
 		this.user = _userservice.getCurrentUser();
 		this.historySearch = _historysearch.getLastSearches()
-		console.log(this._historysearch.getLastSearches())
-		
-		/*let instance = this;
-		if (instance._userservice.getCurrentUser() == null) {
-			instance.user = new User()
-			let key
-			try {
-    				key = window.atob(sessionStorage.getItem('currentUser')) // We put here the try and catch because if we dont the method will not catch the exception
-			} catch(e) {
-			    	instance._router.navigate(['welcome']);
-			}
-			_httpService.getUser(key)
-				.subscribe(function(response) {
-					if (response.email == undefined) {
-						instance._router.navigate(['welcome']);
-					} else {
-						instance.user.mail = response.email;
-						instance.user.publicKey = response.publicAddress;
-						instance.getReputation(response.publicAddress)
-					}
-				});
-		} else {
-			instance.user = instance._userservice.getCurrentUser();
-		}*/
 	}
 
 	toggleSideBar() {
@@ -86,24 +66,56 @@ export class MenuComponent {
 		.subscribe(function(response){console.log(response);})
 	}
 
+	saveOptions() {
+		AppSettings.COL_SEARCH_TERM = this.colSearchTerm
+		AppSettings.COL_KEY_WORDS =  this.colKeyWords
+		AppSettings.COL_MODULE = this.colModule
+		AppSettings.COL_OTHER_TERMS = this.colOtherTerms
+		$('.ui.modal').modal('hide all')
+	}
+
+	searchSelectedWord(word) {
+		
+		console.log(word)
+		$('.ui.sidebar').sidebar('toggle')
+		this._router.navigate(['search/' + word]);
+	}
+
+	showOptions() {
+		$('.ui.options.modal').modal('show')
+	}
+
+	showInfo() {
+		
+	}
+
+	showFeedBack() {
+
+	}
+
+	hideModalOptions() {
+		$('.ui.modal').modal('hide all')
+	}
+
+	changeActiveMenuItem(id, route) {
+		for (var i = this.active.length - 1; i >= 0; i--) { this.active[i] = false; }
+		this.active[id] = true;
+		this._router.navigate([route]);
+	}
+
 	logout() {
 		let instance = this;
 		$('.ui.mini.modal')
 			.modal({
 				closable: false,
 				onDeny: function () {
+					$('.ui.modal').modal('hide all')
 					return true;
 				},
 				onApprove: function () {
 					instance._authservice.logout();
 				}
 			}).modal('show')
-	}
-
-	changeActive(id, route) {
-		for (var i = this.active.length - 1; i >= 0; i--) { this.active[i] = false; }
-		this.active[id] = true;
-		this._router.navigate([route]);
 	}
 
 }

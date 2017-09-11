@@ -21,6 +21,7 @@ export class AuthService {
 	logout() {
 		var el = document.getElementsByClassName('ui dimmer modals page transition hidden'); // Remove other modals
 		if (el.length > 0) { el[0].children[0].remove(); }
+		$('.ui.modal').modal('hide all')
 		sessionStorage.removeItem('currentUser');
 		this._router.navigate(['welcome']);
 	}

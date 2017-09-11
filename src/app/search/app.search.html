@@ -3,12 +3,15 @@
 <div style="width: 100%;text-align: center!important; ">
 	<div style="background-color:#1B1C1D;height: 45px;width: 500px;position: fixed;top: 56px;right: 0px;color: #eee;font-weight: bold;border-radius: 5px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;">
 		<div style="margin-top:3px">Légende</div>
-		<div style="background-color:#0D47A1; width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Terme recherché</span>
-		<div style="background-color:#95a5a6; width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Mot clé</span>
-		<div style="background-color:#d35400; width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Module</span>
-		<div style="background-color:#21ba45; width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Autres termes</span>
+		<div [ngStyle]="{'background-color': col1}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Terme recherché</span>
+		<div [ngStyle]="{'background-color': col2}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Mot clé</span>
+		<div [ngStyle]="{'background-color': col3}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Module</span>
+		<div [ngStyle]="{'background-color': col4}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Autres termes</span>
 	</div>
-	<div style="width: 95%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">
+	<div style="width: 95%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;" >
+		<div *ngIf="loading"  class="ui active dimmer">
+			<div class="ui large text loader">Chargement</div>
+		</div>
 		<h2 class="ui icon header" style="margin-top:25px; text-align:center!important;margin-bottom: -200px">
 			<div class="content" style="color:#F8F9FB; font-weight:200">
 				Résultat de la recherche : <span style="color:burlywood; font-weight:600">{{wordSel.name}}</span>
@@ -59,7 +62,7 @@
 						<div class="c">{{wordSel.type}}</div>
 					</div>
 				</li>
-				<li *ngIf="wordSel.definition != '' || wordSel.definition != ' '" class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="wordSel.definition != ''" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name">Définition : </span>
 						<div class="c">{{wordSel.definition}}</div>
@@ -72,13 +75,13 @@
 						 class="ui blue small left pointing label"><strong>{{wordSel.totalReput}}</strong></div>
 					</div>
 				</li>-->
-				<li *ngIf="wordSel.modules.id != '' || wordSel.modules.id != ' '" class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="wordSel.modules.id != ''" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name">Modules : </span>
 						<div class="c">{{wordSel.modules.id}}</div>
 					</div>
 				</li>
-				<li *ngIf="wordSel.context != '' || wordSel.context != ' '" class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="wordSel.context != ''" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name">Contexte : </span>
 						<div class="c">{{wordSel.context}}</div>
@@ -114,8 +117,7 @@
 				<a tabindex="0" class="ui basic red left pointing label" style="width: 60px; text-align: center">{{wordSel.dislike.number}}</a>
 			</div>
 		</div>
-		<button style="display:block; margin-top:-32px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home"
-		 [routerLink]="['/home']"> 
+		<button style="display:block; margin-top:-32px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home" (click)="backToHome()"> 
 			<i class="reply icon"></i> Retour 
 			<span style="margin-left:8px">|</span>
 			<i class="home icon" style="margin-left:10px"></i>

@@ -25,7 +25,7 @@ export class HttpAPIService {
 	}
 
 	joinCommunity(mail) {
-		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
 		let options = new RequestOptions({ headers: headers });
 		return this._http.post(AppSettings.API_USERS + "?email=" + mail, options)
 		.map((res: Response) => { 
@@ -55,31 +55,33 @@ export class HttpAPIService {
 	}
 
 	postEntryJSON(dataInfo, observatory, tags, secretKey) {
-		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
-		let options = new RequestOptions({ headers: headers });
+		let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let options = new RequestOptions({ headers: headers});
 
 		return this._http.post(AppSettings.API_ENTRY, "secretKey=" + secretKey + "&observatoryId=" + observatory + "&tags= " + tags + "&value= " + JSON.stringify(dataInfo), options)
 			.map((res: Response) => res.json());
 	}
 
 	postBalance(publicKeySender, secretKeySender, publicKeyDestination, amount) {
-		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
 		let options = new RequestOptions({ headers: headers });
-		return this._http.post(AppSettings.API_TRANSFER, "public=" + publicKeySender+ "&secretKey=" + secretKeySender + "&destination=" + publicKeyDestination + "&amount= " + amount, options)
+		return this._http.post(AppSettings.API_TRANSFER + "public=" + publicKeySender+ "&secretKey=" + secretKeySender + "&destination=" + publicKeyDestination + "&amount= " + amount," ", options)
 		.map((res: Response) => res.json());
 	}
 
 	postObservatoryMetadata(name, value, idObservatory, secretKey) {
-		let headers = new Headers({ 'Content-Type': 'application/json', 'Accept': 'application/json' }); // ... Set content type to JSON
-		let options = new RequestOptions({ headers: headers });
-		return this._http.post(AppSettings.API_OBSERVATORYMETADATA  + "secretKey=" + secretKey + "&observatoryId=" + idObservatory + "&metadata%20name=" + name + "&metadata%20value=" + value, options)
-			.map((res: Response) => res.json());
+		console.log('Observatory Metadata')
+		let headers = new Headers({'Content-Type' : 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let options = new RequestOptions({ headers: headers});
+		return this._http.post(AppSettings.API_OBSERVATORYMETADATA  + "secretKey=" + secretKey + "&observatoryId=" + idObservatory + "&metadata%20name=" + name + "&metadata%20value=" + value, " ", options)
+			.map((res: Response) => res);
 	}
 
 	postEntryMetadata(name, value, hashEntry, secretKey) {
-		let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
-		let options = new RequestOptions({ headers: headers });
+		console.log('Entry Metadata')
+		let headers = new Headers({'Content-Type' : 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let options = new RequestOptions({ headers: headers});
 		return this._http.post(AppSettings.API_ENTRYMETADATA + "metadata%20name=" + name + "&metadata%20value=" + value, "secretKey=" + secretKey + "&observatoryId=Words&hash=" + hashEntry, options)
-			.map((res: Response) => res.json());
+			.map((res: Response) => res);
 	}
 }

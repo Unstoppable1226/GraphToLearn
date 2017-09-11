@@ -45,6 +45,11 @@ export class AppSettings {
 	public static BLACK = "#000";
 	public static WHITE = "#FFF";
 
+	public static COL_SEARCH_TERM = "#0D47A1";
+	public static COL_KEY_WORDS = "#95A5A6";
+	public static COL_MODULE = "#D35400";
+	public static COL_OTHER_TERMS = "#21BA45";
+
 	/* Alert */
 	public static MSGSUCCESS = "Les informations ont été inséré avec succès";
 	public static MSGERROR = "Un problème est survenu lors de l'insertion des données, Veuillez réessayer svp !";
@@ -60,7 +65,7 @@ export class AppSettings {
 	public static MINX : number = 40;
 	
 	//public static COLORSSPHERES : Array<string> = ['#0D47A1', '#64B5F6', '#BBDEFB', '#E3F2FD', '#FFFFFF'];
-	public static COLORSSPHERES : Array<string> = ['#21ba45', '#21ba45', '#21ba45', '#21ba45', '#21ba45'];
+	public static COLORSSPHERES : Array<string> = [AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS];
 	/* Reputation Rules */
 	public static COEFRULES : Array<number> = [2.5, 2, 1.5, 1, 0.5]
 	public static TIMESTAMPRULE : Array<number[]> = [[0,10],[3,8],[7,6],[30,4],[90,2],[360,0]]

@@ -13,6 +13,8 @@ import { User } from '../model/user'
 import { UserService } from '../model/user-service'
 import { HistorySearchService } from '../model/history-search'
 
+import { Router} from '@angular/router';
+
 declare var dat: any;
 declare var $: any;
 declare var moment:any;
@@ -43,15 +45,19 @@ export class AppSearch {
 	private dislikes = []
 	private canLike : boolean = false;
 	private canDislike : boolean = false;
-	private canVote : boolean = false;
+	public canVote : boolean = false;
 	private allModules = []
 	private modulesOfWord = {}
 	private totalPoints = 0
+	public col1 = AppSettings.COL_SEARCH_TERM
+	public col2 = AppSettings.COL_KEY_WORDS
+	public col3 = AppSettings.COL_MODULE
+	public col4 = AppSettings.COL_OTHER_TERMS
 
-	constructor(private _route: ActivatedRoute, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch : HistorySearchService) {
+	constructor(private _route: ActivatedRoute,private _router : Router, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch : HistorySearchService) {
 		let instance = this;
 		console.log(this._historysearch.getLastSearches())
-		
+		this.loading = true;
 		instance._httpservice.getEntryJSON(AppSettings.API_MODULES)
 		.subscribe(function(modules) {
 			let obj = modules.dictionary.entries;
@@ -73,6 +79,40 @@ export class AppSearch {
 					})
 			}
 		})
+	}
+	refresh() {
+		this.id = "";
+		this.loading = false
+		this.loading2 = false
+		this.wordSearch = new Entry()// The that we have searched
+		this.wordSel= new Entry() // The word that is selected on the context
+		this.hashWordSel = ""
+		this.collapsedMeaning = false
+		this.collapsedInfos = false
+		this.collapsedComments = true
+		this.collapsedActions = true
+		this.canLike  = false;
+		this.canDislike= false;
+		this.canVote  = false;
+		this.modulesOfWord = {}
+		this.totalPoints = 0
+		this.col1 = AppSettings.COL_SEARCH_TERM
+		this.col2 = AppSettings.COL_KEY_WORDS
+		this.col3 = AppSettings.COL_MODULE
+		this.col4 = AppSettings.COL_OTHER_TERMS
+		this.likes = []
+		this.dislikes = []
+		this.allModules = []
+		this.dictionary = []
+		this.contextEntrys = []
+		this._manager3d.refreshScene();
+	}
+	
+	backToHome() {
+		this.refresh()
+		console.log('ici')
+		//this._router.navigate(['/home'])
+		
 	}
 
 	like() { this.likeDislike(AppSettings.API_METALIKE, this.likes, this.canLike, 0, this.wordSearch.like) }
@@ -253,13 +293,16 @@ export class AppSearch {
 				instance._httpservice.getEntryJSON(AppSettings.API_HISTORY)
 				.subscribe(
 					data => {
+						console.log(data)
+						console.log(instance._userservice.currentUser.mail)
 						instance._historysearch.lastSearches = data.dictionary.conf[instance._userservice.currentUser.mail]
-						if (!data.dictionary.conf[instance._userservice.currentUser.mail].includes(instance.wordSearch.name)) {
-							console.log(instance._historysearch)
-							if (instance._historysearch.lastSearches == "[]") {
-								instance._historysearch.lastSearches = []
+						if (data.dictionary.conf[instance._userservice.currentUser.mail] != undefined) {
+							if (!data.dictionary.conf[instance._userservice.currentUser.mail].includes(instance.wordSearch.name)) {
+								if (instance._historysearch.lastSearches == "[]") {
+									instance._historysearch.lastSearches = []
+								}
+								instance._historysearch.addSearch(instance.wordSearch.name)
 							}
-							instance._historysearch.addSearch(instance.wordSearch.name)
 						}
 						instance._httpservice.postObservatoryMetadata(instance._userservice.currentUser.mail, JSON.stringify(instance._historysearch.getLastSearches()), AppSettings.API_HISTORY, instance._userservice.currentUser.secretKey)
 						.subscribe(function(response){console.log(response);})
@@ -268,7 +311,7 @@ export class AppSearch {
 				)
 				instance.createContext(instance.wordSearch);
 				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop, instance._userservice.getCurrentUser().secretKey) // Put searchClick to 0
-					.subscribe(function (resp) {});
+					.subscribe(function (resp) {console.log(resp)});
 			}
 		}
 	}
@@ -593,6 +636,7 @@ export class AppSearch {
 
 		instance._manager3d.createScene(wordSearch, allEntries, instance.wordSel, instance.modulesOfWord);
 		instance._manager3d.runRender();
+		this.loading = false;
 		/*
 		
 		this.context = this.sanitizeMeaningForZone();

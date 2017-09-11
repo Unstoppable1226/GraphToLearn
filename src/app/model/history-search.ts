@@ -16,6 +16,7 @@ export class HistorySearchService  {
     constructor (private _http: Http, private _router: Router, private _httpservice : HttpAPIService) {}
 
     getLastSearches() {
+        console.log(this.lastSearches)
 		return this.lastSearches
     }
     
