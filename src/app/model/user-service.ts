@@ -31,7 +31,6 @@ export class UserService  {
 
 	getCurrentUser() {
 		let instance = this;
-		console.log(this.currentUser);
 		if (this.currentUser == undefined) {
 			this.currentUser = new User()
 			let key
@@ -42,6 +41,7 @@ export class UserService  {
 			}
 			instance._httpservice.getUser(key)
 			.subscribe(function(response) {
+				console.log(response)
 				if (response.email == undefined) {
 					instance._router.navigate(['welcome']);
 				} else {

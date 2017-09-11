@@ -47,7 +47,7 @@ export class Manager3D {
 		label.cornerRadius = 20;
 		label.thickness = 1;
 		label.linkOffsetY = 30;
-		this.lines.push(label)
+		
 		this.advancedTexture.addControl(label);
 		label.linkWithMesh(mesh);
 
@@ -55,68 +55,8 @@ export class Manager3D {
 		text1.text = mesh.name;
 		text1.color = "black";
 		label.addControl(text1);
+		this.lines.push(label)
 	}
-
-	createInformation(mesh, tag) {
-		// Another GUI on the right
-
-		this.header = null
-		this.info = null
-		delete (this.header)
-		delete (this.info)
-		delete (this.advancedTextureGUI)
-		this.advancedTextureGUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI")
-		this.advancedTextureGUI.layer.layerMask = 5
-		this.panel3 = new BABYLON.GUI.StackPanel()
-		this.panel3.width = "80%"
-		this.panel3.heigth = "400px"
-		this.panel3.fontSize = "20px"
-		this.panel3.fontFamily = "font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;"
-
-		this.panel3.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-		this.panel3.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-		this.panel3.top = "150"
-
-		this.header = new BABYLON.GUI.TextBlock();
-		this.header.text = "Informations concernant : " + mesh.name;
-		this.header.height = "40px";
-		this.header.color = "black";
-		this.header.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-		this.header.paddingTop = "10px";
-		this.advancedTextureGUI.addControl(this.panel3);
-		this.panel3.addControl(this.header);
-
-		this.info = new BABYLON.GUI.TextBlock();
-		this.info.text = "Type : " + this.wordSearch.type + "\n" + "Explications : " + "\n" + (tag == null) ? this.wordSearch.meaning : tag.meaning;
-		this.info.textWrapping = true;
-		this.info.height = "200px";
-		this.info.color = "#333";
-		this.info.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-		this.info.paddingTop = "10px";
-		this.panel3.addControl(this.info);
-
-		var result = new BABYLON.GUI.Button("aimer");
-		result.width = "150px"
-		result.height = "50px"
-		// Adding text
-		var textBlock = new BABYLON.GUI.TextBlock(name + "_button", "Aimer");
-		textBlock.textWrapping = true;
-		textBlock.color = "black"
-		textBlock.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-		textBlock.paddingLeft = "25%";
-		result.addControl(textBlock);
-
-		// Adding image
-		var iconImage = new BABYLON.GUI.Image(name + "_icon", "../assets/images/heart.png");
-		iconImage.width = "40%";
-		iconImage.stretch = BABYLON.GUI.Image.STRETCH_FILL;
-		iconImage.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-		result.addControl(iconImage);
-
-		this.panel3.addControl(result); // Another GUI on the right
-
-	}
-
 
 	moveCamera(mesh) {
 		let instance = this;
@@ -241,15 +181,11 @@ export class Manager3D {
 			line.lineWidth = 0.5;
 
 			this.advancedTexture.addControl(line);
-			this.lines.push(line)
+			
 			line.linkWithMesh(sphere);
 			line.connectedControl = label1;
+			this.lines.push(line)
 		}
-	}
-
-	refreshScene() {
-		
-		
 	}
 
 	createScene(wordSearch, tags, wordSel, modules) {
@@ -261,21 +197,7 @@ export class Manager3D {
 		this.camera.attachControl(this.canvas, true);
 		this.scene.collisionsEnabled = false;
 		this.camera.checkCollisions = false;
-		if (this.advancedTexture == undefined) {
-			this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
-		} else {
-			this.advancedTexture.dispose();
-			this.scene.dispose();
-			//this.
-			this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
-		}
-		
-
-		
-		
-		
-		//this.camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, -8, -80), this.scene);
-		
+		this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
 		
 		var hemi = new BABYLON.HemisphericLight("toto");
 		var sphereMaterial = new BABYLON.StandardMaterial();
@@ -283,19 +205,22 @@ export class Manager3D {
 		let i = 0;
 		var sphere1 = BABYLON.Mesh.CreateSphere(wordSearch.name, 50.0, 15, this.scene);
 		var label1 = new BABYLON.GUI.Rectangle("label" + sphere1.name);
+		this.lines.push(label1)
 		for (let props in modules) {
 			var element = modules[props];
 			var sphere = BABYLON.Mesh.CreateSphere(element.id, 80.0, 25 , this.scene);
 			var label = new BABYLON.GUI.Rectangle("label" + sphere.name);
+			this.lines.push(label);
 			this.createMainMesh(sphere, label, (-50 * Object.keys(modules).length + (i * 100)), 50, AppSettings.COL_MODULE);
 			var line = new BABYLON.GUI.Line('line' + element.name);
-			this.lines.push(line)
+			
 			line.alpha = 1;
 			line.color = "black";
 			line.lineWidth = 1.5;
 			this.advancedTexture.addControl(line);
 			line.linkWithMesh(sphere);
 			line.connectedControl = label1;
+			this.lines.push(line)
 			i++;
 		}
 		
@@ -338,6 +263,7 @@ export class Manager3D {
 		text1.color = "white";
 		label.addControl(text1);
 
+		this.lines.push(label)
 		var materialSphere1 = new BABYLON.StandardMaterial("texture1", this.scene);
 		materialSphere1.diffuseColor = new BABYLON.Color3.FromHexString(color);
 		sphere.material = materialSphere1
