@@ -50,14 +50,14 @@ export class Formatter {
 	}
 
 	getTotalSearchClick(entries, nameModule) {
-		let count : number = 0
+		let count = 0
 		for (let i = entries.length - 1; i >= 0; i--) {
 			for (var index = 0; index < entries[i].modulesReputation.length; index++) {
 				var element = entries[i].modulesReputation[index];
 				if (nameModule.trim() == element.id.id.trim()) {
-					count += Number(entries[i].searchClick)
+					count += entries[i].searchClick
 				}
-			}
+			}	
 		}
 		return count
 	}

@@ -56,8 +56,7 @@ export class AppSearch {
 
 	constructor(private _route: ActivatedRoute,private _router : Router, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch : HistorySearchService) {
 		let instance = this;
-		delete (instance._manager3d)
-		instance._manager3d = new Manager3D(_format)
+		console.log(this._historysearch.getLastSearches())
 		this.loading = true;
 		instance._httpservice.getEntryJSON(AppSettings.API_MODULES)
 		.subscribe(function(modules) {
@@ -106,11 +105,14 @@ export class AppSearch {
 		this.allModules = []
 		this.dictionary = []
 		this.contextEntrys = []
+		this._manager3d.refreshScene();
 	}
 	
 	backToHome() {
 		this.refresh()
-		this._router.navigate(['/home'])
+		console.log('ici')
+		//this._router.navigate(['/home'])
+		
 	}
 
 	like() { this.likeDislike(AppSettings.API_METALIKE, this.likes, this.canLike, 0, this.wordSearch.like) }
@@ -243,7 +245,7 @@ export class AppSearch {
 				if (entry.modules.includes(element.id.trim())) {
 					objInsert = new Entry()
 					objInsert.setData(JSON.parse(obj[prop].value));
-					objInsert.searchClick = obj[prop].conf[AppSettings.API_METASEARCHCLICK] == undefined || obj[prop].conf[AppSettings.API_METASEARCHCLICK] == 'NaN'? 0 : obj[prop].conf[AppSettings.API_METASEARCHCLICK]
+					objInsert.searchClick = obj[prop].conf[AppSettings.API_METASEARCHCLICK] == undefined ? 0 : obj[prop].conf[AppSettings.API_METASEARCHCLICK]
 					objInsert.timestampCreation = this._format.getDate(obj[prop].date);
 					objInsert.author = { name: obj[prop].author, search: "" };
 					element.allterms.push(objInsert)
@@ -270,9 +272,11 @@ export class AppSearch {
 				instance.wordSearch.author = { name: obj[prop].author, search: "" };
 				instance.canVote = instance.wordSearch.author.name.trim().toLowerCase() != instance._userservice.getCurrentUser().mail.trim().toLowerCase()
 				instance.wordSearch.modules.id = instance.wordSearch.modules.id.replace(/\.0/g, "")
+				console.log(instance.allModules)
 
 				instance.wordSearch.modules.id = instance.wordSearch.modules.id.includes(',') ? instance.wordSearch.modules.id.split(',') : instance.wordSearch.modules.id.split('-')
 
+				console.log(instance.wordSearch.modules.id)
 				for(let i = 0; i< instance.wordSearch.modules.id.length; i++) {
 					instance.getSameModule(instance.wordSearch.modules.id[i].trim())
 				}
@@ -290,6 +294,7 @@ export class AppSearch {
 				.subscribe(
 					data => {
 						console.log(data)
+						console.log(instance._userservice.currentUser.mail)
 						instance._historysearch.lastSearches = data.dictionary.conf[instance._userservice.currentUser.mail]
 						if (data.dictionary.conf[instance._userservice.currentUser.mail] != undefined) {
 							if (!data.dictionary.conf[instance._userservice.currentUser.mail].includes(instance.wordSearch.name)) {
@@ -529,10 +534,10 @@ export class AppSearch {
 			var module = modules[index];
 			if (module.trim() != "") {
 				if (this.modulesOfWord[module.trim()] != undefined) {
-					var object = {id : this.modulesOfWord[module.trim()], repRule1 : 0,repRule2 : 0,repRule3 : 0,repRule4 : 0,repRule5 : 0,totalReput : 0, count: 0}
-					object.count = isNaN(this._format.countSameWord(element.name, this.modulesOfWord[module.trim()].goals.split(' '))) ? 0 :this._format.countSameWord(element.name, this.modulesOfWord[module.trim()].goals.split(' ')) 
+					var object = {id : this.modulesOfWord[module], repRule1 : 0,repRule2 : 0,repRule3 : 0,repRule4 : 0,repRule5 : 0,totalReput : 0, count: 0}
+					object.count = this._format.countSameWord(element.name, this.modulesOfWord[module].goals.split(' '))
 					element.count += object.count
-					element.modulesReputation.push(object);
+					element.modulesReputation.push(object)
 				}
 			}
 			
@@ -551,6 +556,7 @@ export class AppSearch {
 	createContext(wordSearch) {
 		let today = moment()
 		let instance = this;
+		console.log(wordSearch)
 
 		var allEntries : Array<Entry>= []
 		
@@ -588,6 +594,7 @@ export class AppSearch {
 			this.createRep3(el.id, allEntries)
 		}
 		this.countTotalReputationForModule(allEntries)
+		console.log(allEntries)
 		var wordSelected
 		for (var index = 0; index < allEntries.length; index++) {
 			var element = allEntries[index];
@@ -596,6 +603,7 @@ export class AppSearch {
 				allEntries.slice(index, 1)
 			}
 		}
+		console.log(instance.wordSel)
 		instance.wordSearch = Object.assign({}, wordSelected)
 		instance.wordSel = Object.assign({}, instance.wordSearch);
 
@@ -603,26 +611,27 @@ export class AppSearch {
 		for (var index = 0; index < allEntries.length; index++) {
 			var element = allEntries[index];
 			var points =  instance.getReputationTotal(element)
-			if (points > totalPoints) {totalPoints = points}
+			console.log(points)
+			if (points > totalPoints) {
+				totalPoints = points
+			}
 		}
 
 		this.totalPoints = totalPoints
 
+
+		
 		for (var index = 0; index < allEntries.length; index++) {
 			var element = allEntries[index];
 			for (var i = 0; i < element.modulesReputation.length; i++) {
 				var ele = element.modulesReputation[i];
 				var half = Math.floor(((ele.totalReput * 10) / this.totalPoints))
+				console.log(half)
 				ele.color = half >= 7 ? "#16ab39" :  half > 4 ? "#eaae00" : "#db2828"
-				ele.animationLeft = "loading-" + (half >= 5 ? (half - 5)*2: 0)  +" 0.5s linear forwards"
-				ele.animationRight = "loading-" + (half >= 5 ? 10 : half * 2) + " 0.5s linear forwards"
+				ele.animationLeft = "loading-" + /*(half >= 5 ? (half - 5)*2: 0)*/ 0 +" 0.5s linear forwards"
+				ele.animationRight = "loading-" + /*(half >= 5 ? 10 : half * 2)*/ 5 + " 0.5s linear forwards"
 			}
 			
-		}
-		for (var cpt = 0; cpt < allEntries.length; cpt++) {
-			if (allEntries[cpt].name == wordSearch.name) {
-				allEntries.splice(cpt, 1)
-			}
 		}
 
 		instance._manager3d.createScene(wordSearch, allEntries, instance.wordSel, instance.modulesOfWord);
