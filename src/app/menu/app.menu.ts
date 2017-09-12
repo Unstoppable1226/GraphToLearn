@@ -20,20 +20,32 @@ declare var $: any;
 
 export class MenuComponent {
 
-	public isConnected = false
-	public active = [true, false, false, false]
-	public user: User
-	public colSearchTerm = AppSettings.COL_SEARCH_TERM
-	public colKeyWords = AppSettings.COL_KEY_WORDS
-	public colModule = AppSettings.COL_MODULE
-	public colOtherTerms = AppSettings.COL_OTHER_TERMS
-	public historySearch = []
-	
+	public isConnected
+	public active
+	public user
+	public colSearchTerm
+	public colKeyWords
+	public colModule
+	public colOtherTerms
+	public historySearch
+
 	constructor(private _httpService: HttpAPIService, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch : HistorySearchService) {
 		this.user = new User();
+		this.initVariables()
 		this.user = _userservice.getCurrentUser();
 		this.historySearch = _historysearch.getLastSearches()
 	}
+
+	initVariables() {
+		this.isConnected = false
+		this.active = [true, false, false, false]
+		this.colSearchTerm = AppSettings.COL_SEARCH_TERM
+		this.colKeyWords = AppSettings.COL_KEY_WORDS
+		this.colModule = AppSettings.COL_MODULE
+		this.colOtherTerms = AppSettings.COL_OTHER_TERMS
+		this.historySearch = []
+	}
+
 
 	toggleSideBar() {
 		if (this.historySearch.length == 0) {
