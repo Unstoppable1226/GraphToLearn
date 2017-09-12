@@ -28,6 +28,7 @@ declare var moment:any;
 export class AppSearch {
 
 	public id = "";
+	public nbTimes = 0;
 	public loading = false
 	public loading2 = false
 	public wordSearch : Entry = new Entry()// The that we have searched
@@ -73,7 +74,6 @@ export class AppSearch {
 			instance.id = instance.id.replace(AppSettings.OPEN_PARENTHESIS, "(");
 			instance.id = instance.id.replace(AppSettings.CLOSE_PARENTHESIS, ")");
 			if (instance.id != undefined) {
-				instance._historysearch.addSearch(instance.id)
 				_httpservice.getEntryJSON(AppSettings.API_WORDS)
 					.subscribe(function (response) {
 						instance.initializeWordSearch(instance, response)
@@ -83,6 +83,7 @@ export class AppSearch {
 	}
 	refresh() {
 		this.id = "";
+		this.nbTimes = 0;
 		this.loading = false
 		this.loading2 = false
 		this.wordSearch = new Entry()// The that we have searched
@@ -113,9 +114,9 @@ export class AppSearch {
 		this._router.navigate(['/home'])
 	}
 
-	like() { this.likeDislike(AppSettings.API_METALIKE, this.likes, this.canLike, 0, this.wordSearch.like) }
+	like() { this.likeDislike(AppSettings.API_METALIKE, this.likes, this.canLike, 0, this.wordSel.like) }
 
-	dislike() { this.likeDislike(AppSettings.API_METADISLIKE, this.dislikes, this.canDislike, 1, this.wordSearch.dislike) }
+	dislike() { this.likeDislike(AppSettings.API_METADISLIKE, this.dislikes, this.canDislike, 1, this.wordSel.dislike) }
 
 	likeDislike(metadata, variable, can, nb, objectIncDec) {
 		let instance = this;
@@ -139,16 +140,19 @@ export class AppSearch {
 					instance.wordSearch.like.number += 1
 					instance.canLike = false
 					instance.loading = false
-					instance._httpservice.getUsers()
-					.subscribe(
-						data => {
-							instance._httpservice.postBalance(instance._userservice.getCurrentUser().publicKey,instance._userservice.getCurrentUser().secretKey, data.user_list.list[instance.wordSel.author.name], (1 -(0.25 * 0)))
-							.subscribe(function(balance){
-								console.log(balance)
-							})
-						},
-						error => {}
-					)
+					instance.nbTimes += 1
+					if (instance.nbTimes < 2) {
+						instance._httpservice.getUsers()
+						.subscribe(
+							data => {
+								instance._httpservice.postBalance(instance._userservice.getCurrentUser().publicKey,instance._userservice.getCurrentUser().secretKey, data.user_list.list[instance.wordSel.author.name], (1 -(0.25 * 0)))
+								.subscribe(function(balance){
+									console.log(balance)
+								})
+							},
+							error => {}
+						)
+					}
 				} else {
 					instance.wordSearch.dislike.number += 1
 					instance.canDislike = false
@@ -290,15 +294,21 @@ export class AppSearch {
 				.subscribe(
 					data => {
 						console.log(data)
-						instance._historysearch.lastSearches = data.dictionary.conf[instance._userservice.currentUser.mail]
+						
 						if (data.dictionary.conf[instance._userservice.currentUser.mail] != undefined) {
 							if (!data.dictionary.conf[instance._userservice.currentUser.mail].includes(instance.wordSearch.name)) {
-								if (instance._historysearch.lastSearches == "[]") {
+								if (data.dictionary.conf[instance._userservice.currentUser.mail] == "[]" ) {
 									instance._historysearch.lastSearches = []
+								} else {
+									instance._historysearch.lastSearches = data.dictionary.conf[instance._userservice.currentUser.mail]
 								}
 								instance._historysearch.addSearch(instance.wordSearch.name)
 							}
+						} else {
+							instance._historysearch.lastSearches = []
+							instance._historysearch.addSearch(instance.wordSearch.name)
 						}
+						console.log(instance._historysearch.lastSearches)
 						instance._httpservice.postObservatoryMetadata(instance._userservice.currentUser.mail, JSON.stringify(instance._historysearch.getLastSearches()), AppSettings.API_HISTORY, instance._userservice.currentUser.secretKey)
 						.subscribe(function(response){console.log(response);})
 					},
@@ -325,6 +335,18 @@ export class AppSearch {
 			return 
 		}
 		this.collapsedComments = !this.collapsedComments
+	}
+
+	hideModals() {
+		$('.ui.modal').modal('hide all')
+	}
+
+	saveModifications() {
+		$('.ui.modal').modal('hide all')
+	}
+
+	showModifications() {
+		$('.ui.modification.modal').modal('show')
 	}
 
 	ngAfterViewInit() {

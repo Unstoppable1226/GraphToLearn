@@ -69,4 +69,4 @@
 /**
  * Need to import at least one locale-data with intl.
  */
- // import 'intl/locale-data/jsonp/en';
+ import 'intl/locale-data/jsonp/en';

@@ -15,13 +15,13 @@
 		<a class="item right">
 			Ma réputation <a class="ui red circular label" [ngClass]="{'blue': user.reputation > -1 }">{{user.reputation}}</a>
 		</a>
-		<a class="item" style="margin-left: auto;" (click)="showInfo()">
+		<a class="item" style="margin-left: auto;" (click)="showInfo()"  data-tooltip="Infos GraphToLearn et son fonctionnement" data-inverted="" data-position="bottom center">
 			<i class="info icon" style="margin-left:5px"></i>
 		</a>
-		<a class="item" (click)="showFeedBack()">
+		<a class="item" (click)="showFeedBack()" data-tooltip="Donner un feedback" data-inverted="" data-position="bottom center">
 			<i class="talk icon" style="margin-left:5px"></i>
 		</a>
-		<a class="item" (click)="showOptions()">
+		<a class="item" (click)="showOptions()" data-tooltip="Paramètres" data-inverted="" data-position="bottom center">
 			<i class="settings icon" style="margin-left:5px"></i>
 		</a>
 		<a class="item right" (click)="logout()">

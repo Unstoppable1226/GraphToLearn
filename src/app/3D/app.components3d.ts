@@ -101,7 +101,10 @@ export class Manager3D {
 	}
 
 	updateInfos(mesh, data) {
+		console.log(data)
 		this.wordSel.name = mesh.name
+		this.wordSel.type = data.type
+		this.wordSel.context = data.type
 		this.wordSel.meaning = data.meaning;
 		this.wordSel.source = data.source;
 		this.wordSel.totalReput = data.totalReput;

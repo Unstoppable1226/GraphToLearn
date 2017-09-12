@@ -18,21 +18,21 @@ declare var $:any;
 })
 
 export class AppLogin {
-	public secretKey = ""
-	public mail = ""
+	public secretKey
+	public mail
 	public modal
-	public objectConnection = {}
-	public objectJoin = {}
+	public objectConnection
+	public objectJoin
 	
-	public error = false;
-	public errorTextSecretKey = AppSettings.MSG_ERROR_SECRETKEY_EMPTY
+	public error
+	public errorTextSecretKey
 
-	public errorMail = false;
-	public errorTextMail = AppSettings.MSG_ERROR_MAIL_EMPTY
+	public errorMail
+	public errorTextMail
 
-	public loading = false
-	public loadingButton = false
-	title = AppSettings.TITLE
+	public loading
+	public loadingButton
+	public title
 
 
 	getReputation(publicKey : string, resp) { // Get the stellar coins of the user => his reputation
@@ -51,9 +51,25 @@ export class AppLogin {
 			instance._alert.create('success', AppSettings.MSGWELCOME + " " + resp.email + " !")
 		})
 	}
+
+	initVariables() {
+		this.secretKey = ""
+		this.mail = ""
+		this.modal
+		this.objectConnection = {}
+		this.objectJoin = {}
+		this.error = false;
+		this.errorTextSecretKey = AppSettings.MSG_ERROR_SECRETKEY_EMPTY
+		this.errorMail = false;
+		this.errorTextMail = AppSettings.MSG_ERROR_MAIL_EMPTY
+		this.loading = false
+		this.loadingButton = false
+		this.title= AppSettings.TITLE
+	}
 	
 	constructor(private _authservice : AuthService, private _router: Router, private _alert: AlertsService, private _userservice : UserService, private _httpservice : HttpAPIService) {
 		let instance = this;
+		instance.initVariables();
 		this.objectConnection = {
 			closable  : true,
 			allowMultiple: false,

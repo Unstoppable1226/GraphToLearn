@@ -8,8 +8,8 @@
 		<div [ngStyle]="{'background-color': col3}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Module</span>
 		<div [ngStyle]="{'background-color': col4}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Autres termes</span>
 	</div>
-	<div style="width: 95%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;" >
-		<div *ngIf="loading"  class="ui active dimmer">
+	<div style="width: 95%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">
+		<div *ngIf="loading" class="ui active dimmer">
 			<div class="ui large text loader">Chargement</div>
 		</div>
 		<h2 class="ui icon header" style="margin-top:25px; text-align:center!important;margin-bottom: -200px">
@@ -32,7 +32,7 @@
 			<a class="ui pointing below label" style="color: #eee; background-color:#1B1C1D;text-align: center;font-size: 1em;font-weight: 600;margin-right: 0px;display:block; margin-bottom:-5px">Réputation dans les modules</a>
 			<div *ngFor="let mod of wordSel.modulesReputation; let i = index" class="ui statistic small" style="margin-left:25px">
 				<div class="label" style="color:#1B1C1D">
-					<div class="cusprogress" [ngStyle]="{'color': mod.color}" >
+					<div class="cusprogress" [ngStyle]="{'color': mod.color}">
 						<span class="cusprogress-left">
 											<span class="cusprogress-bar" [ngStyle]="{'animation': mod.animationLeft}"></span>
 						</span>
@@ -45,7 +45,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="dg main a" style="width: 300px;position: fixed; top:250px; right: 0;margin-right: 0px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 			<div class="close-button" style="width: 300px;height:50px;padding-top: 5px;font-size: 1.3em;line-height:20px!important;user-select: none;"
 			 (click)="hideOrShow($event, 1)">
@@ -117,7 +117,8 @@
 				<a tabindex="0" class="ui basic red left pointing label" style="width: 60px; text-align: center">{{wordSel.dislike.number}}</a>
 			</div>
 		</div>
-		<button style="display:block; margin-top:-32px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home" (click)="backToHome()"> 
+		<button style="display:block; margin-top:-32px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home"
+		 (click)="backToHome()"> 
 			<i class="reply icon"></i> Retour 
 			<span style="margin-left:8px">|</span>
 			<i class="home icon" style="margin-left:10px"></i>
@@ -127,13 +128,16 @@
 		<canvas id="renderCanvas" style="outline: none;"></canvas>
 	</div>
 	<div class="collapse-actions" style="position:fixed;top:200px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
-		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;">
+		<button (click)="showModifications()" class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
+		 data-tooltip="Modifier le terme sélectionné" data-inverted="" data-position="right center">
 			<i class="icon pencil"></i>
 		</button>
-		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top: 95px;margin-left: 52px;">
+		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top: 95px;margin-left: 52px;"
+		 data-tooltip="Donner son avis sur le terme sélectionné" data-inverted="" data-position="right center">
 			<i class="icon comments"></i>
 		</button>
-		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top:160px;margin-left: 52px;">
+		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top:160px;margin-left: 52px;"
+		 data-tooltip="Mettre ce terme en inactif" data-inverted="" data-position="right center">
 			<i class="icon delete"></i>
 		</button>
 		<div class="close-button-actions" (click)="hideOrShow($event, 4)">A<br>C<br>T<br>I<br>O<br>N<br>S<br><i style="margin-top:50px;margin-left:3px;font-size:0.8em!important" class="icon" [ngClass]="{'minus': !collapsedActions, 'plus': collapsedActions}"> </i></div>
@@ -198,5 +202,114 @@
 				</span>
 			</li>
 		</ul>
+
+		<div class="ui modification modal">
+			<i class="close icon" (click)="hideModals()"></i>
+			<div class="header">
+				Modification du terme : {{wordSel.name}}
+			</div>
+			<div class="scrolling content">
+				<div class="ui form">
+					<div class="field icon required">
+						<label>Nom</label>
+						<div class="ui icon input">
+							<i id="wordInfo" class="left info icon"></i>
+							<input class="input-insert" type="text" [(ngModel)]="word" [ngModelOptions]="{standalone: true}" (ngModelChange)="isUnique()"
+							 placeholder="AAA, Module, ..." />
+						</div>
+						<div [hidden]="!nameChosen" class="ui top pointing basic label" [ngClass]="{'green': !nameTaken, 'red': nameTaken}">
+							{{msgNameTaken}} <i class="icon" [ngClass]="{'checkmark': !nameTaken, 'minus circle' : nameTaken}"></i>
+						</div>
+					</div>
+					<div class="field icon">
+						<label>Type</label>
+						<div class="ui icon input">
+							<i class="left info icon"></i>
+							<div class="ui fluid selection dropdown input-insert" style="text-align: center">
+								<input type="hidden" name="gender" value="default">
+								<i class="dropdown icon"></i>
+								<div class="default text" id="select-types">Type du terme : Acronyme, Expression ou Terme</div>
+								<div class="menu">
+									<div class="item" data-value="default">Aucun</div>
+									<div class="item" *ngFor="let type of types; let i = index" data-value="{i}">{{type.value}}</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="field icon">
+						<label>Définition</label>
+						<div class="ui icon input">
+							<i class="left info icon"></i>
+							<input class="input-insert" style="text-align: center" [(ngModel)]="definition" [ngModelOptions]="{standalone: true}" type="text"
+							 placeholder="AAA, Module, ...">
+						</div>
+					</div>
+
+					<div class="field icon required">
+						<label>Source</label>
+						<div class="ui icon input">
+							<i class="left users icon"></i>
+							<input class="input-insert" style="text-align: center" type="text" [(ngModel)]="source" [ngModelOptions]="{standalone: true}"
+							 placeholder="IDEC Metafichier, Google, Wikipedia, ...">
+						</div>
+					</div>
+
+					<div class="field icon">
+						<label>Modules</label>
+						<div class="ui buttons">
+							<button class="ui button" [ngStyle]="{'background-color': styleModuleEx, 'color': styleModuleExCol}" (click)="switchModule(false, 'A')"
+							 type="button">Existant</button>
+							<div class="or" data-text="ou"></div>
+							<button class="ui button" [ngStyle]="{'background-color': styleModuleNew, 'color': styleModuleNewCol}" (click)="switchModule(true, 'B')"
+							 type="button">Nouveau</button>
+						</div>
+						<div id="multi-select-modules" class="ui fluid multiple search selection dropdown input-insert" style="margin-top:5px" [hidden]="newModule">
+							<input type="hidden" name="receipt">
+							<i class="dropdown icon"></i>
+							<div class="default text" id="input-modules">Sélectionner les modules</div>
+							<div class="menu">
+								<div class="item" *ngFor="let module of modules; let i = index" data-value="{i}">{{module.id}} - {{module.name}}</div>
+							</div>
+						</div>
+						<div [hidden]="!newModule" class="ui icon input" style="margin-top:5px">
+							<i class="left search icon"></i>
+							<input class="input-insert" [(ngModel)]="newModules" [ngModelOptions]="{standalone: true}" style="text-align: center" type="text"
+							 placeholder="166-486, 207">
+						</div>
+					</div>
+					<div class="field icon required">
+						<label>Explication</label>
+						<i class="left talk icon"></i>
+						<textarea class="input-insert" [(ngModel)]="meaning" [ngModelOptions]="{standalone: true}" rows="3" style="text-align: left!important"></textarea>
+					</div>
+					<div class="field icon">
+						<label>Contexte / Domaine</label>
+						<div class="ui icon input">
+							<div class="ui icon input">
+								<i class="left info icon"></i>
+								<div class="ui fluid selection dropdown input-insert" style="text-align: center">
+									<input type="hidden" name="gender" value="default">
+									<i class="dropdown icon"></i>
+									<div class="default text" id="select-context">Sécurité, Juridique, ...</div>
+									<div class="menu">
+										<div class="item" data-value="default">Aucun</div>
+										<div class="item" *ngFor="let con of contexts; let i = index" data-value="{i}">{{con.value}}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="field icon" style="text-align: center!important">
+						<label>Tags associés</label>
+						<tag-input [(ngModel)]='items' [ngModelOptions]="{standalone: true}"></tag-input>
+					</div>
+					<div class="field icon required">
+						<label style="color:#db2828; font-size: 0.8em; float: right;">Champ obligatoire </label>
+					</div>
+				</div>
+				<div class="ui fluid large approve button button-blur" style="margin-left:0px;margin-top:15px" (click)="saveModifications()">Enregistrer modifications<i class="right checkmark icon"></i></div>
+			</div>
+
+		</div>
 	</div>
 </div>

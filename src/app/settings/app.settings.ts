@@ -20,11 +20,12 @@ export class AppSettings {
 	public static API_HISTORY = "History";
 	public static API_TYPES = "Types";
 	public static API_CONTEXT= "Context";
-
+	
 	public static API_METASEARCHCLICK= "searchClick";
 	public static API_METALIKE= "like";
 	public static API_METADISLIKE= "dislike";
 	public static API_METAHISTORYSEARCH= "historySearch";
+	public static API_METAREVISIONS= "REVIEW_";
 
 
 	/* URL */

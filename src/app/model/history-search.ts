@@ -11,16 +11,20 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class HistorySearchService  {
 
-    public lastSearches : Array<string> = []
+    public lastSearches = []
 
-    constructor (private _http: Http, private _router: Router, private _httpservice : HttpAPIService) {}
+    constructor (private _http: Http, private _router: Router, private _httpservice : HttpAPIService) {
+        this.lastSearches = []
+    }
 
     getLastSearches() {
-        console.log(this.lastSearches)
 		return this.lastSearches
     }
     
     addSearch(name) {
+        if (this.lastSearches == undefined) {
+            this.lastSearches = []
+        }
         this.lastSearches.push(name)
     }
 
