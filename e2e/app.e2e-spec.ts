@@ -1,14 +1,14 @@
-import { GraphtolearnPage } from './app.po';
+import { AppPage } from './app.po';
 
-describe('graphtolearn App', () => {
-  let page: GraphtolearnPage;
+describe('graph-to-learn-prod App', () => {
+  let page: AppPage;
 
   beforeEach(() => {
-    page = new GraphtolearnPage();
+    page = new AppPage();
   });
 
   it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('Welcome to app!!');
+    expect(page.getParagraphText()).toEqual('Welcome to app!');
   });
 });
