@@ -27,7 +27,7 @@ export class HttpAPIService {
 	joinCommunity(mail) {
 		let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
 		let options = new RequestOptions({ headers: headers });
-		return this._http.post(AppSettings.API_USERS + "?email=" + mail, options)
+		return this._http.post(AppSettings.API_USERS + "?email=" + mail, "", options)
 		.map((res: Response) => { 
 			
 			return res

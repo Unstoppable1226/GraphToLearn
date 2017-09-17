@@ -42,7 +42,7 @@ export class Formatter {
 			for (var index = 0; index < entrys[i].modulesReputation.length; index++) {
 				var element = entrys[i].modulesReputation[index];
 				if (nameModule.trim() == element.id.id.trim()) {
-					count += element.count
+					count = count + element.count
 				}
 			}	
 		}
@@ -55,7 +55,20 @@ export class Formatter {
 			for (var index = 0; index < entries[i].modulesReputation.length; index++) {
 				var element = entries[i].modulesReputation[index];
 				if (nameModule.trim() == element.id.id.trim()) {
-					count += Number(entries[i].searchClick)
+					count = count + Number(entries[i].searchClick)
+				}
+			}
+		}
+		return count
+	}
+
+	getTotalLikes(entries, nameModule) {
+		let count : number = 0
+		for (let i = entries.length - 1; i >= 0; i--) {
+			for (var index = 0; index < entries[i].modulesReputation.length; index++) {
+				var element = entries[i].modulesReputation[index];
+				if (nameModule.trim() == element.id.id.trim()) {
+					count = count + Number(entries[i].like.number)
 				}
 			}
 		}
@@ -63,7 +76,7 @@ export class Formatter {
 	}
 
 	getReput(tag, divisions) {
-		for (let i = 0, rep = 1; i < divisions.length - 1; i++ , rep++) {
+		for (let i = 0, rep = 1; i <= divisions.length; i++ , rep++) {
 			if (tag <= divisions[i]) {
 				return rep;
 			}
@@ -103,7 +116,7 @@ export class Formatter {
 			if (el.name.toLowerCase() == tag.toLowerCase()) {
 				let def = this.splitter(el.definition, [',', ' ', ':'])
 				for (var i = 0; i <= length - 1; i++) {
-					word += def[i] + (length == length - 1 ? '' : ' ')
+					word = word + def[i] + (length == length - 1 ? '' : ' ')
 				}
 				return word;
 			}
@@ -118,6 +131,16 @@ export class Formatter {
 		let hours = string.substring(8, 10)
 		let minutes = string.substring(10, 12)
 		return day + "/" + month + "/" + year + " " + hours + ":" + minutes
+	}
+
+
+	formatDate(string) {
+		let year = string.substring(0, 4)
+		let month = string.substring(4, 6)
+		let day = string.substring(6, 8)
+		let hours = string.substring(8, 10)
+		let minutes = string.substring(10, 12)
+		return new Date(year, month-1, day, hours, minutes)
 	}
 
 	cleanArray(array) {

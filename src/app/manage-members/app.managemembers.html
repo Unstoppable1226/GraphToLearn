@@ -1,0 +1,29 @@
+<app-menu></app-menu>
+<div style="width: 100%;text-align: center!important; margin-top: 10px">
+    <div style="width: 95%;display: inline-block;">
+        <h2 class="ui icon header" style="text-align:center!important;margin-bottom: -200px">
+            <i class="users icon" style="color:white"></i>
+            <div class="content" style="color:white">
+                Gestion des membres
+            </div>
+        </h2>
+        <button style="display:block; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home"
+            [routerLink]="['/home']"> <i class="reply icon"></i> Retour <span style="margin-left:8px">|</span><i class="home icon" style="margin-left:10px"></i></button>
+        <form id="insert-form" class="ui form" style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
+            <h2>Nouvelles demandes <a class="ui green circular label">{{newMembers.length}}</a> <div class="ui button" style="margin-left: 20px">Tout accepter</div></h2>
+
+            <div class="ui middle aligned animated list">
+                <div *ngFor="let member of newMembers; let i = index" class="item">
+                    <div class="right floated content">
+                        <div class="ui button positive" (click)="addMember(i)">Accepter</div>
+                        <div class="ui button negative" (click)="refuseMember(i)">Refuser</div>
+                    </div>
+                    <img class="ui avatar image" src="../assets/images/new-user.png">
+                    <div class="content">
+                        <div class="header">{{member.mail}}</div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

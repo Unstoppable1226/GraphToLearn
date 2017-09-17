@@ -21,7 +21,17 @@ export class AppInsertion implements OnInit {
 	public newModule = false;
 	public loading = false;
 	public nameTaken = false;
+	public nameTakenModule = false;
+
 	public nameChosen = false;
+	public nameChosenModule = false;
+
+	public loadingAddModule = false;
+	public newModuleObj : any= {id: "", name:"", goals: ""}
+	public errorAddModule = false;
+	public errorTextAddModule = "";
+	public msgIdModuleTaken = "Ce N° est disponible"
+
 	public msgNameTaken = "Ce nom est disponible";
 	public styleModuleNew = AppSettings.WHITEMOREDARK;
 	public styleModuleNewCol = AppSettings.BLACK;
@@ -30,6 +40,7 @@ export class AppInsertion implements OnInit {
 	public data = {};
 	public types = [];
 	public modules : Array<any> = [];
+	public valuesModules : Array<any> = []
 	public contexts = [];
 	public word : string = '';
 	public newModules : string = '';
@@ -37,56 +48,107 @@ export class AppInsertion implements OnInit {
 	public definition : string = ""; 
 	public meaning : string = "";
 
-
-
-	public items = ['Angular' ,'React'];
+	public items = [];
 
 	constructor(private _httpService : HttpAPIService, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {
-		console.log(_userservice.getCurrentUser())
+		_userservice.getCurrentUser()
 		console.log(_historysearch.getLastSearches())
 	}
 
-	isUnique() {
+	addModule() {
+		if (this.newModuleObj.id == "" || this.newModuleObj.name == "" || this.newModuleObj.goals == "" ) {
+			this.errorAddModule = true;
+			this.errorTextAddModule = "Veuillez compléter tous les champs requis : N° du module, Nom du module et Objectifs du module"
+		} else {
+			if (this.nameTakenModule) {
+				this.errorAddModule = true;
+				this.errorTextAddModule = "Veuillez choisir un autre n° pour l'identifiant du module, car ce dernier a déjà été utilisé !"
+				return
+			}
+			this.errorAddModule = false;
+			this.loadingAddModule = true;
+			this._httpService.postEntryJSON(this.newModuleObj, AppSettings.API_MODULES, this.newModuleObj.id, this._userservice.currentUser.secretKey)
+				.subscribe(
+					data => {
+						console.log(data);
+						this.loadingAddModule = false;
+						var element: any = {}
+						element.selected = true;
+						element.text = this.newModuleObj.id;
+						element.name = this.newModuleObj.id + " - " + this.newModuleObj.name
+						element.value = this.newModuleObj.id;
+						this.valuesModules.push(element)
+						this.switchModule(false, 'A')
+						$('.ui.dropdown.multiple').dropdown({values : this.valuesModules})
+						this.newModuleObj = {id: "", name:"", goals: ""}
+						this._alert.create('success', 'Le module a été inséré avec succès, il se trouve désormais avec les existants !');}
+				)
+		}
+	}
+
+	isUnique(idChoice, idSelectTagHtml, property) {
 		let instance = this;
-		if (instance.word != "") {
-			$('#wordInfo').removeClass('info');
-			$('#wordInfo').addClass('circle');
-			$('#wordInfo').addClass('notched');
-			$('#wordInfo').addClass('loading');
-			instance.nameChosen = true;
-			this._httpService.getEntryJSON(AppSettings.API_WORDS)
+		let word = (idChoice == 0 ? instance.word : instance.newModuleObj.id)
+		let apiObservatory = (idChoice == 0 ? AppSettings.API_WORDS : AppSettings.API_MODULES)
+		if (word != "") {
+			$(idSelectTagHtml).removeClass('info');
+			$(idSelectTagHtml).addClass('circle');
+			$(idSelectTagHtml).addClass('notched');
+			$(idSelectTagHtml).addClass('loading');
+			if (idChoice == 0) {instance.nameChosen = true} else {instance.nameChosenModule = true}
+			this._httpService.getEntryJSON(apiObservatory)
 			.subscribe(
 				function(response) {
 					let obj = response.dictionary.entries;
 					let data
 					let count = 0;
-					for (let prop in obj){
-						data = JSON.parse(obj[prop].value);
-						count += instance.word.toLowerCase() == data.name.toLowerCase() ? 1 : 0;
+					let props = Object.keys(obj)
+					
+					let i = 0
+					while(i <= props.length - 1 && count < 1) {
+						data = JSON.parse(obj[props[i]].value);
+						count = count + (word.toLowerCase() == data[property].toLowerCase() ? 1 : 0);
+						i++
 					}
+
 					setTimeout(function(){
-						$('#wordInfo').removeClass('circle');
-						$('#wordInfo').removeClass('notched');
-						$('#wordInfo').removeClass('loading');
-						$('#wordInfo').addClass('info');
+						$(idSelectTagHtml).removeClass('circle');
+						$(idSelectTagHtml).removeClass('notched');
+						$(idSelectTagHtml).removeClass('loading');
+						$(idSelectTagHtml).addClass('info');
 					}, 200);
-					instance.nameTaken = count >= 1
-					instance.msgNameTaken = instance.nameTaken ? "Ce nom existe déjà !":  "Ce nom est disponible";
+					if (idChoice == 0) {
+						instance.nameTaken = count >= 1
+						instance.msgNameTaken = instance.nameTaken ? "Ce nom existe déjà !":  "Ce nom est disponible";
+					} else {
+						instance.nameTakenModule = count >= 1
+						instance.msgIdModuleTaken = instance.nameTakenModule ? "Ce n° a déjà été choisi !":  "Ce n° est disponible";
+					}
 				}
 			)
 		} else {
-			instance.nameChosen = false;
+			if (idChoice == 0) {instance.nameChosen = false} else {instance.nameChosenModule = false}
 		}
 	}
 
 
 	ngAfterViewInit(){
 		$('.ui.dropdown').dropdown();
-		$('#multi-select-modules').dropdown({
-			allowAdditions: true,
-			filterRemoteData: true
-		});
-		this.isUnique();
+		$('.ui.dropdown.multiple').dropdown({allowAdditions: true,});
+		this.isUnique(0, '#wordInfo', 'name');
+	}
+
+	getModulesValues() {
+		this.valuesModules.splice(0, this.valuesModules.length)
+		this.valuesModules.push(...this.modules)
+		for (var index = 0; index < this.valuesModules.length; index++) {
+			var element = this.valuesModules[index];
+			element.selected = false;
+			element.text = element.id;
+			element.name = element.id + " - " + element.name
+			element.value = element.id;
+		}
+		$('.ui.dropdown.multiple').dropdown({values : this.valuesModules})
 	}
 
 	getData(observatory, table : Array<any>) {
@@ -97,6 +159,10 @@ export class AppInsertion implements OnInit {
 				console.log(response); // Transform js object into json
 				let obj = response.dictionary.entries;
 				for (let prop in obj){ table.push(table == instance.modules ? JSON.parse(obj[prop].value) : obj[prop]);}
+				if (table == instance.modules) {
+					instance.getModulesValues()
+					
+				}
 			},
 		)
 	}
@@ -115,15 +181,6 @@ export class AppInsertion implements OnInit {
 		return this.word != "";
 	}
 
-	insertNewData() {
-		let instance = this;
-		if (this.newModule) {
-			let modules = instance.newModules.split(',');
-			this._httpService.postEntryJSON(modules, AppSettings.API_MODULES, instance.newModules, instance._userservice.getCurrentUser().secretKey)
-			.subscribe()
-		}
-	}
-
 	reinit() {
 		this.word = "";
 		this.source = ""; // Separate with the comma
@@ -134,34 +191,38 @@ export class AppInsertion implements OnInit {
 	}
 
 	saveInsertion() {
+		console.log(this.items)
 		if (this.validated()) {
+			let tags = "";
+			for (var index = 0; index < this.items.length; index++) {
+				var element = this.items[index];
+				tags = tags + element.display + (index == this.items.length -1 ? "": ", ")
+			}
+			
 			let instance = this;
 			this.loading = true;
 			
 			let modules = this.newModules.split(',');
-			let modulesNotNew = "";
-			if(this.newModule) {
-				//this.insertNewData();
-				modulesNotNew = this.newModules;
-			} else {
-				if ($('#multi-select-modules').children('a.ui.label.transition.visible').text() != "") {
-					let listModules = $('#multi-select-modules').children('a.ui.label.transition.visible').text();
-					listModules = listModules.split('[');
-					listModules = listModules[1].split(']');
-					listModules = listModules[0].split('"');
-					for (let i = 0; i <= listModules.length - 1; i++) {
-						modulesNotNew += listModules[i];
-					}
-				} else {
-					modulesNotNew = "";
-				}
-			}
+			let modulesNotNew = $('.ui.dropdown.multiple').dropdown('get value');
+
 			
-			let dataInfo = {name : this.word, type: $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text(), source : this.source, modules : modulesNotNew, definition: this.definition, meaning : this.meaning, context :  $('#select-context').text() == "Aucun" ? "" : $('#select-context').text(), commentary : "", review : ""};
-			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name, instance._userservice.getCurrentUser().secretKey)
+			let dataInfo = {
+				name : this.word,
+				type: $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text(), 
+				source : this.source, 
+				modules : modulesNotNew, 
+				definition: this.definition, 
+				meaning : this.meaning, 
+				context :  $('#select-context').text() == "Aucun" ? "" : $('#select-context').text(), 
+				commentary : "", 
+				review : "",
+				keywords : tags
+			};
+			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name, instance._userservice.currentUser.secretKey)
 			.subscribe(
 				function(response) { // The communication with the API has matched
-					instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, response, instance._userservice.getCurrentUser().secretKey) // Put searchClick to 0
+					console.log(response)
+					instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, response, instance._userservice.currentUser.secretKey) // Put searchClick to 0
 					.subscribe(
 						function(resp) {
 							instance.loading = false;

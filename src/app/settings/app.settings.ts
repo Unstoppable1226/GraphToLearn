@@ -19,6 +19,9 @@ export class AppSettings {
 	public static API_MODULES = "Modules";
 	public static API_HISTORY = "History";
 	public static API_TYPES = "Types";
+	public static API_MEMBERS = "Members";
+	public static API_FEEDBACK= "Feedback";
+	public static API_SETTINGS= "Settings";
 	public static API_CONTEXT= "Context";
 	
 	public static API_METASEARCHCLICK= "searchClick";
@@ -26,7 +29,16 @@ export class AppSettings {
 	public static API_METADISLIKE= "dislike";
 	public static API_METAHISTORYSEARCH= "historySearch";
 	public static API_METAREVISIONS= "REVIEW_";
+	public static API_METAFEEDBACKPROP= "feedback";
 
+
+	public static RULELAMBDA= "Lambda";
+	public static RULEEDITOR= "Editor";
+	public static RULEADMINISTRATOR= "Administrator";
+
+
+	public static TAGMEMBERS = "members"
+	public static TAGSETTINGS = "settings"
 
 	/* URL */
 	public static URL_SEARCH = 'http://localhost:4200/search/'
@@ -69,7 +81,7 @@ export class AppSettings {
 	public static COLORSSPHERES : Array<string> = [AppSettings.COL_OTHER_TERMS, AppSettings.COL_OTHER_TERMS, AppSettings.COL_OTHER_TERMS, AppSettings.COL_OTHER_TERMS, AppSettings.COL_OTHER_TERMS];
 	public static COLORSKEYWORDS : Array<string> = [AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS];
 	/* Reputation Rules */
-	public static COEFRULES : Array<number> = [2.5, 2, 1.5, 1, 0.5]
+	public static COEFRULES : Array<number> = [3, 2.5, 1.5, 1, 0.5, 2]
 	public static TIMESTAMPRULE : Array<number[]> = [[0,10],[3,8],[7,6],[30,4],[90,2],[360,0]]
 
 	/* Table that contains words that must be deleted by the algorithm when he will create the world for the response*/

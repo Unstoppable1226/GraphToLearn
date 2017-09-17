@@ -14,6 +14,7 @@ import { AppHome } from './home/app.home';
 import { AppLogin } from './login/app.login';
 import { AppSearch } from './search/app.search';
 import { AppInsertion } from './insertion/app.insertion';
+import { AppManagerMembers } from './manage-members/app.managemembers';
 import { MenuComponent } from './menu/app.menu';
 import { PageNotFoundComponent } from './app.pagenotfound';
 
@@ -37,6 +38,7 @@ import { HistorySearchService } from './model/history-search';
 		AppLogin,
 		AppSearch,
 		AppInsertion,
+		AppManagerMembers,
 		MenuComponent,
 		PageNotFoundComponent,
 	],

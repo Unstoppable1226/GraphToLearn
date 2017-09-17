@@ -34,6 +34,7 @@ export class AppSearch {
 	public wordSearch : Entry = new Entry()// The that we have searched
 	public wordSel: Entry = new Entry() // The word that is selected on the context
 	public hashWordSel : string = ""
+	public canVote :true
 	public dictionary = []
 	public context
 	public contextEntrys : Array<Entry> = []
@@ -42,11 +43,6 @@ export class AppSearch {
 	public collapsedComments = true
 	public collapsedActions = true
 	private user: User
-	private likes = []
-	private dislikes = []
-	private canLike : boolean = false;
-	private canDislike : boolean = false;
-	public canVote : boolean = false;
 	private allModules = []
 	private modulesOfWord = {}
 	private totalPoints = 0
@@ -56,10 +52,15 @@ export class AppSearch {
 	public col4 = AppSettings.COL_OTHER_TERMS
 
 	constructor(private _route: ActivatedRoute,private _router : Router, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch : HistorySearchService) {
+		this.loading = true;
+		this.onCreate();
+	}
+
+	onCreate() {
 		let instance = this;
 		delete (instance._manager3d)
-		instance._manager3d = new Manager3D(_format)
-		this.loading = true;
+		instance._manager3d = new Manager3D(this._format)
+		
 		instance._httpservice.getEntryJSON(AppSettings.API_MODULES)
 		.subscribe(function(modules) {
 			let obj = modules.dictionary.entries;
@@ -67,20 +68,21 @@ export class AppSearch {
 				instance.allModules.push(JSON.parse(obj[prop].value))
 			}
 		})
-		instance.user = instance._userservice.getCurrentUser()
+		instance.user = instance._userservice.currentUser
 		instance._route.params.subscribe(routeParams => {
 			instance.id = routeParams.id;
 			instance.id = instance.id.replace(AppSettings.FORWARD_SLACH, "/");
 			instance.id = instance.id.replace(AppSettings.OPEN_PARENTHESIS, "(");
 			instance.id = instance.id.replace(AppSettings.CLOSE_PARENTHESIS, ")");
 			if (instance.id != undefined) {
-				_httpservice.getEntryJSON(AppSettings.API_WORDS)
+				instance._httpservice.getEntryJSON(AppSettings.API_WORDS)
 					.subscribe(function (response) {
 						instance.initializeWordSearch(instance, response)
 					})
 			}
 		})
 	}
+
 	refresh() {
 		this.id = "";
 		this.nbTimes = 0;
@@ -92,18 +94,13 @@ export class AppSearch {
 		this.collapsedMeaning = false
 		this.collapsedInfos = false
 		this.collapsedComments = true
-		this.collapsedActions = true
-		this.canLike  = false;
-		this.canDislike= false;
-		this.canVote  = false;
+		this.collapsedActions = true;
 		this.modulesOfWord = {}
 		this.totalPoints = 0
 		this.col1 = AppSettings.COL_SEARCH_TERM
 		this.col2 = AppSettings.COL_KEY_WORDS
 		this.col3 = AppSettings.COL_MODULE
 		this.col4 = AppSettings.COL_OTHER_TERMS
-		this.likes = []
-		this.dislikes = []
 		this.allModules = []
 		this.dictionary = []
 		this.contextEntrys = []
@@ -114,38 +111,32 @@ export class AppSearch {
 		this._router.navigate(['/home'])
 	}
 
-	like() { this.likeDislike(AppSettings.API_METALIKE, this.likes, this.canLike, 0, this.wordSel.like) }
+	like() { this.likeDislike(AppSettings.API_METALIKE, this.wordSel.likes, this.wordSel.canLike, 0, this.wordSel.like) }
 
-	dislike() { this.likeDislike(AppSettings.API_METADISLIKE, this.dislikes, this.canDislike, 1, this.wordSel.dislike) }
+	dislike() { this.likeDislike(AppSettings.API_METADISLIKE, this.wordSel.dislikes, this.wordSel.canDislike, 1, this.wordSel.dislike) }
 
-	likeDislike(metadata, variable, can, nb, objectIncDec) {
-		let instance = this;
-		if (nb==0) {
-			instance.loading = true
-		} else {
-			instance.loading2 = true
+	postLikeBalance(metadata, nb, hash, voted) {
+		let hashWord = ""
+		for (let prop in hash.dictionary.entries) {
+			if (JSON.parse(hash.dictionary.entries[prop].value).name == this.wordSel.name) {
+				hashWord = prop
+				break;
+			}
 		}
 		
-		if (can) {
-			if (nb == 0) {
-				instance.likes.push(instance._userservice.getCurrentUser().mail)
-			} else {
-				instance.dislikes.push(instance._userservice.getCurrentUser().mail)
-			}
-			
-			instance._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? instance.likes : instance.dislikes), instance.hashWordSel, instance._userservice.getCurrentUser().secretKey)
-			.subscribe(function(res) {
+		this._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? this.wordSel.likes : this.wordSel.dislikes), hashWord, this._userservice.currentUser.secretKey)
+		.subscribe(
+			res => {
 				console.log(res)
 				if (nb == 0) {
-					instance.wordSearch.like.number += 1
-					instance.canLike = false
-					instance.loading = false
-					instance.nbTimes += 1
-					if (instance.nbTimes < 2) {
-						instance._httpservice.getUsers()
+					this.wordSel.like.number += 1
+					this.wordSel.canLike = false
+					this.loading = false
+					if (voted) {
+						this._httpservice.getUsers()
 						.subscribe(
 							data => {
-								instance._httpservice.postBalance(instance._userservice.getCurrentUser().publicKey,instance._userservice.getCurrentUser().secretKey, data.user_list.list[instance.wordSel.author.name], (1 -(0.25 * 0)))
+								this._httpservice.postBalance(this._userservice.currentUser.publicKey,this._userservice.currentUser.secretKey, data.user_list.list[this.wordSel.author.name], (1 -(0.25 * 0)))
 								.subscribe(function(balance){
 									console.log(balance)
 								})
@@ -154,35 +145,70 @@ export class AppSearch {
 						)
 					}
 				} else {
-					instance.wordSearch.dislike.number += 1
-					instance.canDislike = false
-					instance.loading2 = false
+					this.wordSel.dislike.number += 1
+					this.wordSel.canDislike = false
+					this.loading2 = false
 				}
-			})
+			}
+		)
+	}
+
+	likeDislike(metadata, variable, can, nb, objectIncDec) {
+		
+		let instance = this;
+		if (nb==0) {
+			instance.loading = true
+		} else {
+			instance.loading2 = true
+		}
+		if (can) {
+			let voted = false
+			if (nb == 0) {
+				voted = true
+				instance.wordSel.likes.push(instance._userservice.currentUser.mail)
+			} else {
+				instance.wordSel.dislikes.push(instance._userservice.currentUser.mail)
+			}
+			instance._httpservice.getEntryJSON(AppSettings.API_WORDS)
+				.subscribe(
+					data => this.postLikeBalance(metadata, nb, data, voted)
+				)
 		} else {
 			if (nb == 0) {
-				instance.likes.splice(instance.likes.indexOf(instance._userservice.getCurrentUser().mail), 1)
+				instance.wordSel.likes.splice(instance.wordSel.likes.indexOf(instance._userservice.currentUser.mail), 1)
 			} else {
-				instance.dislikes.splice(instance.dislikes.indexOf(instance._userservice.getCurrentUser().mail), 1)
+				instance.wordSel.dislikes.splice(instance.wordSel.dislikes.indexOf(instance._userservice.currentUser.mail), 1)
 			}
-			instance._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? instance.likes : instance.dislikes), instance.hashWordSel, instance._userservice.getCurrentUser().secretKey)
-			.subscribe(function(res) {
-				console.log(res)
-				if (nb == 0) {
-					instance.wordSearch.like.number -= 1
-					instance.canLike = true
-					instance.loading = false
-				} else {
-					instance.wordSearch.dislike.number -= 1
-					instance.canDislike = true
-					instance.loading2 = false
+			instance._httpservice.getEntryJSON(AppSettings.API_WORDS)
+			.subscribe(
+				data => {
+					let hashWord = ""
+					for (let prop in data.dictionary.entries) {
+						if (JSON.parse(data.dictionary.entries[prop].value).name == this.wordSel.name) {
+							hashWord = prop
+							break;
+						}
+					}
+					instance._httpservice.postEntryMetadata(metadata, JSON.stringify(nb == 0 ? instance.wordSel.likes : instance.wordSel.dislikes), hashWord, instance._userservice.currentUser.secretKey)
+					.subscribe(function(res) {
+						console.log(res)
+						if (nb == 0) {
+							instance.wordSel.like.number -= 1
+							instance.wordSel.canLike = true
+							instance.loading = false
+						} else {
+							instance.wordSel.dislike.number -= 1
+							instance.wordSel.canDislike = true
+							instance.loading2 = false
+						}
+					})
 				}
-			})
+			)
 		}
 	}
 
 	findUser(tabLikes) {
-		let user = this._userservice.getCurrentUser()
+		let user = this._userservice.currentUser
 		for (let i = 0; i < tabLikes.length; i++) {
 			if (user.mail.toLowerCase() == tabLikes[i].toLowerCase()) {
 				return true;
@@ -191,30 +217,30 @@ export class AppSearch {
 		return false
 	}
 
-	constructLikeDislike(tab, nb, can) {
-		console.log(tab)
+	constructLikeDislike(tab, nb, term) {
 		if (tab == undefined) {
-			can = true;
+			term.canLike = true;
+			term.canDislike = true;
 		} else {
 			if (nb == 0) {
 				try {
-					this.likes = JSON.parse(tab)
+					term.likes = JSON.parse(tab)
 				} catch(e) {
-					this.likes = tab
+					term.likes = tab
 				}
-				can = !this.findUser(this.likes)
-				this.wordSearch.like.number = this.likes.length;
+				term.canLike  = !this.findUser(term.likes)
+				term.like.number = term.likes.length;
 			} else {
 				try {
-					this.dislikes = JSON.parse(tab)
+					term.dislikes = JSON.parse(tab)
 				} catch(e) {
-					this.dislikes = tab
+					term.dislikes = tab
 				}
-				can = !this.findUser(this.dislikes)
-				this.wordSearch.dislike.number = this.dislikes.length;
+				term.canDislike = !this.findUser(term.dislikes)
+				term.dislike.number = term.dislikes.length;
 			}
 		}
-		return can;
+		return term
 	}
 
 	getSameModule(word) {
@@ -248,6 +274,10 @@ export class AppSearch {
 					objInsert = new Entry()
 					objInsert.setData(JSON.parse(obj[prop].value));
 					objInsert.searchClick = obj[prop].conf[AppSettings.API_METASEARCHCLICK] == undefined || obj[prop].conf[AppSettings.API_METASEARCHCLICK] == 'NaN'? 0 : obj[prop].conf[AppSettings.API_METASEARCHCLICK]
+
+					objInsert = this.constructLikeDislike(obj[prop].conf.like, 0, objInsert)
+					objInsert = this.constructLikeDislike(obj[prop].conf.dislike, 1, objInsert)
+					objInsert.timestamp = this._format.formatDate(obj[prop].date)
 					objInsert.timestampCreation = this._format.getDate(obj[prop].date);
 					objInsert.author = { name: obj[prop].author, search: "" };
 					element.allterms.push(objInsert)
@@ -266,15 +296,25 @@ export class AppSearch {
 				let nbSearch: number = Number(obj[prop].conf.searchClick)
 				nbSearch += 1
 				instance.hashWordSel = prop;
-				instance.canLike = instance.constructLikeDislike(obj[prop].conf.like, 0 ,instance.canLike)
-				instance.canDislike = instance.constructLikeDislike(obj[prop].conf.dislike, 1, instance.canDislike)
+
 				instance.wordSearch.setData(JSON.parse(obj[prop].value));
+				var term = instance.constructLikeDislike(obj[prop].conf.like, 0 , instance.wordSearch)
+				instance.wordSearch = instance.constructLikeDislike(obj[prop].conf.dislike, 1, term)
+				
+				console.log(instance.constructLikeDislike(obj[prop].conf.like, 0 ,instance.wordSearch))
 				instance.wordSearch.searchClick = nbSearch
+				instance.wordSearch.timestamp = instance._format.formatDate(obj[prop].date);
 				instance.wordSearch.timestampCreation = instance._format.getDate(obj[prop].date);
 				instance.wordSearch.author = { name: obj[prop].author, search: "" };
-				instance.canVote = instance.wordSearch.author.name.trim().toLowerCase() != instance._userservice.getCurrentUser().mail.trim().toLowerCase()
-				instance.wordSearch.modules.id = instance.wordSearch.modules.id.replace(/\.0/g, "")
+				let canVote = !(instance.wordSearch.author.name == instance._userservice.currentUser.mail && instance._userservice.currentUser.reputation < instance._userservice.currentUser.settingsReputation.repIntegrationEditor)
 
+				if (instance.wordSearch.canLike) {
+					instance.wordSearch.canLike = canVote
+				}
+				if (instance.wordSearch.canDislike) {
+					instance.wordSearch.canDislike = canVote
+				}
+				instance.wordSearch.modules.id = instance.wordSearch.modules.id.replace(/\.0/g, "")
 				instance.wordSearch.modules.id = instance.wordSearch.modules.id.includes(',') ? instance.wordSearch.modules.id.split(',') : instance.wordSearch.modules.id.split('-')
 
 				for(let i = 0; i< instance.wordSearch.modules.id.length; i++) {
@@ -293,8 +333,7 @@ export class AppSearch {
 				instance._httpservice.getEntryJSON(AppSettings.API_HISTORY)
 				.subscribe(
 					data => {
-						console.log(data)
-						
+
 						if (data.dictionary.conf[instance._userservice.currentUser.mail] != undefined) {
 							if (!data.dictionary.conf[instance._userservice.currentUser.mail].includes(instance.wordSearch.name)) {
 								if (data.dictionary.conf[instance._userservice.currentUser.mail] == "[]" ) {
@@ -315,7 +354,7 @@ export class AppSearch {
 					error => {}
 				)
 				instance.createContext(instance.wordSearch);
-				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop, instance._userservice.getCurrentUser().secretKey) // Put searchClick to 0
+				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop, instance._userservice.currentUser.secretKey) // Put searchClick to 0
 					.subscribe(function (resp) {console.log(resp)});
 			}
 		}
@@ -442,41 +481,23 @@ export class AppSearch {
 		return arrayEntrys
 	}
 
-	createRep1(wordSearch, entrys) {
-		let totalPoints = this._format.getTotalCountWord(entrys);
-		let nbTags = entrys.length;
-		let divisions = this._format.getDivisions(totalPoints, nbTags);
-		for (let i = entrys.length - 1; i >= 0; i--) {
-			entrys[i].repRule1 = this._format.getReput(entrys[i].count, divisions) * AppSettings.COEFRULES[0]
-		}
-		entrys.sort(function (a, b) { return a.reputRule1 > b.reputRule1; });
-	}
-
-	createRep1Entrys(moduleName, entrys) {
+	createRep1(moduleName, entrys) {
 		let totalPoints = this._format.getTotalCountEntry(entrys, moduleName);
+		
 		let nbTags = entrys.length;
 		let divisions = this._format.getDivisions(totalPoints, nbTags);
+		let rep 
 		for (let i = entrys.length - 1; i >= 0; i--) {
 			for (var index = 0; index < entrys[i].modulesReputation.length; index++) {
 				var element =  entrys[i].modulesReputation[index];
 				if (moduleName.trim() == element.id.id.trim()) {
-					element.repRule1 = this._format.getReput(element.count, divisions) * AppSettings.COEFRULES[0]
+					let rep = this._format.getReput(element.count, divisions)
+					element.repRule1 = (rep == undefined ? Math.floor(element.count /16 * 10) : rep) * AppSettings.COEFRULES[0]
+					//console.log(element.repRule1)
 				}
 			}
 		}
 	}
-/*
-	createRep1WordSearch(moduleName, wordSearch) {
-		let totalPoints = this._format.getTotalCountEntry(entrys, moduleName);
-		let nbTags = entrys.length;
-		let divisions = this._format.getDivisions(totalPoints, nbTags);
-		for (var index = 0; index < entrys[i].modulesReputation.length; index++) {
-			var element =  entrys[i].modulesReputation[index];
-			if (moduleName.trim() == element.id.id.trim()) {
-				element.repRule1 = this._format.getReput(element.count, divisions) * AppSettings.COEFRULES[0]
-			}
-		}
-	}*/
 
 	createRep2(moduleName, listUsers, entries) {
 		for (var index = 0; index < entries.length; index++) {
@@ -486,7 +507,7 @@ export class AppSearch {
 					this._httpservice.getUserReputation(listUsers[entries[index].author.name])
 						.subscribe(
 							data => {
-								console.log(data);
+								el.repRule2 = data
 							}
 						) 
 				}
@@ -497,13 +518,45 @@ export class AppSearch {
 
 	createRep3(moduleName, entries) {
 		let totalPoints = this._format.getTotalSearchClick(entries, moduleName);
-		let nbTags = entries.length;
+		let nbTags = entries.length <= 16 ? 16 : entries.length;
 		let divisions = this._format.getDivisions(totalPoints, nbTags);
+		let rep : number
 		for (let i = entries.length - 1; i >= 0; i--) {
 			for (var index = 0; index < entries[i].modulesReputation.length; index++) {
 				var element =  entries[i].modulesReputation[index];
 				if (moduleName.trim() == element.id.id.trim()) {
-					element.repRule3 = this._format.getReput(element.count, divisions) * AppSettings.COEFRULES[2]
+					rep = this._format.getReput(entries[i].searchClick, divisions)
+					element.repRule3 = (rep == undefined ? 0 : rep)  * AppSettings.COEFRULES[2]
+				}
+			}
+		}
+	}
+
+	createRep5(moduleName, entries) {
+		let today = moment()
+		for (let i = entries.length - 1; i >= 0; i--) {
+			for (var index = 0; index < entries[i].modulesReputation.length; index++) {
+				var element =  entries[i].modulesReputation[index];
+				if (moduleName.trim() == element.id.id.trim()) {
+					let obj = {nbDays : 0, reputation : 0}
+					obj = this.getTimestamp(entries[i].timestamp,today, entries)
+					element.repRule5 = obj.reputation
+				}
+			}
+		}
+	}
+
+	createRep6(moduleName, entries) {
+		let totalPoints = this._format.getTotalLikes(entries, moduleName);
+		let nbTags = entries.length < 16 ? 16 : entries.length;
+		let divisions = this._format.getDivisions(totalPoints, nbTags);
+		let rep : number
+		for (let i = entries.length - 1; i >= 0; i--) {
+			for (var index = 0; index < entries[i].modulesReputation.length; index++) {
+				var element =  entries[i].modulesReputation[index];
+				if (moduleName.trim() == element.id.id.trim()) {
+					rep = this._format.getReput((entries[i].like.number - entries[i].dislike.number), divisions)
+					element.repRule6 = (rep == undefined ? 0 : rep)  * AppSettings.COEFRULES[5]
 				}
 			}
 		}
@@ -531,29 +584,29 @@ export class AppSearch {
 		for (var index = 0; index < context.length; index++) {
 			context[index].totalReput = (context[index].repRule1 +  
 				context[index].repRule2 + context[index].repRule3 
-				+ context[index].repRule4 + context[index].repRule5)
+				+ context[index].repRule4 + context[index].repRule5 + context[index].repRule6)
 		}
 	}
 	countTotalReputationForModule(entries) {
 		for (var index = 0; index < entries.length; index++) {
 			var el = entries[index].modulesReputation
 			for (var i = 0; i < el.length;i++) {
-				el[i].totalReput = (el[i].repRule1 +  
+				el[i].totalReput = Math.floor(el[i].repRule1 +  
 					el[i].repRule2 + el[i].repRule3 
-					+ el[i].repRule4 + el[i].repRule5)
+					+ el[i].repRule4 + el[i].repRule5 +  el[i].repRule6)
 			}
 			
 		}
 	}
 
-	constructReputationForModule(element, modules) {
+	initReputationForEachModule(element, modules) {
 		for (var index = 0; index < modules.length; index++) {
 			var module = modules[index];
 			if (module.trim() != "") {
 				if (this.modulesOfWord[module.trim()] != undefined) {
-					var object = {id : this.modulesOfWord[module.trim()], repRule1 : 0,repRule2 : 0,repRule3 : 0,repRule4 : 0,repRule5 : 0,totalReput : 0, count: 0}
+					var object = {id : this.modulesOfWord[module.trim()], repRule1 : 0,repRule2 : 0,repRule3 : 0,repRule4 : 0,repRule5 : 0,repRule6 : 0,totalReput : 0, count: 0}
 					object.count = isNaN(this._format.countSameWord(element.name, this.modulesOfWord[module.trim()].goals.split(' '))) ? 0 :this._format.countSameWord(element.name, this.modulesOfWord[module.trim()].goals.split(' ')) 
-					element.count += object.count
+					element.count = element.count + object.count
 					element.modulesReputation.push(object);
 				}
 			}
@@ -570,6 +623,60 @@ export class AppSearch {
 		return count;
 	}
 
+	getTotalPointsForEachModule(module, allEntries) {
+		var totalPoints = 0
+		for (var index = 0; index < allEntries.length; index++) {
+			var element = allEntries[index];
+			for (var cpt = 0; cpt < element.modulesReputation.length; cpt++) {
+				var el = element.modulesReputation[cpt];
+				if (el.id.id == module.id) {
+					totalPoints = totalPoints + el.totalReput
+				}
+			}
+		}
+		return totalPoints
+	}
+
+	constructTotalPointsReputation(allEntries) {
+		for (let prop in this.modulesOfWord) {
+			var mod = this.modulesOfWord[prop];
+			mod.totalPoints = this.getTotalPointsForEachModule(mod, allEntries)
+		}
+		for (var index = 0; index < allEntries.length; index++) {
+			var element = allEntries[index];
+			for (var cpt = 0; cpt < element.modulesReputation.length; cpt++) {
+				var el = element.modulesReputation[cpt];
+				el.totalPoints = Math.floor(this.modulesOfWord[el.id.id].totalPoints)
+			}
+		}
+		return allEntries
+	}
+
+	constructAnimationReputation(allEntries) {
+		for (var index = 0; index < allEntries.length; index++) {
+			var element = allEntries[index];
+	
+			for (var i = 0; i < element.modulesReputation.length; i++) {
+				var ele = element.modulesReputation[i];
+				var half = Math.floor(((ele.totalReput * 10) / ele.totalPoints))
+				ele.color = half >= 7 ? "#16ab39" : half > 4 ? "#eaae00" : "#db2828"
+				ele.animationLeft = "loading-" + (half >= 5 ? (half - 5) * 2 : 0) + " 0.5s linear forwards"
+				ele.animationRight = "loading-" + (half >= 5 ? 10 : half * 2) + " 0.5s linear forwards"
+			}
+		}
+		return allEntries
+	}
+
+	deleteWordSearchFromEntries(allEntries, wordSearch) {
+		for (var cpt = 0; cpt < allEntries.length; cpt++) {
+			if (allEntries[cpt].name == wordSearch.name) {
+				allEntries.splice(cpt, 1)
+			}
+		}
+		return allEntries
+	}
+	
+
 	createContext(wordSearch) {
 		let today = moment()
 		let instance = this;
@@ -581,24 +688,25 @@ export class AppSearch {
 			allEntries = allEntries.concat(module.allterms)
 		}
 		allEntries = this._format.uniqueEntries(allEntries, 'name')		
-		
+		allEntries = this.deleteWordSearchFromEntries(allEntries, wordSearch)
+
 		for (var index = 0; index < allEntries.length; index++) {
 			var element = allEntries[index];
 			element.modules.id = element.modules.id.replace(/\.0/g, " ")
 			var mod = element.modules.id.replace(/\,/g, " ").replace(/\-/g, " ")
 			var modu = mod.split(' ')
-			this.constructReputationForModule(element, modu)
+			this.initReputationForEachModule(element, modu)
 		}
-
+		
 		allEntries = this.sortTags(allEntries)
 
-		this.constructReputationForModule(wordSearch, wordSearch.modules.id)
+		this.initReputationForEachModule(wordSearch, wordSearch.modules.id)
 
 		allEntries.push(wordSearch)
 
 		for (let prop in this.modulesOfWord) {
 			var el = this.modulesOfWord[prop];
-			this.createRep1Entrys(el.id, allEntries)
+			this.createRep1(el.id, allEntries)
 			//this.createRep2(el.id, allEntries)
 			/*instance._httpservice.getUsers()
 			.subscribe(
@@ -608,45 +716,29 @@ export class AppSearch {
 				error => {}
 			)*/
 			this.createRep3(el.id, allEntries)
+			this.createRep5(el.id, allEntries)
+			this.createRep6(el.id, allEntries)
 		}
 		this.countTotalReputationForModule(allEntries)
+
+		
+		allEntries = this.constructTotalPointsReputation(allEntries)
+		allEntries = this.constructAnimationReputation(allEntries)
+
 		var wordSelected
 		for (var index = 0; index < allEntries.length; index++) {
 			var element = allEntries[index];
 			if (element.name == wordSearch.name) {
 				wordSelected = element
-				allEntries.slice(index, 1)
+				allEntries.splice(index, 1)
 			}
 		}
+
 		instance.wordSearch = Object.assign({}, wordSelected)
 		instance.wordSel = Object.assign({}, instance.wordSearch);
 
-		var totalPoints = instance.getReputationTotal(instance.wordSearch)
-		for (var index = 0; index < allEntries.length; index++) {
-			var element = allEntries[index];
-			var points =  instance.getReputationTotal(element)
-			if (points > totalPoints) {totalPoints = points}
-		}
-
-		this.totalPoints = totalPoints
-
-		for (var index = 0; index < allEntries.length; index++) {
-			var element = allEntries[index];
-			for (var i = 0; i < element.modulesReputation.length; i++) {
-				var ele = element.modulesReputation[i];
-				var half = Math.floor(((ele.totalReput * 10) / this.totalPoints))
-				ele.color = half >= 7 ? "#16ab39" :  half > 4 ? "#eaae00" : "#db2828"
-				ele.animationLeft = "loading-" + (half >= 5 ? (half - 5)*2: 0)  +" 0.5s linear forwards"
-				ele.animationRight = "loading-" + (half >= 5 ? 10 : half * 2) + " 0.5s linear forwards"
-			}
-			
-		}
-		for (var cpt = 0; cpt < allEntries.length; cpt++) {
-			if (allEntries[cpt].name == wordSearch.name) {
-				allEntries.splice(cpt, 1)
-			}
-		}
-
+		console.log(allEntries)
+		console.log(instance.wordSearch)
 		instance._manager3d.createScene(wordSearch, allEntries, instance.wordSel, instance.modulesOfWord);
 		instance._manager3d.runRender();
 		this.loading = false;
@@ -669,7 +761,7 @@ export class AppSearch {
 			
 			//element.name = element.name[element.name.length-1] != '.' ? element.name : element.name.substring(0,element.name.length-1)
 			element.totalReput = 0;
-			element.repRule1 = 0;
+			element.0;
 			element.repRule2 = 0;
 			element.repRule3 = 0;
 			element.repRule4 = 0;

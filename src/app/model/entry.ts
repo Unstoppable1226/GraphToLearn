@@ -4,6 +4,7 @@ export class Entry {
     source: string = "";
     modules: {id: string, name: string} = {id: "", name: ""};
     definition: string = "";
+    timestamp: string = "";
     timestampCreation: string = "";
     timestampUpdate: string = "";
     inactive: boolean = false;
@@ -20,9 +21,14 @@ export class Entry {
     repRule3: number = 0;
     repRule4: number = 0;
     repRule5: number = 0;
+    repRule6: number = 0;
     totalReput : number = 0;
+    canLike : boolean = false;
+    canDislike : boolean = false;
     like: {number: number, author: string} = {number: 0, author: ""};
     dislike:  {number: number, author: string} = {number: 0, author: ""};
+    likes: Array<any> = [];
+    dislikes: Array<any> = [];
     parent: string = "";
     commentary : string = "";
     review : string = "";

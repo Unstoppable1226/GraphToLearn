@@ -14,7 +14,10 @@
 		</div>
 		<h2 class="ui icon header" style="margin-top:25px; text-align:center!important;margin-bottom: -200px">
 			<div class="content" style="color:#F8F9FB; font-weight:200">
-				Résultat de la recherche : <span style="color:burlywood; font-weight:600">{{wordSel.name}}</span>
+				Résultat de la recherche :
+				<div class="ui left pointing label" style="background-color:#1B1C1D; font-size:0.8em">
+					<strong style="color:#2185d0!important;">{{wordSel.name}}</strong>
+				</div>
 
 				<div class="ui statistic small" style="margin-left:25px">
 					<div class="value" style="color:#1B1C1D">
@@ -28,8 +31,8 @@
 			</div>
 		</h2>
 
-		<div id="style-15" class="scrollbar" style="position: fixed;top: 500px;left: 0px;width: 400px; max-width:400px;overflow-y: scroll;max-height: 115px">
-			<a class="ui pointing below label" style="color: #eee; background-color:#1B1C1D;text-align: center;font-size: 1em;font-weight: 600;margin-right: 0px;display:block; margin-bottom:-5px">Réputation dans les modules</a>
+		<div id="style-15" class="scrollbar" style="position: fixed;top: 430px;left: 0px;max-width: 400px; overflow-x: scroll;max-height: 210px">
+			<a class="ui pointing below label" style="color: #eee; background-color:#1B1C1D;text-align: center;font-size: 1em;font-weight: 600;margin-right: 0px;display:block; margin-bottom:-5px">Réputation du terme recherché <strong style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong> dans les modules suivants :</a>
 			<div *ngFor="let mod of wordSel.modulesReputation; let i = index" class="ui statistic small" style="margin-left:25px">
 				<div class="label" style="color:#1B1C1D">
 					<div class="cusprogress" [ngStyle]="{'color': mod.color}">
@@ -39,7 +42,7 @@
 						<span class="cusprogress-right">
 											<span class="cusprogress-bar" [ngStyle]="{'animation': mod.animationRight}"></span>
 						</span>
-						<div class="cusprogress-value">{{mod.totalReput}}/{{totalPoints}}<br></div>
+						<div class="cusprogress-value" style="padding-top:10px"><span style="font-size: 1.2em">{{mod.totalReput}}</span><span style="font-size: 0.5em;"> / {{mod.totalPoints}}</span><br></div>
 					</div>
 					<span style="margin-top:10px!important; font-size:1.2em"> {{mod.id.id}}</span>
 				</div>
@@ -49,14 +52,14 @@
 		<div class="dg main a" style="width: 300px;position: fixed; top:250px; right: 0;margin-right: 0px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 			<div class="close-button" style="width: 300px;height:50px;padding-top: 5px;font-size: 1.3em;line-height:20px!important;user-select: none;"
 			 (click)="hideOrShow($event, 1)">
-				Informations sur <br>{{wordSel.name}}
+				Informations sur <br><strong style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
 				<div style="float: right; margin-top:-10px!important;font-size: 0.7em">
 					<i class="icon" [ngClass]="{'minus': !collapsedInfos, 'plus': collapsedInfos}"></i>
 				</div>
 			</div>
 			<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
 			<ul style="height: auto;">
-				<li class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="wordSel.type != ''" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name">Type : </span>
 						<div class="c">{{wordSel.type}}</div>
@@ -104,13 +107,13 @@
 					Créé par : <span style="padding-left: 5px">{{wordSel.author.name}}</span>
 				</li>
 			</ul>
-			<div class="ui labeled button" [ngClass]='{disabled: !canVote}' (click)="like()">
+			<div class="ui labeled button" [ngClass]='{disabled: !wordSel.canLike}' (click)="like()">
 				<div class="ui blue button" [ngClass]="{'loading' : loading}" style="width: 240px;">
 					<i class="smile icon"></i> Contenu très utile
 				</div>
 				<a tabindex="0" class="ui basic blue left pointing label" style="width: 60px; text-align: center">{{wordSel.like.number}}</a>
 			</div>
-			<div class="ui labeled button" tabindex="1" [ngClass]='{disabled: !canVote}' (click)="dislike()">
+			<div class="ui labeled button" tabindex="1" [ngClass]='{disabled: !wordSel.canDislike}' (click)="dislike()">
 				<div class="ui red button" [ngClass]="{'loading' : loading2}" style="width: 240px;">
 					<i class="frown icon"></i> Contenu sans intérêt
 				</div>
@@ -145,7 +148,7 @@
 
 	<div class="dg main a" style="width: 59%;left:0;position: fixed;right: 0; margin-right:0px!important;bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
-		 (click)="hideOrShow($event, 2)">Explications de {{wordSel.name}}
+		 (click)="hideOrShow($event, 2)">Explications de <strong style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
 			<div style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedMeaning, 'plus': collapsedMeaning}"></i></div>
 		</div>
 		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
@@ -208,6 +211,7 @@
 			<div class="header">
 				Modification du terme : {{wordSel.name}}
 			</div>
+			
 			<div class="scrolling content">
 				<div class="ui form">
 					<!--<div class="field icon required">
@@ -305,8 +309,8 @@
 					</div>
 					<div class="field icon required">
 						<label style="color:#db2828; font-size: 0.8em; float: right;">Champ obligatoire </label>
-					</div> -->
-				</div>
+					</div>
+				</div> -->
 				<div class="ui fluid large approve button button-blur" style="margin-left:0px;margin-top:15px" (click)="saveModifications()">Enregistrer modifications<i class="right checkmark icon"></i></div>
 			</div>
 

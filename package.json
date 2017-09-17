@@ -1,6 +1,6 @@
 {
-  "name": "graph-to-learn-prod",
-  "version": "0.0.0",
+  "name": "graph-to-learn",
+  "version": "1.0.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",

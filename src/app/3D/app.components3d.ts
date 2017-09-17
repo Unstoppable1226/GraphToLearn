@@ -104,7 +104,7 @@ export class Manager3D {
 		console.log(data)
 		this.wordSel.name = mesh.name
 		this.wordSel.type = data.type
-		this.wordSel.context = data.type
+		this.wordSel.context = data.context
 		this.wordSel.meaning = data.meaning;
 		this.wordSel.source = data.source;
 		this.wordSel.totalReput = data.totalReput;
@@ -113,6 +113,10 @@ export class Manager3D {
 		this.wordSel.searchClick = data.searchClick
 		this.wordSel.like = data.like
 		this.wordSel.dislike = data.dislike
+		this.wordSel.canLike = data.canLike
+		this.wordSel.canDislike = data.canDislike
+		this.wordSel.likes = data.likes
+		this.wordSel.dislikes = data.dislikes
 		this.wordSel.lastUpdatedNbDays = data.lastUpdatedNbDays;
 		this.wordSel.timestampCreation = data.timestampCreation;
 		this.wordSel.modulesReputation = data.modulesReputation;

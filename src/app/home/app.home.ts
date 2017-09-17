@@ -28,7 +28,12 @@ export class AppHome {
 	timeEstimated = ""
 
 	constructor(private _httpService: HttpAPIService, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
-		console.log(this._userservice.getCurrentUser());
+		this._userservice.getCurrentUser()
+			.then(
+				resolve => {
+					console.log(resolve)
+				}
+			)
 		
 	}
 
@@ -123,7 +128,7 @@ export class AppHome {
 							(function(index) {
 								var element = data[index];
 								setTimeout(function() { 
-									instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name, instance._userservice.getCurrentUser().secretKey)
+									instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name, instance._userservice.currentUser.secretKey)
 									.subscribe(function(res) {
 										console.log(res)
 									})
@@ -147,6 +152,7 @@ export class AppHome {
 	}
 
 	ngAfterViewInit() {
+		
 		let instance = this;
 		$('.ui.search.searchWord')
 			.search({
@@ -160,7 +166,7 @@ export class AppHome {
 						let obj = response.dictionary.entries;
 						for (let prop in obj) {
 							let tag = obj[prop].tags;
-							if (tag.toLowerCase().includes(instance.searchWord.toLowerCase())) {
+							if (tag.toLowerCase().trim().startsWith('||' + instance.searchWord.toLowerCase().trim())) {
 								instance.content.push(obj[prop].value);
 							}
 						}
@@ -168,10 +174,6 @@ export class AppHome {
 							let itemObj = JSON.parse(item);
 							itemObj.modules = itemObj.modules.replace(/\.0/g,"")
 							let modules = itemObj.modules.length > 1 ? " [" + (isNaN(parseInt(itemObj.modules)) ? itemObj.modules : itemObj.modules) + "]" : ""
-							
-							let name = itemObj.name.replace(/\//g, AppSettings.FORWARD_SLACH);
-							name = name.replace(/\(/g, AppSettings.OPEN_PARENTHESIS).replace(/\)/g, AppSettings.CLOSE_PARENTHESIS)
-							name = name.replace(/\s/g,"%20")
 							responseSearch.results.push({
 								title: itemObj.name + modules,
 								description: itemObj.meaning,
@@ -183,8 +185,12 @@ export class AppHome {
 					}
 				},
 				minCharacters: 1,
+				maxResults : 10,
 				onSelect(result, response) {
-					instance._router.navigate(['search/' + result.name])
+					let name = result.name.replace(/\//g, AppSettings.FORWARD_SLACH);
+					name = name.replace(/\(/g, AppSettings.OPEN_PARENTHESIS).replace(/\)/g, AppSettings.CLOSE_PARENTHESIS)
+					//name = name.replace(/\s/g,"%20")
+					instance._router.navigate(['search/' + name])
 				}
 			});
 	}
