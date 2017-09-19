@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
+import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 import { AuthService } from '../login/app.authservice';
 import { UserService } from '../model/user-service';
 //import { Observable } from 'rxjs/Observable';
@@ -27,7 +28,7 @@ export class AppHome {
 	title = AppSettings.TITLE;
 	timeEstimated = ""
 
-	constructor(private _httpService: HttpAPIService, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
+	constructor(private _httpService: HttpAPIService, private _alert : AlertsService, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
 		this._userservice.getCurrentUser()
 			.then(
 				resolve => {
@@ -80,6 +81,9 @@ export class AppHome {
 			if (data == undefined) {
 				alert('Attention data doit être le premier objet présent')
 			} else {
+				instance._alert.create('error', "Cette fonctionnalitée a été désactivée, car elle est encore dans l'état expérimentale");
+				console.log('expérimental')
+				/*
 				instance._httpService.getEntryJSON(AppSettings.API_WORDS)
 					.subscribe(function(res){
 						console.log(Object.keys(res.dictionary.entries).length)
@@ -121,7 +125,7 @@ export class AppHome {
 								}, i * 5000);
 							})(i);
 						} */
-				
+				/*
 						let tab = []
 						
 						for (var i = 0; i < data.length; i++) {
@@ -145,7 +149,7 @@ export class AppHome {
 									}) 
 							}
 						});*/
-					})	
+					/*})	*/
 			
 			}
 		}
