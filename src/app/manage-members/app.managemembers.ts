@@ -32,7 +32,7 @@ export class AppManagerMembers implements OnInit {
 			data=> {
 				this.allMembers = JSON.parse(data.dictionary.entries[Object.keys(data.dictionary.entries)[0]].value)
 				for (let prop in this.allMembers) {
-					if (this.allMembers[prop].validated == false && this.allMembers[prop].refusedBy == undefined) {
+					if (this.allMembers[prop].validated == false && true/*this.allMembers[prop].refusedBy == undefined*/) {
 						this.allMembers[prop].mail = prop
 						this.newMembers.push(this.allMembers[prop])
 					}

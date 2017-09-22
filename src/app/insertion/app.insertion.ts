@@ -178,7 +178,7 @@ export class AppInsertion implements OnInit {
 	}
 
 	validated() { // Function who validates if everything is ok before the insert
-		return this.word != "";
+		return this.word != "" && this.source != "" && this.meaning != ""; // Value required to insert
 	}
 
 	reinit() {

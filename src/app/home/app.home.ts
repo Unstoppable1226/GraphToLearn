@@ -161,16 +161,16 @@ export class AppHome {
 		$('.ui.search.searchWord')
 			.search({
 				apiSettings: {
-					url: AppSettings.API_OBSERVATORY + "?observatoryId=" + AppSettings.API_WORDS,
+					url: AppSettings.API_OBSERVATORY + "?observatoryId=" + AppSettings.API_WORDS, // Communication avec l'API Cowaboo
 					onResponse: function (response) {
-						instance.content.splice(0, instance.content.length)
+						instance.content.splice(0, instance.content.length) // Vider le tableau
 						let responseSearch = {
-							results: []
+							results: [] // Tableau qui contient les résultats
 						}
 						let obj = response.dictionary.entries;
 						for (let prop in obj) {
-							let tag = obj[prop].tags;
-							if (tag.toLowerCase().trim().startsWith('||' + instance.searchWord.toLowerCase().trim())) {
+							let tag = obj[prop].tags; // Récupère le tag lié à l'entrée
+							if (tag.toLowerCase().trim().startsWith('||' + instance.searchWord.toLowerCase().trim())) { // Algorithme de recherche
 								instance.content.push(obj[prop].value);
 							}
 						}
@@ -188,8 +188,8 @@ export class AppHome {
 						return responseSearch;
 					}
 				},
-				minCharacters: 1,
-				maxResults : 10,
+				minCharacters: 1, // 1 caractère minimum pour déclencher l'algorithme de recherche
+				maxResults : 10, // Affiche 10 résultats maximum
 				onSelect(result, response) {
 					let name = result.name.replace(/\//g, AppSettings.FORWARD_SLACH);
 					name = name.replace(/\(/g, AppSettings.OPEN_PARENTHESIS).replace(/\)/g, AppSettings.CLOSE_PARENTHESIS)
