@@ -4,6 +4,12 @@
 	color:white;
 }
 
+.not-active {
+	pointer-events: none!important;
+	cursor: default!important;
+ }
+
+
 .button-blur:active {
 	background-color: #0c5a4a;
 	color:white;

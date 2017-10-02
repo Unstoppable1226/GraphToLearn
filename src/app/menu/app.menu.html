@@ -13,8 +13,8 @@
 		<a *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')" class="item" [ngClass]="{'active': active[3]}" (click)="changeActiveMenuItem(3, 'manage-members')">
 			Gestion membres<a class="ui green circular label">{{nbNewMembers}}</a><i class="right users icon" style="margin-left:5px"></i>
 		</a>
-		<a class="item right">
-			Ma réputation <a class="ui red circular label" [ngClass]="{'blue': user.reputation > -1 }">{{user.reputation}}</a>
+		<a class="item right" data-tooltip="Cette réputation correspond à votre Réputation P" data-position="bottom center" data-inverted="">
+			Ma réputation <a class="ui red left pointing label" [ngClass]="{'blue': user.reputation > -1 }">{{user.reputation}}</a>
 		</a>
 		<a class="item" style="margin-left: auto;" (click)="showInfo()" data-tooltip="Infos GraphToLearn et son fonctionnement" data-inverted=""
 		 data-position="bottom center">
@@ -85,14 +85,165 @@
 			L'outil sert à pouvoir rechercher des mots qui ont été créé par les gens de la communauté GraphToLearn. Ces mots là apparaîtront
 			à l'utilisateur de manière graphique (3D) grâce à la librairie <strong>BabylonJS</strong>. Plusieurs possibilités s'offrent
 			alors pour l'utilisateur:<br><br> 1 - Donner son avis sur un contenu, cela améliorera alors la réputation du mot lorsqu'il
-			sera recherché une nouvelle fois <br> 2 - Commenter le mot; 3 - Modifier le mot donnera <strong>1</strong> de réputation
+			sera recherché une nouvelle fois <br> 2 - Commenter le mot; <br>3 - Modifier le mot donnera <strong>1</strong> de réputation
 			en plus à l'utilisateur qui a apporté la modifications;
 		</p>
+		<hr>
 		<h3>Réputation</h3>
-		<p>La réputation est </p>
+		<p>La réputation est l’importance quantifiée qui sert à distinguer, évaluer et différencier toutes les entrées et les membres
+			de la communauté selon la recherche effectuée. <br> Règles définis <br> • Toutes les entrées et personnes doivent avoir
+			une réputation. <br> • Si une entrée est associée à x module(s), alors elle possède x réputation(s), chacune correspondant
+			à un module. <br>
+		</p>
+		<hr>
+		<h3>Algorithme de classification collaborative</h3>
+		<p>L'algorithme est construit grâce à 6 règles métiers.</p>
+		<table class="ui single line table">
+			<thead>
+				<tr>
+					<th>Nom de la règle</th>
+					<th>Son coefficient</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Interne</td>
+					<td>3</td>
+				</tr>
+				<tr>
+					<td>Réputation P</td>
+					<td>2.5</td>
+				</tr>
+				<tr>
+					<td>Avis sur le contenu</td>
+					<td>2</td>
+				</tr>
+				<tr>
+					<td>Vue / clic</td>
+					<td>1.5</td>
+				</tr>
 
+				<tr>
+					<td>Mise à jour</td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td>Timestamp création</td>
+					<td>0.5</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>Explications des règles métiers</p>
+		<div class="ui items">
+			<div class="item">
+				<div class="content">
+					<a class="header">Interne</a>
+					<div class="description">
+						<p>Une entrée a la priorité lorsqu’elle apparaît plus souvent dans les objectifs d’un module.</p>
+						<p>C’est-à-dire que chaque entrée répertorie le nombre de fois où elle est citée dans les objectifs des modules auxquels
+							elle est liée. Les entrées seront alors triées. Celles qui ont de meilleurs résultats apparaissent au début, les autres
+							vers la fin.</p>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="content">
+					<a class="header">Réputation P (Désactivée)</a>
+					<div class="description">
+						<p>Une entrée a la priorité lorsqu’elle a été créée par une personne avec une meilleure Réputation P.</p>
+						<p>Dans cette règle, la réputation en question est celle d’une personne et non d’une entrée. En effet, le solde du compte
+							Stellar de la personne qui a créé l’entrée est consulté et transformé en réputation. <br>Exemple : une personne possède
+							x dans la monnaie Stellar, elle possède alors x de réputation.</p>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="content">
+					<a class="header">Avis sur le contenu</a>
+					<div class="description">
+						<p>Une entrée a la priorité lorsqu’un meilleur score est obtenu pour la formule qui suit : <br>
+							• (Nombre de votes positifs - Nombre de votes négatifs) = score
+						</p>
+						<p>La soustraction de ces deux résultats fera ainsi variée le score. Si le score obtenu est négatif cela voudra dire que l’entrée possède plus d’avis négatifs que positifs. En conséquence, elle fera « théoriquement » baisser la réputation (importance du terme) dès l’application de cette règle.</p>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="content">
+					<a class="header">Vue / Clic</a>
+					<div class="description">
+						<p>Une entrée a la priorité lorsqu’elle a été recherchée plus souvent et récemment.</p>
+						<p>Toutes les informations concernant une entrée sont stockées sur IPFS via l’API Cowaboo. GraphToLearn lance une fonction qui récupère le nombre de vues ou clics qu’une entrée possède. Ces données peuvent être consultées par les utilisateurs. C’est un choix que j’ai fait sur l’outil. De ce fait, je ne voulais pas privatiser les données concernant les actions d’un utilisateur.</p>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="content">
+					<a class="header">Mise à jour (Non implémentée)</a>
+					<div class="description">
+						<p>Une entrée a la priorité lorsqu’elle a subi une mise à jour ou modification récente et fréquente.</p>
+						<p>Cette règle n’a pas encore été implémentée. En effet, il était question de pouvoir modifier une entrée. Malheureusement, cette fonctionnalité à l’heure où j’écris n’a pas encore été intégrée dans l’outil GraphToLearn. En conséquence, cette règle n’est pas utilisée par l’algorithme.</p>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="content">
+					<a class="header">Timestamp création</a>
+					<div class="description">
+						<p>Une entrée insérée plus récemment, a la priorité sur les plus anciennes.</p>
+						<p>La date de création est stockée lorsqu’une entrée est insérée dans l’outil automatiquement grâce à l’API Cowaboo. L’outil compare ainsi les entrées entre elles et détermine lesquelles sont prioritaires.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr>
 		<h3>API</h3>
-		<p>groups.cowaboo.net </p>
+		<a>http://groups.cowaboo.net/group-graphToLearn/public/api</a><br>
+		<h5>L’outil utilise 8 observatoires qui vous sont présentés ci-dessous, sous forme de tableau.</h5>
+		<table class="ui single line table">
+			<thead>
+				<tr>
+					<th>Nom de l'observatoire</th>
+					<th>Son contenu</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Types</td>
+					<td>Contient tous les types disponibles à attribuer à une entrée.</td>
+				</tr>
+				<tr>
+					<td>Context</td>
+					<td>Contient tous les contextes (thèmes) disponibles à attribuer à une entrée.</td>
+				</tr>
+				<tr>
+					<td>Modules</td>
+					<td>Contient tous les modules existants et disponibles qui peuvent être attribués à une entrée.</td>
+				</tr>
+				<tr>
+					<td>Words</td>
+					<td>Contient toutes les entrées présentes sur GraphToLearn.</td>
+				</tr>
+
+				<tr>
+					<td>History</td>
+					<td>Contient les informations de l’historique de recherche de chaque membre.</td>
+				</tr>
+				<tr>
+					<td>Members</td>
+					<td>Contient les informations concernant tous les membres.</td>
+				</tr>
+				<tr>
+					<td>Feedback</td>
+					<td>Contient toutes les informations d’un membre lorsqu’il a donné un feedback dans l’outil. Son avis et ses propositions
+						sont enregistrés ici.</td>
+				</tr>
+				<tr>
+					<td>Settings</td>
+					<td>Contient tous les paramètres de l’outil.</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
 

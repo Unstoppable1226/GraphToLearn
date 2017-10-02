@@ -18,6 +18,7 @@
 				<p>Nous insérons le contenu et vous serez averti dès que la transaction sera terminé.</p>
 			</div>
 		</div>
+
 		<form id="insert-form" class="ui form" [ngClass]="{'loading' : loading}" style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
 
 			<div class="field icon required">
@@ -50,8 +51,15 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="field icon required">
+				<label>Explication</label>
+				<i class="left talk icon"></i>
+				<textarea class="input-insert" [(ngModel)]="meaning" [ngModelOptions]="{standalone: true}" rows="3" style="text-align: left!important"></textarea>
+			</div>
+
 			<div class="field icon">
-				<label>Définition</label>
+				<label>Définition (Seulement si Acronyme)</label>
 				<div class="ui icon input">
 					<i class="left info icon"></i>
 					<input class="input-insert" style="text-align: center" [(ngModel)]="definition" [ngModelOptions]="{standalone: true}" type="text"
@@ -124,11 +132,7 @@
 				</div>
 			</div>
 
-			<div class="field icon required">
-				<label>Explication</label>
-				<i class="left talk icon"></i>
-				<textarea class="input-insert" [(ngModel)]="meaning" [ngModelOptions]="{standalone: true}" rows="3" style="text-align: left!important"></textarea>
-			</div>
+			
 			<div class="field icon">
 				<label>Contexte / Domaine</label>
 				<div class="ui icon input">
@@ -153,8 +157,8 @@
 			<div class="field icon required">
 				<label style="color:#db2828; font-size: 0.8em; float: right;">Champ obligatoire </label>
 			</div>
-		</form>
-		<button style="margin-top:10px;min-width:250px!important; font-size: 1.2em;" class="ui button button-blur" (click)="saveInsertion()">Enregistrer <i class="plus icon" style="margin-left: 10px"></i></button>
+		</form> 
+		<div class="ui large approve button button-blur" style="margin-left:0px;margin-top:15px;width: 300px" (click)="saveInsertion()">Enregistrer <i class="right add icon"></i></div>
 		<br><br><br>
 	</div>
 </div>

@@ -7,6 +7,8 @@ import { Formatter } from '../tools/app.formatter';
 import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 import { AuthService } from '../login/app.authservice';
 import { UserService } from '../model/user-service';
+import { EntryCowaboo } from '../model/entrycowaboo';
+import { Comment } from '../model/comment';
 //import { Observable } from 'rxjs/Observable';
 import { Observable } from 'rxjs/Rx';
 import { Router} from '@angular/router';
@@ -81,14 +83,39 @@ export class AppHome {
 			if (data == undefined) {
 				alert('Attention data doit être le premier objet présent')
 			} else {
-				instance._alert.create('error', "Cette fonctionnalitée a été désactivée, car elle est encore dans l'état expérimentale");
+				//instance._alert.create('error', "Cette fonctionnalitée a été désactivée, car elle est encore dans l'état expérimentale");
 				console.log('expérimental')
-				/*
+				
 				instance._httpService.getEntryJSON(AppSettings.API_WORDS)
 					.subscribe(function(res){
-						console.log(Object.keys(res.dictionary.entries).length)
-						let obj = res.dictionary.entries
-						/*let i = 0;
+						let words = res.dictionary.entries
+						let cpt = 0;
+						/*
+						for (let prop in words) {
+							let el = JSON.parse(words[prop].value)
+							if (cpt < 6 && (el.keywords == undefined)) {
+
+								let modules = el.modules.replace(/\.0/g,"")
+								let tags = (el.keywords == undefined ? "" : el.keywords)
+								let comments = []
+								if (el.commentary.trim() != "") {
+									comments.push(new Comment(el.commentary, "IDEC", el.timestampCreation, []))
+								}
+								let newValue = new EntryCowaboo(el.name, el.type.trim(), el.source.trim(), modules, el.definition.trim(), el.meaning, el.context.trim(), el.review.trim(), tags, el.parent.trim(), el.timestampCreation, [], comments, false, el.commentary)
+								instance._httpService.putEntryJSON(newValue, AppSettings.API_WORDS, prop, instance._userservice.currentUser.secretKey)
+								.subscribe(
+									hashGenerated => {
+										console.log(hashGenerated);
+									},
+									e => {console.log(e)}
+								)	
+								
+							}
+							cpt++;
+						}
+						*/
+						/*let obj = res.dictionary.entries
+						let i = 0;
 						
 						let a2 = []
 						for (let prop in obj) {
@@ -100,9 +127,9 @@ export class AppHome {
 							if (!instance.exists(data[i].name.trim(), a2)) {								
 								tab.push(data[i])
 							}
-						}
-						console.log(tab)
-						for (var cpt = 0; cpt < tab.length; cpt++) {
+						}*/
+						//console.log(tab)
+						/*for (var cpt = 0; cpt < tab.length; cpt++) {
 							(function(index) {
 								var element = tab[index];
 								setTimeout(function() { 
@@ -150,7 +177,7 @@ export class AppHome {
 							}
 						});*/
 					/*})	*/
-			
+				})
 			}
 		}
 	}
@@ -189,7 +216,7 @@ export class AppHome {
 					}
 				},
 				minCharacters: 1, // 1 caractère minimum pour déclencher l'algorithme de recherche
-				maxResults : 10, // Affiche 10 résultats maximum
+				maxResults : 15, // Affiche 10 résultats maximum
 				onSelect(result, response) {
 					let name = result.name.replace(/\//g, AppSettings.FORWARD_SLACH);
 					name = name.replace(/\(/g, AppSettings.OPEN_PARENTHESIS).replace(/\)/g, AppSettings.CLOSE_PARENTHESIS)

@@ -52,6 +52,8 @@ export class AppSettings {
 
 	public static API_WIKI = "http://fr.wikipedia.org/w/api.php?"
 
+	public static API_KEY = "SDRSUEUEOJAJJG4MC76F2H7FTGYYTFASNCTMEJ7XJFUHFRQG5M2QI5O3"
+
 	/* Colors */
 	public static GREY = "#333";
 	public static WHITEMOREDARK = "#EEE";
@@ -74,6 +76,9 @@ export class AppSettings {
 	public static MSG_ERROR_MAIL_TAKEN = "Attention, un utilisateur avec cet email existe déjà !";
 	public static MSG_ERROR_CREATE_USER = "Attention, un problème est survenu lors de la création du compte, veuillez réessayer !";
 	public static MSG_ERROR_LOG_IN = "La secret key donnée est incorrecte !";
+	public static MSG_SUCCESS_MODIFICATION = "La modification a été réalisé avec succès !";
+
+
 	/* 3D variables */
 	public static MINX : number = 40;
 	

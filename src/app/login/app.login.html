@@ -79,8 +79,7 @@
 					<div class="field required">
 						<div class="ui left icon input">
 							<i class="lock icon"></i>
-							<input type="password" (focus)="focusPassword()" class="input-insert" name="password" [(ngModel)]="secretKey" [ngModelOptions]="{standalone: true}"
-							 placeholder="Secret Key">
+							<input type="password" (focus)="focusPassword()" class="input-insert" name="password" [(ngModel)]="secretKey" placeholder="Secret Key">
 						</div>
 					</div>
 					<div class="ui fluid large approve teal submit button button-connect-modal" [ngClass]="{'loading' : loadingButton}" style="margin-left:0px">Se connecter <i class="right sign in icon"></i></div>

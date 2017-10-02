@@ -28,8 +28,7 @@ export class HttpAPIService {
 		let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
 		let options = new RequestOptions({ headers: headers });
 		return this._http.post(AppSettings.API_USERS + "?email=" + mail, "", options)
-		.map((res: Response) => { 
-			
+		.map((res: Response) => {
 			return res
 		})
 	}
@@ -59,6 +58,14 @@ export class HttpAPIService {
 		let options = new RequestOptions({ headers: headers});
 
 		return this._http.post(AppSettings.API_ENTRY, "secretKey=" + secretKey + "&observatoryId=" + observatory + "&tags= " + tags + "&value= " + JSON.stringify(dataInfo), options)
+			.map((res: Response) => res.json());
+	}
+
+	putEntryJSON(dataInfo, observatory, hash, secretKey) {
+		let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let options = new RequestOptions({ headers: headers});
+
+		return this._http.put(AppSettings.API_ENTRY, "secretKey=" + secretKey + "&observatoryId=" + observatory + "&hash= " + hash + "&newValue= " + JSON.stringify(dataInfo), options)
 			.map((res: Response) => res.json());
 	}
 

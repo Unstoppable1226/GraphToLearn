@@ -6,6 +6,7 @@ import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
 
 import { Entry } from '../model/entry'
+import { EntryCowaboo } from '../model/entrycowaboo'
 import { UserService } from '../model/user-service';
 import { HistorySearchService } from '../model/history-search';
 
@@ -17,9 +18,12 @@ declare var $:any; // This is necessary if you want to use jQuery in the app
 	styleUrls: ['./app.insertion.css'],
 })
 
-export class AppInsertion implements OnInit {
+export class AppInsertion implements OnInit{
+
+	public loading : boolean = false
+
+
 	public newModule = false;
-	public loading = false;
 	public nameTaken = false;
 	public nameTakenModule = false;
 
@@ -50,6 +54,7 @@ export class AppInsertion implements OnInit {
 
 	public items = [];
 
+	
 	constructor(private _httpService : HttpAPIService, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {
 		_userservice.getCurrentUser()
 		console.log(_historysearch.getLastSearches())
@@ -204,7 +209,8 @@ export class AppInsertion implements OnInit {
 			
 			let modules = this.newModules.split(',');
 			let modulesNotNew = $('.ui.dropdown.multiple').dropdown('get value');
-
+			let type = $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text()
+			let context = $('#select-context').text() == "Aucun" ? "" : $('#select-context').text()
 			
 			let dataInfo = {
 				name : this.word,
@@ -218,6 +224,8 @@ export class AppInsertion implements OnInit {
 				review : "",
 				keywords : tags
 			};
+			//new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, "", tags, "", [], [], false)
+			
 			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name, instance._userservice.currentUser.secretKey)
 			.subscribe(
 				function(response) { // The communication with the API has matched

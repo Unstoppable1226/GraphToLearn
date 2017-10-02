@@ -18,6 +18,9 @@ import { AppManagerMembers } from './manage-members/app.managemembers';
 import { MenuComponent } from './menu/app.menu';
 import { PageNotFoundComponent } from './app.pagenotfound';
 
+
+/* Pipes */
+import { RoundPipe } from './tools/round'
 /* Constants*/
 import { routing } from './app.routing';
 
@@ -38,6 +41,7 @@ import { HistorySearchService } from './model/history-search';
 		AppLogin,
 		AppSearch,
 		AppInsertion,
+		RoundPipe,
 		AppManagerMembers,
 		MenuComponent,
 		PageNotFoundComponent,

@@ -8,7 +8,7 @@
 		<div [ngStyle]="{'background-color': col3}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Module</span>
 		<div [ngStyle]="{'background-color': col4}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Autres termes</span>
 	</div>
-	<div style="width: 95%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">
+	<div style="width: 100%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">
 		<div *ngIf="loading" class="ui active dimmer">
 			<div class="ui large text loader">Chargement</div>
 		</div>
@@ -31,9 +31,10 @@
 			</div>
 		</h2>
 
-		<div id="style-15" class="scrollbar" style="position: fixed;top: 430px;left: 0px;max-width: 400px; overflow-x: scroll;max-height: 210px">
+		<div class="scrollbar" style="position: fixed;top: 430px;left: 0px;max-width: 400px; overflow-x: scroll;max-height: 210px">
 			<a class="ui pointing below label" style="color: #eee; background-color:#1B1C1D;text-align: center;font-size: 1em;font-weight: 600;margin-right: 0px;display:block; margin-bottom:-5px">Réputation du terme recherché <strong style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong> dans les modules suivants :</a>
-			<div *ngFor="let mod of wordSel.modulesReputation; let i = index" class="ui statistic small" style="margin-left:25px">
+			<div (mouseover)="showInfos($event, i)" (mouseleave)="showInfosLeave($event, i)" *ngFor="let mod of wordSel.modulesReputation; let i = index"
+			 class="ui statistic small" style="margin-left:25px;margin-bottom:5px">
 				<div class="label" style="color:#1B1C1D">
 					<div class="cusprogress" [ngStyle]="{'color': mod.color}">
 						<span class="cusprogress-left">
@@ -42,33 +43,47 @@
 						<span class="cusprogress-right">
 											<span class="cusprogress-bar" [ngStyle]="{'animation': mod.animationRight}"></span>
 						</span>
-						<div class="cusprogress-value" style="padding-top:10px"><span style="font-size: 1.2em">{{mod.totalReput}}</span><span style="font-size: 0.5em;"> / {{mod.totalPoints}}</span><br></div>
+						<div class="ui blurring dimmable cusprogress-value" style="padding-top:10px">
+							<span id="pro{{i}}" style="display:none">
+								<span style="font-size: 1.2em">{{mod.totalReput}}</span><span style="font-size: 0.5em;"> / {{mod.totalPoints}}</span><br>
+							</span>
+							<!---->
+							<span id="proDefault{{i}}" style="font-size: 1.3em">{{ ((mod.totalReput * 100) / mod.totalPoints) | round }} % </span>
+						</div>
 					</div>
-					<span style="margin-top:10px!important; font-size:1.2em"> {{mod.id.id}}</span>
+					<span class="ui top pointing small label" style="margin-top:10px!important;background-color:#1B1C1D;color:#fff; border-radius:50px;font-size:1.1em"> {{mod.id.id}}</span>
 				</div>
+
 			</div>
+
 		</div>
 
-		<div class="dg main a" style="width: 300px;position: fixed; top:250px; right: 0;margin-right: 0px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
-			<div class="close-button" style="width: 300px;height:50px;padding-top: 5px;font-size: 1.3em;line-height:20px!important;user-select: none;"
+		<div class="dg main a" style="width: 350px;position: fixed; top:150px; right: 0;margin-right: 0px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
+			<div class="close-button" style="width: 350px;height:50px;padding-top: 5px;font-size: 1.3em;line-height:20px!important;user-select: none;"
 			 (click)="hideOrShow($event, 1)">
-				Informations sur <br><strong style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
-				<div style="float: right; margin-top:-10px!important;font-size: 0.7em">
+				Informations sur <br><strong class="not-active" style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
+				<div class="not-active" style="float: right; margin-top:-10px!important;font-size: 0.7em">
 					<i class="icon" [ngClass]="{'minus': !collapsedInfos, 'plus': collapsedInfos}"></i>
 				</div>
 			</div>
 			<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
 			<ul style="height: auto;">
-				<li *ngIf="wordSel.type != ''" class="cr number" style="height: 35px;line-height: 35px">
+				<li class="cr number" style="height: 35px;line-height: 35px">
 					<div>
-						<span class="property-name">Type : </span>
-						<div class="c">{{wordSel.type}}</div>
+						<span class="property-name" style="text-align:left;padding-left:8px">Type : </span>
+						<div class="c" style="font-weight: bold; color:white; font-size:1em; text-align:right;padding-right: 15px"><span *ngIf="(wordSel.type.length < 2)">Aucun</span>{{wordSel.type}}</div>
 					</div>
 				</li>
-				<li *ngIf="wordSel.definition != ''" class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="(wordSel.definition != '')" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
-						<span class="property-name">Définition : </span>
-						<div class="c">{{wordSel.definition}}</div>
+						<span class="property-name" style="text-align:left;padding-left:8px">Définition : </span>
+						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px">{{wordSel.definition}}</div>
+					</div>
+				</li>
+				<li class="cr number" style="height: 35px;line-height: 35px">
+					<div>
+						<span class="property-name" style="text-align:left;padding-left:8px">Source : </span>
+						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px">{{wordSel.source}}</div>
 					</div>
 				</li>
 				<!--<li *ngIf="wordSel.name != wordSearch.name" class="cr number has-slider" style="height: 35px;line-height: 35px">
@@ -78,46 +93,71 @@
 						 class="ui blue small left pointing label"><strong>{{wordSel.totalReput}}</strong></div>
 					</div>
 				</li>-->
-				<li *ngIf="wordSel.modules.id != ''" class="cr number" style="height: 35px;line-height: 35px">
+				<li class="cr number" style="height: 35px;line-height: 35px">
 					<div>
-						<span class="property-name">Modules : </span>
-						<div class="c">{{wordSel.modules.id}}</div>
+						<span class="property-name" style="text-align:left;padding-left:8px">Contexte : </span>
+						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px"><span *ngIf="(wordSel.context == '')">Aucun</span>{{wordSel.context}}</div>
 					</div>
 				</li>
-				<li *ngIf="wordSel.context != ''" class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="wordSel.lastUpdated != ''" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
-						<span class="property-name">Contexte : </span>
-						<div class="c">{{wordSel.context}}</div>
+						<span class="property-name" style="text-align:left;padding-left:8px">Dernière modification:</span>
+						<div class="c">
+							<div id="lastModif" class="circular ui violet icon button" data-tooltip="Voir la dernière modification" data-inverted=""
+							 data-position="top center" style="width: 20px;height: 20px;border-radius: 20px;float: left;margin: 7px;padding: 3px;"
+							 (click)="showLastModification()">
+								<i class="icon info"></i>
+							</div>
+							<span style="font-weight: bold; color:white; font-size:1em;text-align:right;float:right;padding-right: 15px">{{wordSel.lastUpdated}}</span>
+
+						</div>
 					</div>
 				</li>
 				<li *ngIf="wordSel.timestampCreation != ''" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
-						<span class="property-name">Date de création :</span> {{wordSel.timestampCreation}}
-						<div class="c"></div>
+						<span class="property-name" style="text-align:left;padding-left:8px">Date de création :</span>
+						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px">{{wordSel.timestampCreation}}</div>
+					</div>
+				</li>
+				<li class="cr number" style="height: 60px">
+					<div class='header'>Créé par</div>
+					<div class='content' style="font-weight: bold; color:white; font-size:1em">
+						{{wordSel.author.name}}
+						<div class="ui blue small left pointing label">
+							<strong>{{wordSel.totalReput}}</strong>
+						</div>
+					</div>
+				</li>
+				<li *ngIf="wordSel.modules.id != ''" class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
+					<div>
+						<div class='header'>Appartient aux modules suivants :</div>
+						<div class='content'>
+							<a *ngFor="let module of wordSel.modules.id" class="ui orange label" style="margin-left:15px;  margin-top:5px;margin-bottom:10px">{{module}}</a>
+						</div>
 					</div>
 				</li>
 
-				<li *ngIf="wordSel.lastUpdatedNbDays != 0" class="cr number" style="height: 35px;line-height: 35px">
-					<div>
-						<span class="property-name">Modifié :</span> Il y a {{wordSel.lastUpdatedNbDays}} jours
-						<div class="c"></div>
+
+				<li *ngIf="(wordSel.keywords != undefined)" class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
+					<div class='header'>Mots clés</div>
+					<div class='content'>
+						<span *ngIf="wordSel.keywords.length == 0" style="font-weight: bold; color:white; font-size:1em">Aucun mot clé est associé</span>
+						<a *ngFor="let tag of wordSel.keywords" class="ui grey tag label" style="margin-left:15px;  margin-top:5px;margin-bottom:10px">{{tag}}</a>
 					</div>
 				</li>
-				<li class="cr number" style="height: 35px;line-height: 35px">
-					Créé par : <span style="padding-left: 5px">{{wordSel.author.name}}</span>
-				</li>
+
 			</ul>
 			<div class="ui labeled button" [ngClass]='{disabled: !wordSel.canLike}' (click)="like()">
-				<div class="ui blue button" [ngClass]="{'loading' : loading}" style="width: 240px;">
+				<div class="ui blue button" [ngClass]="{'loading' : loading}" style="width: 270px;">
 					<i class="smile icon"></i> Contenu très utile
 				</div>
-				<a tabindex="0" class="ui basic blue left pointing label" style="width: 60px; text-align: center">{{wordSel.like.number}}</a>
+				<a tabindex="0" class="ui basic blue left pointing label" style="width: 80px; text-align: center">{{wordSel.like.number}}</a>
 			</div>
 			<div class="ui labeled button" tabindex="1" [ngClass]='{disabled: !wordSel.canDislike}' (click)="dislike()">
-				<div class="ui red button" [ngClass]="{'loading' : loading2}" style="width: 240px;">
+				<div class="ui red button" [ngClass]="{'loading' : loading2}" style="width: 270px;">
 					<i class="frown icon"></i> Contenu sans intérêt
 				</div>
-				<a tabindex="0" class="ui basic red left pointing label" style="width: 60px; text-align: center">{{wordSel.dislike.number}}</a>
+				<a tabindex="0" class="ui basic red left pointing label" style="width: 80px; text-align: center">{{wordSel.dislike.number}}</a>
 			</div>
 		</div>
 		<button style="display:block; margin-top:-32px; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home"
@@ -130,7 +170,7 @@
 		<br>
 		<canvas id="renderCanvas" style="outline: none;"></canvas>
 	</div>
-	<div class="collapse-actions" style="position:fixed;top:200px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
+	<div *ngIf="user.group != 'Lambda'" class="collapse-actions" style="position:fixed;top:200px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
 		<button (click)="showModifications()" class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
 		 data-tooltip="Modifier le terme sélectionné" data-inverted="" data-position="right center">
 			<i class="icon pencil"></i>
@@ -143,13 +183,14 @@
 		 data-tooltip="Mettre ce terme en inactif" data-inverted="" data-position="right center">
 			<i class="icon delete"></i>
 		</button>
-		<div class="close-button-actions" (click)="hideOrShow($event, 4)">A<br>C<br>T<br>I<br>O<br>N<br>S<br><i style="margin-top:50px;margin-left:3px;font-size:0.8em!important" class="icon" [ngClass]="{'minus': !collapsedActions, 'plus': collapsedActions}"> </i></div>
+		<div class="close-button-actions" (click)="hideOrShow($event, 4)">A<br>C<br>T<br>I<br>O<br>N<br>S<br><i style="margin-top:50px;margin-left:3px;font-size:0.8em!important" class="icon not-active"
+			 [ngClass]="{'minus': !collapsedActions, 'plus': collapsedActions}"> </i></div>
 	</div>
 
 	<div class="dg main a" style="width: 59%;left:0;position: fixed;right: 0; margin-right:0px!important;bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
-		 (click)="hideOrShow($event, 2)">Explications de <strong style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
-			<div style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedMeaning, 'plus': collapsedMeaning}"></i></div>
+		 (click)="hideOrShow($event, 2)">Explications de <strong class="not-active" style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
+			<div class="not-active" style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedMeaning, 'plus': collapsedMeaning}"></i></div>
 		</div>
 		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
 		<ul style="height: auto;">
@@ -159,7 +200,7 @@
 	<div class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
 		 (click)="hideOrShow($event, 3)">Espace commentaires et révisions
-			<div style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedComments, 'plus': collapsedComments}"></i></div>
+			<div class="not-active" style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedComments, 'plus': collapsedComments}"></i></div>
 		</div>
 		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
 		<ul class="collapse" style="height: auto;">
@@ -167,81 +208,124 @@
 				<span>
 					
 					<div class="ui feed">
-						<div class="event">
+
+						<div class="event" *ngFor="let comment of wordSel.comments; let i = index">
 							<div class="content" >
 								<div class="summary"  style="color:#eee!important">
 									<a class="user">
-										@Joel Marques
-									</a> a ajouté le terme
+										{{comment.author}} :
+									</a> {{comment.info}}
 									<div class="date"  style="color:#eee!important">
-										1 Hour Ago
+										{{comment.timestamp}}
 									</div>
 								</div>
-								<div class="meta">
-									<a class="like"  style="color:#eee!important">
-										<i class="like icon"></i> 4 Likes
+								<div class="meta" style="user-select:none">
+									<a class="like"  style="color:#eee!important" (click)="addLikeToComment(i)">
+										<i class="thumbs up icon"></i>{{comment.likes.length}} Appréciation
 									</a>
 								</div>
 							</div>
+							<hr>
 						</div>
-						<div class="event">
-							<div class="content">
-								<div class="summary"  style="color:#eee!important">
-									<a>@Joel Marques</a> a ajouté <a>2 commentaires</a>
-									<button class="ui button small" style="font-size:0.8em; height:25px; margin-left: 10px"> Consulter</button>
-									<div class="date"  style="color:#eee!important">
-									4 days ago
-									</div>
-								</div>
-								<div class="meta">
-									<a class="like"  style="color:#eee!important">
-										<i class="like icon"></i> 1 Like
-									</a>
-								</div>
-							</div>
-						</div>
+						
 					</div>
 
 				</span>
 			</li>
 		</ul>
+		<div class="ui modal lastModif">
+			<div class="header">Information sur la dernière modification</div>
+			<div class="scrolling content">
+				<h3>Effectué par : {{wordSel.lastUpdatedAuthor}} <span style="float:right"><a style="text-decoration: line-through;color:red">Supprimer</a>  <a style="color:green;text-decoration: underline">Ajouter</a> </span></h3>
+				<hr>
+				<div class="ui grid">
+					<div class="eight wide column">
+						<h4>Avant la modification</h4>
+						<h5 *ngIf="difName">Nom</h5>
+						<p *ngIf="difName">{{lastModifItem.name}}</p>
+						<h5 *ngIf="difType">Type</h5>
+						<p *ngIf="difType">{{lastModifItem.type}}</p>
+						<h5 *ngIf="difMeaning">Explications</h5>
+						<p *ngIf="difMeaning">{{lastModifItem.meaning}}></p>
+						<h5 *ngIf="difDefinition">Définition</h5>
+						<p *ngIf="difDefinition">{{lastModifItem.definition}}</p>
+						<h5 *ngIf="difSource">Source</h5>
+						<p *ngIf="difSource">{{lastModifItem.source}}</p>
+						<h5 *ngIf="difContext">Contexte/Domaine</h5>
+						<p *ngIf="difContext">{{lastModifItem.context}}</p>
+						<h5 *ngIf="difKeywords">Mots clés</h5>
+						<p *ngIf="difKeywords">{{lastModifItem.keywords}}</p>
+						
+					</div>
 
-		<div class="ui modification modal">
+					<div class="eight wide column">
+						<h4>Après la modification</h4>
+						<h5 *ngIf="difName">Nom</h5>
+						<p id="afterModifName"></p>
+						<h5 *ngIf="difType">Type</h5>
+						<p id="afterModifType"></p>
+						<h5 *ngIf="difMeaning">Explications</h5>
+						<p id="afterModifMeaning"></p>
+						<h5 *ngIf="difDefinition">Définition</h5>
+						<p id="afterModifDefinition"></p>
+						<h5 *ngIf="difSource">Source</h5>
+						<p id="afterModifSource"></p>
+						<h5 *ngIf="difContext">Contexte/Domaine</h5>
+						<p id="afterModifContext"></p>
+						<h5 *ngIf="difKeywords">Mots clés</h5>
+						<p id="afterModifKeywords"></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="ui modification fullscreen modal">
 			<i class="close icon" (click)="hideModals()"></i>
-			<div class="header">
+			<div class="header" style="text-align:center">
 				Modification du terme : {{wordSel.name}}
 			</div>
-			
+
 			<div class="scrolling content">
-				<div class="ui form">
-					<!--<div class="field icon required">
-						<label>Nom</label>
+				<form id="insert-form" class="ui form" [ngClass]="{'loading' : loadingModif}" style="background-color: white; padding: 25px; text-align: center">
+
+					<div class="field icon required">
+						<label>Mot</label>
 						<div class="ui icon input">
 							<i id="wordInfo" class="left info icon"></i>
-							<input class="input-insert" type="text" [(ngModel)]="word" [ngModelOptions]="{standalone: true}" (ngModelChange)="isUnique()"
-							 placeholder="AAA, Module, ..." />
+							<input style="text-align: center" class="input-insert" type="text" [(ngModel)]="word" [ngModelOptions]="{standalone: true}"
+							 (ngModelChange)="isUnique(0, '#wordInfo', 'name')" placeholder="AAA, Module, ..." />
 						</div>
 						<div [hidden]="!nameChosen" class="ui top pointing basic label" [ngClass]="{'green': !nameTaken, 'red': nameTaken}">
 							{{msgNameTaken}} <i class="icon" [ngClass]="{'checkmark': !nameTaken, 'minus circle' : nameTaken}"></i>
 						</div>
 					</div>
+					<div class="ui success message">
+						<div class="header">Form Completed</div>
+						<p>You're all signed up for the newsletter.</p>
+					</div>
 					<div class="field icon">
 						<label>Type</label>
 						<div class="ui icon input">
 							<i class="left info icon"></i>
-							<div class="ui fluid selection dropdown input-insert" style="text-align: center">
-								<input type="hidden" name="gender" value="default">
+							<div id="select-types" class="ui fluid selection dropdown insert-input" style="text-align: center">
+								<input name="types" type="hidden">
 								<i class="dropdown icon"></i>
-								<div class="default text" id="select-types">Type du terme : Acronyme, Expression ou Terme</div>
+								<div class="default text">Sélectionnez les modules</div>
 								<div class="menu">
-									<div class="item" data-value="default">Aucun</div>
-									<div class="item" *ngFor="let type of types; let i = index" data-value="{i}">{{type.value}}</div>
 								</div>
 							</div>
 						</div>
 					</div>
+
+					<div class="field icon required">
+						<label>Explication</label>
+						<i class="left talk icon"></i>
+						<textarea class="input-insert" [(ngModel)]="meaning" [ngModelOptions]="{standalone: true}" rows="3" style="text-align: left!important"></textarea>
+					</div>
+
 					<div class="field icon">
-						<label>Définition</label>
+						<label>Définition (Seulement si Acronyme)</label>
 						<div class="ui icon input">
 							<i class="left info icon"></i>
 							<input class="input-insert" style="text-align: center" [(ngModel)]="definition" [ngModelOptions]="{standalone: true}" type="text"
@@ -257,9 +341,17 @@
 							 placeholder="IDEC Metafichier, Google, Wikipedia, ...">
 						</div>
 					</div>
-
 					<div class="field icon">
 						<label>Modules</label>
+						<div class="ui message">
+							<div class="header">
+								Notion de modules
+							</div>
+							<ul class="list">
+								<li>Il est très <strong>important</strong>, car le module va aider l'outil à créer le contexte de la recherche du <strong>terme</strong>									recherché</li>
+								<li>Il est <strong>recommandé</strong> de lié le terme à un module, il est possible de créer un nouveau "module" </li>
+							</ul>
+						</div>
 						<div class="ui buttons">
 							<button class="ui button" [ngStyle]="{'background-color': styleModuleEx, 'color': styleModuleExCol}" (click)="switchModule(false, 'A')"
 							 type="button">Existant</button>
@@ -267,51 +359,73 @@
 							<button class="ui button" [ngStyle]="{'background-color': styleModuleNew, 'color': styleModuleNewCol}" (click)="switchModule(true, 'B')"
 							 type="button">Nouveau</button>
 						</div>
-						<div id="multi-select-modules" class="ui fluid multiple search selection dropdown input-insert" style="margin-top:5px" [hidden]="newModule">
-							<input type="hidden" name="receipt">
+						<div class="ui fluid multiple search selection dropdown" [hidden]="newModule" style="margin-top:5px">
+							<input name="tags" type="hidden">
 							<i class="dropdown icon"></i>
-							<div class="default text" id="input-modules">Sélectionner les modules</div>
+							<div class="default text">Sélectionnez les modules</div>
 							<div class="menu">
-								<div class="item" *ngFor="let module of modules; let i = index" data-value="{i}">{{module.id}} - {{module.name}}</div>
 							</div>
 						</div>
-						<div [hidden]="!newModule" class="ui icon input" style="margin-top:5px">
-							<i class="left search icon"></i>
-							<input class="input-insert" [(ngModel)]="newModules" [ngModelOptions]="{standalone: true}" style="text-align: center" type="text"
-							 placeholder="166-486, 207">
+					</div>
+
+					<div [hidden]="!newModule" class="ui segment" style="background-color: rgb(51, 51, 51);">
+						<div class="ui form">
+							<div class="field required" style="margin-top:5px;background-color: rgb(51, 51, 51)">
+								<label style="color:white">N° du module</label>
+								<div class="ui icon input">
+									<i id="wordInfoModule" class="left info icon"></i>
+									<input class="input-insert" [(ngModel)]="newModuleObj.id" [ngModelOptions]="{standalone: true}" (ngModelChange)="isUnique(1, '#wordInfoModule', 'id')"
+									 style="text-align: center" type="text" placeholder="625">
+								</div>
+								<div [hidden]="!nameChosenModule" class="ui top pointing basic label" [ngClass]="{'green': !nameTakenModule, 'red': nameTakenModule}">
+									{{msgIdModuleTaken}} <i class="icon" [ngClass]="{'checkmark': !nameTakenModule, 'minus circle' : nameTakenModule}"></i>
+								</div>
+							</div>
+							<div class="field required" style="margin-top:5px">
+								<label style="color:white">Nom du module</label>
+								<input class="input-insert" [(ngModel)]="newModuleObj.name" [ngModelOptions]="{standalone: true}" style="text-align: center"
+								 type="text" placeholder="Optimiser les réseaux">
+							</div>
+							<div class="field required">
+								<label style="color:white">Objectifs du module</label>
+								<textarea rows="3" [(ngModel)]="newModuleObj.goals" [ngModelOptions]="{standalone: true}" placeholder="Décriver des objectifs"></textarea>
+							</div>
+							<div *ngIf="errorAddModule" class="ui error error-message" style="margin-bottom: 10px;color: #db2828;">
+								{{errorTextAddModule}}
+							</div>
+							<div class="ui fluid blue labeled submit icon button button-blur" [ngClass]="{'loading': loadingAddModule}" (click)="addModule()">
+								<i class="icon add"></i> Ajouter module
+							</div>
 						</div>
 					</div>
-					<div class="field icon required">
-						<label>Explication</label>
-						<i class="left talk icon"></i>
-						<textarea class="input-insert" [(ngModel)]="meaning" [ngModelOptions]="{standalone: true}" rows="3" style="text-align: left!important"></textarea>
-					</div>
+
+
 					<div class="field icon">
 						<label>Contexte / Domaine</label>
 						<div class="ui icon input">
 							<div class="ui icon input">
 								<i class="left info icon"></i>
-								<div class="ui fluid selection dropdown input-insert" style="text-align: center">
-									<input type="hidden" name="gender" value="default">
+								<div id="select-context" class="ui fluid selection dropdown insert-input" style="text-align: center">
+									<input name="types" type="hidden">
 									<i class="dropdown icon"></i>
-									<div class="default text" id="select-context">Sécurité, Juridique, ...</div>
+									<div class="default text">Sélectionnez les modules</div>
 									<div class="menu">
-										<div class="item" data-value="default">Aucun</div>
-										<div class="item" *ngFor="let con of contexts; let i = index" data-value="{i}">{{con.value}}</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="field icon" style="text-align: center!important">
-						<label>Tags associés</label>
+						<label>Mots clés associés</label>
 						<tag-input [(ngModel)]='items' [ngModelOptions]="{standalone: true}"></tag-input>
 					</div>
 					<div class="field icon required">
 						<label style="color:#db2828; font-size: 0.8em; float: right;">Champ obligatoire </label>
 					</div>
-				</div> -->
-				<div class="ui fluid large approve button button-blur" style="margin-left:0px;margin-top:15px" (click)="saveModifications()">Enregistrer modifications<i class="right checkmark icon"></i></div>
+				</form>
+			</div>
+			<div class="actions">
+				<div class="ui fluid large approve button button-blur" style="margin-top:15px;margin-left:0px" (click)="saveModifications()">Enregistrer modifications<i class="right checkmark icon"></i></div>
 			</div>
 
 		</div>

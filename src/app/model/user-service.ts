@@ -81,8 +81,8 @@ export class UserService  {
 
 	logout() {
 		this.currentUser = new User()
-		var el = document.getElementsByClassName('ui dimmer modals page transition hidden'); // Remove other modals
-		if (el.length > 0) {el[0].children[0].remove();}
+		/*var el = document.getElementsByClassName('ui dimmer modals page transition hidden'); // Remove other modals
+		if (el.length > 0) {el[0].children[0].remove();}*/
 		localStorage.removeItem('currentUser');
 		this._router.navigate(['welcome']);
 	}

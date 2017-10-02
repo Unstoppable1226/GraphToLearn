@@ -9,6 +9,7 @@ import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { User } from '../model/user';
 import { UserService } from '../model/user-service';
+
 declare var $: any;
 
 @Component({
@@ -83,6 +84,7 @@ export class AppLogin {
 		instance.objectConnection = {
 			closable: true,
 			allowMultiple: false,
+			observeChanges : true,
 			onDeny: function () { return false; },
 			onApprove: function () {
 				if (instance.secretKey.length > 0) {
@@ -160,24 +162,51 @@ export class AppLogin {
 			onApprove: function () {				
 				if (instance.mail.length > 0) {
 					instance.loadingButton = true
-
 					instance._authservice.join(instance.mail)
 						.subscribe(
-						data => {
-							$('#modalJoinCommunity').modal('hide');
-							instance.loadingButton = false
-							instance._alert.create('success', AppSettings.MSGMAILSUCCESS, { duration: 15000 })
-							return true;
-						},
-						err => {
-							instance.loadingButton = false;
-							instance.errorMail = true;
-							if (err.status == 409) { // User already exists
-								instance.errorTextMail = AppSettings.MSG_ERROR_MAIL_TAKEN
-							} else if (err.status == 500) {
-								instance.errorTextMail = AppSettings.MSG_ERROR_CREATE_USER
+							data => {
+								instance._httpservice.getEntryJSON(AppSettings.API_MEMBERS)
+								.subscribe(
+									dataMembers => {
+										let dataInfo = JSON.parse(dataMembers.dictionary.entries[Object.keys(dataMembers.dictionary.entries)[0]].value)
+										let mail : string = instance.mail
+					
+										if (dataInfo[mail] == undefined) {
+											dataInfo[mail] = {
+												publicKey: "",
+												group: AppSettings.RULELAMBDA,
+												validated: false
+											}
+
+											instance._httpservice.postEntryJSON(dataInfo, AppSettings.API_MEMBERS, "members", AppSettings.API_KEY)
+											.subscribe(
+												datas => {
+													console.log(datas)
+													$('#modalJoinCommunity').modal('hide')
+													instance.loadingButton = false
+													instance._alert.create('success', AppSettings.MSGMAILSUCCESS, { duration: 15000 })
+													return true;
+												},
+												error => { }
+											)
+										} else {
+											$('#modalJoinCommunity').modal('hide');
+											instance.loadingButton = false
+											instance._alert.create('success', AppSettings.MSGMAILSUCCESS, { duration: 15000 })
+											return true;
+										}
+									}
+								)
+							},
+							err => {
+								instance.loadingButton = false;
+								instance.errorMail = true;
+								if (err.status == 409) { // User already exists
+									instance.errorTextMail = AppSettings.MSG_ERROR_MAIL_TAKEN
+								} else if (err.status == 500) {
+									instance.errorTextMail = AppSettings.MSG_ERROR_CREATE_USER
+								}
 							}
-						}
 						)
 					return false;
 				} else {

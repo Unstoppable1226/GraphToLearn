@@ -5,6 +5,7 @@ import { AppSettings } from '../settings/app.settings'
 import { Entry } from '../model/entry'
 
 declare var BABYLON: any;
+declare var $: any;
 declare var Button: any;
 
 @Injectable()
@@ -62,16 +63,16 @@ export class Manager3D {
 		let instance = this;
 		var startPos = this.camera.target.z;
 		var startRadius = this.camera.radius;
-		var translate = new BABYLON.Animation("camTranslate", "target.z", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-		var radius = new BABYLON.Animation("camAlpha", "radius", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+		var translate = new BABYLON.Animation("camTranslate", "target.z", 10, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+		var radius = new BABYLON.Animation("camAlpha", "radius", 10, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 
-		var keys = [{ frame: 0, value: startPos }, { frame: 30, value: mesh }];
-		var keys2 = [{ frame: 0, value: startRadius }, { frame: 30, value: 70 }];
+		var keys = [{ frame: 0, value: startPos }, { frame: 10, value: mesh }];
+		var keys2 = [{ frame: 0, value: startRadius }, { frame: 10, value: 80 }];
 		translate.setKeys(keys);
 		radius.setKeys(keys2);
 		this.camera.animations.push(translate);
 		this.camera.animations.push(radius);
-		this.scene.beginAnimation(this.camera, 0, 30, false, 1, function () {});
+		this.scene.beginAnimation(this.camera, 0, 10, false, 1, function () {});
 	}
 
 	getLabelByName(mesh, type) {
@@ -91,8 +92,8 @@ export class Manager3D {
 	moveCameraToMesh(mesh) {
 		/*this.camera.lockedTarget = mesh;*/
 		this.camera.setTarget(mesh)
+		this.camera.maxCameraSpeed = 20
 		this.moveCamera(mesh)
-		this.camera.maxCameraSpeed = 10
 		var pos = this.getLabelByName(mesh, 'label')
 		var label = this.advancedTexture._rootContainer.children[pos]
 		label.alpha = 1
@@ -117,9 +118,15 @@ export class Manager3D {
 		this.wordSel.canDislike = data.canDislike
 		this.wordSel.likes = data.likes
 		this.wordSel.dislikes = data.dislikes
+		this.wordSel.keywords = data.keywords
+		this.wordSel.author = data.author
 		this.wordSel.lastUpdatedNbDays = data.lastUpdatedNbDays;
 		this.wordSel.timestampCreation = data.timestampCreation;
 		this.wordSel.modulesReputation = data.modulesReputation;
+		this.wordSel.updates = data.updates;
+		this.wordSel.comments = data.comments;
+		this.wordSel.lastUpdated = data.lastUpdated;
+		this.wordSel.lastUpdatedAuthor = data.lastUpdatedAuthor;
 	}
 
 	registerAction(mesh, tag) {
@@ -206,7 +213,10 @@ export class Manager3D {
 		this.camera.checkCollisions = false;
 		this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
 		
-		var hemi = new BABYLON.HemisphericLight("toto");
+		var light0 = new BABYLON.HemisphericLight("Hemi0", new BABYLON.Vector3(0, 1, 0), this.scene);
+		light0.diffuse = new BABYLON.Color3(1, 1, 1);
+		light0.specular = new BABYLON.Color3(1, 1, 1);
+
 		var sphereMaterial = new BABYLON.StandardMaterial();
 		
 		let i = 0;
