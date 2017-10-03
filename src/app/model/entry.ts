@@ -5,7 +5,7 @@ export class Entry {
     name: string = "";
     type: string = "";
     source: string = "";
-    modules: {id: string, name: string} = {id: "", name: ""};
+    modules: {id: Array<string>, name: string} = {id: [], name: ""};
     definition: string = "";
     timestamp: string = "";
     timestampCreation: string = "";

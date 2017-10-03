@@ -8,6 +8,7 @@ import { AppSettings } from '../settings/app.settings';
 import { Entry } from '../model/entry'
 import { EntryCowaboo } from '../model/entrycowaboo'
 import { UserService } from '../model/user-service';
+import { Formatter } from '../tools/app.formatter';
 import { HistorySearchService } from '../model/history-search';
 
 declare var $:any; // This is necessary if you want to use jQuery in the app
@@ -55,7 +56,7 @@ export class AppInsertion implements OnInit{
 	public items = [];
 
 	
-	constructor(private _httpService : HttpAPIService, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {
+	constructor(private _httpService : HttpAPIService, private _format : Formatter, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {
 		_userservice.getCurrentUser()
 		console.log(_historysearch.getLastSearches())
 	}
@@ -212,7 +213,8 @@ export class AppInsertion implements OnInit{
 			let type = $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text()
 			let context = $('#select-context').text() == "Aucun" ? "" : $('#select-context').text()
 			
-			let dataInfo = {
+			let dataInfo = new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, "", tags, "", this._format.getTodayTimestamp(), [], [], false, "")
+			/*{
 				name : this.word,
 				type: $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text(), 
 				source : this.source, 
@@ -223,8 +225,8 @@ export class AppInsertion implements OnInit{
 				commentary : "", 
 				review : "",
 				keywords : tags
-			};
-			//new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, "", tags, "", [], [], false)
+			};*/
+			//
 			
 			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name, instance._userservice.currentUser.secretKey)
 			.subscribe(

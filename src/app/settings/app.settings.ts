@@ -52,7 +52,7 @@ export class AppSettings {
 
 	public static API_WIKI = "http://fr.wikipedia.org/w/api.php?"
 
-	public static API_KEY = "SDRSUEUEOJAJJG4MC76F2H7FTGYYTFASNCTMEJ7XJFUHFRQG5M2QI5O3"
+	public static API_KEY = "SCD3L76IHDAZRVAY3MH2G3T2UAUMVFIR3I26RLLWEYIJ3EWHLD5G6QP4"
 
 	/* Colors */
 	public static GREY = "#333";

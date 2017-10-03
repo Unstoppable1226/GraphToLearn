@@ -217,6 +217,10 @@ export class AppHome {
 				},
 				minCharacters: 1, // 1 caractère minimum pour déclencher l'algorithme de recherche
 				maxResults : 15, // Affiche 10 résultats maximum
+				searchDelay: 0,
+				searchFields: [
+					'title',
+				],
 				onSelect(result, response) {
 					let name = result.name.replace(/\//g, AppSettings.FORWARD_SLACH);
 					name = name.replace(/\(/g, AppSettings.OPEN_PARENTHESIS).replace(/\)/g, AppSettings.CLOSE_PARENTHESIS)

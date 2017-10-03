@@ -12,6 +12,7 @@ import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 import { Entry } from '../model/entry'
 import { EntryCowaboo } from '../model/entrycowaboo'
 import { Update } from '../model/update'
+import { Comment } from '../model/comment'
 
 import { User } from '../model/user'
 import { UserService } from '../model/user-service'
@@ -46,8 +47,8 @@ export class AppSearch implements OnInit {
 	public collapsedMeaning = false
 	public collapsedInfos = false
 	public collapsedComments = true
-	public collapsedActions = true
-	private user: User
+	public collapsedActions = false
+	public user: User
 	private allModules = []
 	private modulesOfWord = {}
 	private totalPoints = 0
@@ -64,6 +65,7 @@ export class AppSearch implements OnInit {
 	public nameChosenModule = false;
 
 	public loadingAddModule = false;
+	public loadingAddComment = false;
 	public newModuleObj: any = { id: "", name: "", goals: "" }
 	public errorAddModule = false;
 	public errorTextAddModule = "";
@@ -85,14 +87,16 @@ export class AppSearch implements OnInit {
 	public definition: string = "";
 	public meaning: string = "";
 
-	public lastModifItem : EntryCowaboo
-	difName : boolean = false
-	difType : boolean = false
-	difMeaning : boolean = false
-	difDefinition : boolean = false
-	difSource : boolean = false
-	difContext : boolean = false
-	difKeywords : boolean = false
+	public newComment: string = "";
+
+	public lastModifItem: EntryCowaboo
+	difName: boolean = false
+	difType: boolean = false
+	difMeaning: boolean = false
+	difDefinition: boolean = false
+	difSource: boolean = false
+	difContext: boolean = false
+	difKeywords: boolean = false
 	public items = [];
 
 
@@ -100,7 +104,7 @@ export class AppSearch implements OnInit {
 	constructor(private _route: ActivatedRoute, private _router: Router, private _alert: AlertsService, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch: HistorySearchService) {
 		this.loading = true;
 		this.user = this._userservice.currentUser;
-		this.lastModifItem = new EntryCowaboo("", "","","","","","","","","","",[], [], false, "")
+		this.lastModifItem = new EntryCowaboo("", "", "", "", "", "", "", "", "", "", "", [], [], false, "")
 	}
 
 	onCreate() {
@@ -129,6 +133,9 @@ export class AppSearch implements OnInit {
 			}
 		})
 	}
+	focusAddComment() {
+		
+	}
 
 	refresh() {
 		this.id = "";
@@ -141,7 +148,7 @@ export class AppSearch implements OnInit {
 		this.collapsedMeaning = false
 		this.collapsedInfos = false
 		this.collapsedComments = true
-		this.collapsedActions = true;
+		this.collapsedActions = false;
 		this.modulesOfWord = {}
 		this.totalPoints = 0
 		this.col1 = AppSettings.COL_SEARCH_TERM
@@ -335,10 +342,12 @@ export class AppSearch implements OnInit {
 
 	initializeWordSearch(instance, response) {
 		let obj = response.dictionary.entries;
+		let word
 		for (let prop in obj) {
 			let tag = obj[prop].tags;
+			word = JSON.parse(obj[prop].value)
 			instance.dictionary.push(obj[prop]);
-			if (tag.trim().toLowerCase() == "||" + instance.id.trim().toLowerCase() + "||") {
+			if ((tag.trim().toLowerCase() == "||" + instance.id.trim().toLowerCase() + "||") || (word.name.trim().toLowerCase() == instance.id.trim().toLowerCase())) {
 				/* Il faudrait mettre à jour un compteur pour la recherche */
 				let nbSearch: number = Number(obj[prop].conf.searchClick)
 				nbSearch += 1
@@ -348,7 +357,6 @@ export class AppSearch implements OnInit {
 				var term = instance.constructLikeDislike(obj[prop].conf.like, 0, instance.wordSearch)
 				instance.wordSearch = instance.constructLikeDislike(obj[prop].conf.dislike, 1, term)
 
-				console.log(instance.constructLikeDislike(obj[prop].conf.like, 0, instance.wordSearch))
 				instance.wordSearch.searchClick = nbSearch
 				instance.wordSearch.timestamp = instance._format.formatDate(obj[prop].date);
 				instance.wordSearch.timestampCreation = instance._format.getDate(obj[prop].date);
@@ -392,7 +400,6 @@ export class AppSearch implements OnInit {
 							instance._historysearch.lastSearches = []
 							instance._historysearch.addSearch(instance.wordSearch.name)
 						}
-						console.log(instance._historysearch.lastSearches)
 						instance._httpservice.postObservatoryMetadata(instance._userservice.currentUser.mail, JSON.stringify(instance._historysearch.getLastSearches()), AppSettings.API_HISTORY, instance._userservice.currentUser.secretKey)
 							.subscribe(function (response) { console.log(response); })
 					},
@@ -401,6 +408,7 @@ export class AppSearch implements OnInit {
 				instance.createContext(instance.wordSearch);
 				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop, instance._userservice.currentUser.secretKey) // Put searchClick to 0
 					.subscribe(function (resp) { console.log(resp) });
+				break;
 			}
 		}
 	}
@@ -504,17 +512,16 @@ export class AppSearch implements OnInit {
 	}
 
 	showLastModification() {
-		let modif = this.wordSel.updates[this.wordSel.updates.length - 1]
-		let lastModif = JSON.parse(modif.version)
+		let modif : any  = this.wordSel.updates[this.wordSel.updates.length - 1]
+		
+		let lastModif = modif.version
 
 		this.lastModifItem = lastModif
 		let tags = "";
 
-		console.log(lastModif)
-
 		for (var index = 0; index < this.wordSel.keywords.length; index++) {
 			var element = this.wordSel.keywords[index];
-			tags = tags + element + (index == this.wordSel.keywords.length-1 ? "" : ", ")
+			tags = tags + element + (index == this.wordSel.keywords.length - 1 ? "" : ", ")
 		}
 		this.difName = false
 		this.difType = false
@@ -523,10 +530,9 @@ export class AppSearch implements OnInit {
 		this.difSource = false
 		this.difContext = false
 		this.difKeywords = false
-		
+
 		if (lastModif.name != this.wordSel.name) {
 			this.difName = true
-			console.log(this._format.diffString(lastModif.name, this.wordSel.name))
 			document.getElementById('afterModifName').innerHTML = this._format.diffString(lastModif.name, this.wordSel.name)
 		}
 		if (lastModif.type != this.wordSel.type) {
@@ -560,9 +566,58 @@ export class AppSearch implements OnInit {
 			;
 	}
 
+	deleteComment(index) {
+		this.wordSel.comments.splice(index, 1)
+		this.modifyWordOnAPI();
+	}
+
+	modifyWordOnAPI() {
+		let dataInfo = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, this.wordSel.updates, this.wordSel.comments, false, this.wordSel.commentary)
+
+		let dataInfoString = {
+			name: dataInfo.name,
+			type: dataInfo.type,
+			source: dataInfo.source,
+			modules: dataInfo.modules,
+			definition: dataInfo.definition,
+			meaning: dataInfo.meaning,
+			context: dataInfo.context,
+			review: dataInfo.review,
+			keywords: dataInfo.keywords,
+			parent: dataInfo.parent,
+			timestampCreation: dataInfo.timestampCreation,
+			updates: dataInfo.updates,
+			comments: dataInfo.comments,
+			inactive: false,
+		}
+		this._httpservice.getEntryJSON(AppSettings.API_WORDS)
+			.subscribe(
+			data => {
+				let hashWord = null
+				let obj
+				for (let prop in data.dictionary.entries) {
+					obj = JSON.parse(data.dictionary.entries[prop].value)
+					if (this.wordSel.name.toLowerCase() == obj.name.toLowerCase()) {
+						hashWord = prop
+						break;
+					}
+				}
+				this._httpservice.putEntryJSON(dataInfoString, AppSettings.API_WORDS, hashWord, this._userservice.currentUser.secretKey)
+					.subscribe(
+					dataModif => {
+						console.log(dataModif)
+					},
+					errModif => { console.log(errModif); }
+					)
+
+			},
+			error => { console.log(error); }
+		)
+	}
+
 	addLikeToComment(index) {
 		this.wordSel.comments[index].likes.push(this._userservice.currentUser.mail)
-		console.log(this.wordSel.comments[index])
+		this.modifyWordOnAPI();
 	}
 
 	findVerb(tag) {
@@ -906,8 +961,6 @@ export class AppSearch implements OnInit {
 		instance.wordSearch = Object.assign({}, wordSelected)
 		instance.wordSel = Object.assign({}, instance.wordSearch);
 
-		console.log(allEntries)
-		console.log(instance.wordSearch)
 		instance._manager3d.createScene(wordSearch, allEntries, instance.wordSel, instance.modulesOfWord);
 		instance._manager3d.runRender();
 		this.loading = false;
@@ -972,6 +1025,57 @@ export class AppSearch implements OnInit {
 		
 		}
 		*/
+	}
+
+	addComment() {
+		if (this.newComment != "") {
+			this.loadingAddComment = true
+			let dataInfo = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, this.wordSel.updates, this.wordSel.comments, false, this.wordSel.commentary)
+			let commentToInsert = new Comment(this.newComment, this._userservice.currentUser.mail + " [" + this._userservice.currentUser.group +"]", this._format.getTodayTimestamp(), [])
+			dataInfo.comments.push(commentToInsert)
+			let dataInfoString = {
+				name: dataInfo.name,
+				type: dataInfo.type,
+				source: dataInfo.source,
+				modules: dataInfo.modules,
+				definition: dataInfo.definition,
+				meaning: dataInfo.meaning,
+				context: dataInfo.context,
+				review: dataInfo.review,
+				keywords: dataInfo.keywords,
+				parent: dataInfo.parent,
+				timestampCreation: dataInfo.timestampCreation,
+				updates: dataInfo.updates,
+				comments: dataInfo.comments,
+				inactive: false,
+			}
+			this._httpservice.getEntryJSON(AppSettings.API_WORDS)
+				.subscribe(
+				data => {
+					let hashWord = null
+					let obj
+					for (let prop in data.dictionary.entries) {
+						obj = JSON.parse(data.dictionary.entries[prop].value)
+						if (this.wordSel.name.toLowerCase() == obj.name.toLowerCase()) {
+							hashWord = prop
+							break;
+						}
+					}
+					this._httpservice.putEntryJSON(dataInfoString, AppSettings.API_WORDS, hashWord, this._userservice.currentUser.secretKey)
+						.subscribe(
+						dataModif => {
+							console.log(dataModif)
+							this.loadingAddComment = false
+							this.newComment = "";
+						},
+						errModif => { console.log(errModif); this.loadingAddComment = false }
+						)
+
+				},
+				error => { console.log(error); this.loadingAddComment = false }
+				)
+
+		}
 	}
 
 	addModule() {
@@ -1124,15 +1228,16 @@ export class AppSearch implements OnInit {
 			let type = $('#select-types').dropdown('get value') == "Aucun" ? "" : $('#select-types').dropdown('get value');
 			let context = $('#select-context').dropdown('get value') == "Aucun" ? "" : $('#select-context').dropdown('get value')
 
-			let updatesVersions = Object.assign([], this.wordSel.updates)
-			let lastVersion = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, this.wordSel.updates, this.wordSel.comments, false, this.wordSel.commentary)
-			console.log(lastVersion)
+			let updatesVersions : Array<Update>= Object.assign([], this.wordSel.updates)
+			let lastVersion = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, [], [], false, this.wordSel.commentary)
 
-			updatesVersions.push(new Update(JSON.stringify(lastVersion), this._format.getTodayTimestamp(), this._userservice.currentUser.mail, true))
+			updatesVersions.push(new Update(lastVersion, this._format.getTodayTimestamp(), this._userservice.currentUser.mail, true))
+			
+
+			
 
 			let dataInfo = new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, this.wordSel.review, tags, this.wordSel.parent, this.wordSel.timestampCreation, updatesVersions, this.wordSel.comments, false, this.wordSel.commentary)
-
-			console.log(dataInfo)
+			
 			let dataInfoString = {
 				name: dataInfo.name,
 				type: dataInfo.type,
@@ -1145,11 +1250,10 @@ export class AppSearch implements OnInit {
 				keywords: dataInfo.keywords,
 				parent: dataInfo.parent,
 				timestampCreation: dataInfo.timestampCreation,
-				updates: JSON.stringify(dataInfo.updates),
-				comments: JSON.stringify(dataInfo.comments),
+				updates : dataInfo.updates,
+				comments: dataInfo.comments,
 				inactive: false,
 			}
-
 
 			instance._httpservice.getEntryJSON(AppSettings.API_WORDS)
 				.subscribe(
@@ -1169,6 +1273,16 @@ export class AppSearch implements OnInit {
 						hashGenerated => {
 							console.log(hashGenerated);
 							$('.ui.modal').modal('hide all');
+							this.wordSel.name = dataInfoString.name
+							this.wordSel.type = dataInfoString.type
+							this.wordSel.source = dataInfoString.source
+							this.wordSel.definition = dataInfoString.definition
+							this.wordSel.meaning = dataInfoString.meaning
+							this.wordSel.context = dataInfoString.context
+							this.wordSel.updates = dataInfoString.updates
+							this.wordSel.modules.id = dataInfoString.modules.split(',')
+							this.wordSel.modules.name = dataInfoString.modules
+							this.wordSel.keywords = dataInfoString.keywords.split(', ')
 							this.loadingModif = false
 							this._alert.create('success', AppSettings.MSG_SUCCESS_MODIFICATION);
 						},
@@ -1176,10 +1290,10 @@ export class AppSearch implements OnInit {
 						)
 				},
 				error => { console.log(error) }
-				)
-
+			)
 		} else {
 			this._alert.create('warning', AppSettings.MSGINCOMPLETED);
+			this.loadingModif = false
 		}
 	}
 

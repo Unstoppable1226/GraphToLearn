@@ -10,7 +10,10 @@
 	</div>
 	<div style="width: 100%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">
 		<div *ngIf="loading" class="ui active dimmer">
-			<div class="ui large text loader">Chargement</div>
+			<div class="ui large text loader">Initialisation de l'interface ...</div>
+		</div>
+		<div *ngIf="loadingModif" class="ui active dimmer">
+			<div class="ui large text loader">Mise à jour des infomations ...</div>
 		</div>
 		<h2 class="ui icon header" style="margin-top:25px; text-align:center!important;margin-bottom: -200px">
 			<div class="content" style="color:#F8F9FB; font-weight:200">
@@ -170,16 +173,16 @@
 		<br>
 		<canvas id="renderCanvas" style="outline: none;"></canvas>
 	</div>
-	<div *ngIf="user.group != 'Lambda'" class="collapse-actions" style="position:fixed;top:200px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
-		<button (click)="showModifications()" class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
+	<div *ngIf="user.group != 'Lambda'" class="" style="position:fixed;top:180px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
+		<button (click)="showModifications()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
 		 data-tooltip="Modifier le terme sélectionné" data-inverted="" data-position="right center">
 			<i class="icon pencil"></i>
 		</button>
-		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top: 95px;margin-left: 52px;"
+		<button (click)="focusAddComment()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 95px;margin-left: 52px;"
 		 data-tooltip="Donner son avis sur le terme sélectionné" data-inverted="" data-position="right center">
 			<i class="icon comments"></i>
 		</button>
-		<button class="circular ui icon button collapse-actions-buttons" style="display: block;position: absolute;margin-top:160px;margin-left: 52px;"
+		<button class="circular ui icon button" style="display: block;position: absolute;margin-top:160px;margin-left: 52px;"
 		 data-tooltip="Mettre ce terme en inactif" data-inverted="" data-position="right center">
 			<i class="icon delete"></i>
 		</button>
@@ -205,32 +208,43 @@
 		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
 		<ul class="collapse" style="height: auto;">
 			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;">
-				<span>
-					
-					<div class="ui feed">
-
-						<div class="event" *ngFor="let comment of wordSel.comments; let i = index">
-							<div class="content" >
-								<div class="summary"  style="color:#eee!important">
-									<a class="user">
-										{{comment.author}} :
-									</a> {{comment.info}}
-									<div class="date"  style="color:#eee!important">
-										{{comment.timestamp}}
-									</div>
-								</div>
-								<div class="meta" style="user-select:none">
-									<a class="like"  style="color:#eee!important" (click)="addLikeToComment(i)">
-										<i class="thumbs up icon"></i>{{comment.likes.length}} Appréciation
-									</a>
-								</div>
-							</div>
-							<hr>
-						</div>
-						
+				<div class="ui comments" [ngClass]="{'loading': loadingAddComment}" style="max-height: 300px; overflow: auto">
+					<div class="ui dimmer" [ngClass]="{'active': loadingAddComment}">
+						<div class="ui loader"></div>
 					</div>
+					<div class="comment" *ngFor="let comment of wordSel.comments; let i = index">
+						<a class="avatar" style="background-color: none">
+							<img class="ui avatar image" src="../assets/images/user.png">
+						</a>
+						<div class="content">
+							<a class="author" style="color:rgb(74, 141, 189)!important" >
+								{{comment.author}}
+							</a>
+							<div class="metadata" style="color:#eee!important">
+								<div class="date">{{comment.timestamp}}</div>
+							</div>
+							<div class="text" style="color:#eee!important">
+								<p>{{comment.info}}</p>
+							</div>
+							<div class="actions">
+								<a class="like" style="user-select:none" style="color:#eee!important" (click)="addLikeToComment(i)"><i class="thumbs up icon"></i> {{comment.likes.length}}</a>
+								<a class="reply" style="color:#63924D!important">Répondre</a>
+								<a class="delete" style="color:rgb(100, 55, 55)!important" (click)="deleteComment(i)">Supprimer</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</li>
+			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;">
+				<div class="ui form">
+					<div class="field">
+						<textarea rows="2" [(ngModel)]="newComment" [ngModelOptions]="{standalone: true}" placeholder="Écriver un commentaire"></textarea>
+					</div>
+					<div class="ui blue fluid labeled submit icon button" [ngClass]="{'loading': loadingAddComment}" (click)="addComment()">
+						<i class="icon comment"></i> Ajouter commentaire
+					</div>
+				</div>
 
-				</span>
 			</li>
 		</ul>
 		<div class="ui modal lastModif">
@@ -255,7 +269,7 @@
 						<p *ngIf="difContext">{{lastModifItem.context}}</p>
 						<h5 *ngIf="difKeywords">Mots clés</h5>
 						<p *ngIf="difKeywords">{{lastModifItem.keywords}}</p>
-						
+
 					</div>
 
 					<div class="eight wide column">
