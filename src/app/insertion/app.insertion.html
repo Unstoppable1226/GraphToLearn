@@ -87,10 +87,10 @@
 					</ul>
 				</div>
 				<div class="ui buttons">
-					<button class="ui button" [ngStyle]="{'background-color': styleModuleEx, 'color': styleModuleExCol}" (click)="switchModule(false, 'A')"
+					<button class="ui button" [ngStyle]="{'background-color': styleModuleEx, 'color': styleModuleExCol}" (click)="switchExistsOrAddModule(false, 'A')"
 					 type="button">Existant</button>
 					<div class="or" data-text="ou"></div>
-					<button class="ui button" [ngStyle]="{'background-color': styleModuleNew, 'color': styleModuleNewCol}" (click)="switchModule(true, 'B')"
+					<button class="ui button" [ngStyle]="{'background-color': styleModuleNew, 'color': styleModuleNewCol}" (click)="switchExistsOrAddModule(true, 'B')"
 					 type="button">Nouveau</button>
 				</div>
 				<div class="ui fluid multiple search selection dropdown" [hidden]="newModule" style="margin-top:5px">

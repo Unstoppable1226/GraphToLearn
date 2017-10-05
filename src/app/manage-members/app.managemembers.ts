@@ -4,6 +4,7 @@ import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 
 import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
+import { Formatter } from '../tools/app.formatter';
 
 import { Entry } from '../model/entry'
 import { UserService } from '../model/user-service';
@@ -21,9 +22,8 @@ export class AppManagerMembers implements OnInit {
 	public allMembers = {};
 	public newMembers = [];
 
-	constructor(private _httpService : HttpAPIService, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {
-		this._userservice.getCurrentUser()
-		this.getMembers()
+	constructor(private _httpService : HttpAPIService, private _format: Formatter, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {
+		this._format.deleteAllModals()
 	}
 
 	getMembers() {
@@ -37,15 +37,11 @@ export class AppManagerMembers implements OnInit {
 						this.newMembers.push(this.allMembers[prop])
 					}
 				}
-				
-				console.log(this.allMembers)
 			}
 		)
 	}
 
 	addMember(i) {
-		
-		console.log(this.newMembers[i])
 		let member = {
 			publicKey : this.newMembers[i].publicKey,
 			group : this.newMembers[i].group,
@@ -81,5 +77,8 @@ export class AppManagerMembers implements OnInit {
 			
 	}
 
-	ngOnInit() {}
+	ngOnInit() {
+		this._userservice.getCurrentUser()
+		this.getMembers()
+	}
 }

@@ -70,7 +70,7 @@ export class AppSettings {
 	public static MSGERROR = "Un problème est survenu lors de l'insertion des données, Veuillez réessayer svp !";
 	public static MSGINCOMPLETED = "Vous n'avez pas renseigner tous les champs requis pour l'insertion des données !";
 	public static MSGWELCOME = "Vous êtes connecté sur GraphToLearn, Bienvenue ";
-	public static MSGMAILSUCCESS = "Votre compte a été créé, vous allez recevoir sous peu vos informations par mail et dès que votre demande d'adhésion sera accepté vous en serez informé";
+	public static MSGMAILSUCCESS = "Votre compte a été créé, vous allez recevoir sous peu vos informations par mail et dès que votre demande d'adhésion est accepté par un membre de la communauté, vous pourrez utiliser l'outil";
 	public static MSG_ERROR_MAIL_EMPTY = "Veuillez renseigner le champ Mail ! ";
 	public static MSG_ERROR_SECRETKEY_EMPTY = "Veuillez renseigner le champ Secret Key ! ";
 	public static MSG_ERROR_MAIL_TAKEN = "Attention, un utilisateur avec cet email existe déjà !";
@@ -78,6 +78,11 @@ export class AppSettings {
 	public static MSG_ERROR_LOG_IN = "La secret key donnée est incorrecte !";
 	public static MSG_SUCCESS_MODIFICATION = "La modification a été réalisé avec succès !";
 
+	public static MSG_ERROR_INFO_MODULE_EMPTY = "Veuillez compléter tous les champs requis : N° du module, Nom du module et Objectifs du module"
+	public static MSG_ERROR_NO_MODULE_TAKEN = "Veuillez choisir un autre n° pour l'identifiant du module, car ce dernier a déjà été utilisé !"
+
+	public static MSG_MODULE_INSERT_SUCCESS = "Le module a été inséré avec succès, il se trouve désormais avec les existants !"
+	public static MSG_MODULE_INSERT_ERROR = "Une erreur est survenue et le module n'a pas pu être inséré !"
 
 	/* 3D variables */
 	public static MINX : number = 40;

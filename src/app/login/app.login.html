@@ -57,7 +57,7 @@
 							<input type="mail" class="input-insert" (focus)="focusPassword()" name="mail" [(ngModel)]="mail" [ngModelOptions]="{standalone: true}" placeholder="Insérer votre mail">
 						</div>
 					</div>
-					<div class="ui fluid large approve teal submit button button-connect-modal" [ngClass]="{'loading' : loadingButton}" style="margin-left:0px">Envoyer demande<i class="right send icon"></i></div>
+					<div class="ui fluid large teal button button-connect-modal" [ngClass]="{'loading' : loadingButton}" style="margin-left:0px" (click)="launchRegistration()">Envoyer demande<i class="right send icon"></i></div>
 				</div>
 				<div *ngIf="errorMail" class="ui error error-message" style="margin-bottom: 12px">
 					{{errorTextMail}}
@@ -82,7 +82,7 @@
 							<input type="password" (focus)="focusPassword()" class="input-insert" name="password" [(ngModel)]="secretKey" placeholder="Secret Key">
 						</div>
 					</div>
-					<div class="ui fluid large approve teal submit button button-connect-modal" [ngClass]="{'loading' : loadingButton}" style="margin-left:0px">Se connecter <i class="right sign in icon"></i></div>
+					<div class="ui fluid large teal button button-connect-modal" [ngClass]="{'loading' : loadingButton}" style="margin-left:0px" (click)="startConnection()">Se connecter <i class="right sign in icon"></i></div>
 				</div>
 				<div *ngIf="error" class="ui error error-message">
 					{{errorTextSecretKey}}

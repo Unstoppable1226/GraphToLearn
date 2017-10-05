@@ -1,6 +1,6 @@
 <app-menu></app-menu>
 
-<div style="width: 100%;text-align: center!important; ">
+<div style="width: 100%;text-align: center!important;">
 	<div style="background-color:#1B1C1D;height: 45px;width: 500px;position: fixed;top: 56px;right: 0px;color: #eee;font-weight: bold;border-radius: 5px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;">
 		<div style="margin-top:3px">Légende</div>
 		<div [ngStyle]="{'background-color': col1}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Terme recherché</span>
@@ -8,6 +8,9 @@
 		<div [ngStyle]="{'background-color': col3}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Module</span>
 		<div [ngStyle]="{'background-color': col4}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Autres termes</span>
 	</div>
+
+	<div></div>
+	
 	<div style="width: 100%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">
 		<div *ngIf="loading" class="ui active dimmer">
 			<div class="ui large text loader">Initialisation de l'interface ...</div>
@@ -22,7 +25,7 @@
 					<strong style="color:#2185d0!important;">{{wordSel.name}}</strong>
 				</div>
 
-				<div class="ui statistic small" style="margin-left:25px">
+				<div *ngIf="wordFind" class="ui statistic small" style="margin-left:25px">
 					<div class="value" style="color:#1B1C1D">
 						{{wordSel.searchClick}}
 					</div>
@@ -34,8 +37,9 @@
 			</div>
 		</h2>
 
-		<div class="scrollbar" style="position: fixed;top: 430px;left: 0px;max-width: 400px; overflow-x: scroll;max-height: 210px">
+		<div *ngIf="wordFind" class="scrollbar" style="position: fixed;top: 430px;left: 0px;max-width: 400px; overflow-x: scroll;max-height: 210px">
 			<a class="ui pointing below label" style="color: #eee; background-color:#1B1C1D;text-align: center;font-size: 1em;font-weight: 600;margin-right: 0px;display:block; margin-bottom:-5px">Réputation du terme recherché <strong style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong> dans les modules suivants :</a>
+			<div *ngIf="wordSel.modulesReputation.length == 0" style="font-size: 1em;font-weight: bold;padding-top: 10px;padding-bottom: 10px;background-color: rgba(26, 26, 26, 0.79);color: white;">Aucun module n'est associé à ce mot</div>
 			<div (mouseover)="showInfos($event, i)" (mouseleave)="showInfosLeave($event, i)" *ngFor="let mod of wordSel.modulesReputation; let i = index"
 			 class="ui statistic small" style="margin-left:25px;margin-bottom:5px">
 				<div class="label" style="color:#1B1C1D">
@@ -61,7 +65,7 @@
 
 		</div>
 
-		<div class="dg main a" style="width: 350px;position: fixed; top:150px; right: 0;margin-right: 0px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
+		<div *ngIf="wordFind" class="dg main a" style="width: 350px;position: fixed; top:150px; right: 0;margin-right: 0px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 			<div class="close-button" style="width: 350px;height:50px;padding-top: 5px;font-size: 1.3em;line-height:20px!important;user-select: none;"
 			 (click)="hideOrShow($event, 1)">
 				Informations sur <br><strong class="not-active" style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
@@ -86,7 +90,7 @@
 				<li class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Source : </span>
-						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px">{{wordSel.source}}</div>
+						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px">{{wordSel.source}} <i *ngIf="wordSel.source == 'Google'" class="google icon"></i><i *ngIf="wordSel.source == 'Wikipédia'" class="wikipedia icon"></i></div>
 					</div>
 				</li>
 				<!--<li *ngIf="wordSel.name != wordSearch.name" class="cr number has-slider" style="height: 35px;line-height: 35px">
@@ -131,20 +135,23 @@
 						</div>
 					</div>
 				</li>
-				<li *ngIf="wordSel.modules.id != ''" class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
+				<li class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
 					<div>
-						<div class='header'>Appartient aux modules suivants :</div>
+						<div class='header'>Appartient aux modules suivants : </div>
 						<div class='content'>
-							<a *ngFor="let module of wordSel.modules.id" class="ui orange label" style="margin-left:15px;  margin-top:5px;margin-bottom:10px">{{module}}</a>
+							<span *ngIf="wordSel.modules.id == '' || wordSel.modules.id == ' '" style="font-weight: bold; color:white; font-size:1em">Aucun module n'est associé</span>
+							<div *ngIf="wordSel.modules.id != '' && wordSel.modules.id != ' '">
+								<a  *ngFor="let module of wordSel.modules.id" class="ui orange label" style="margin-left:15px;  margin-top:5px;margin-bottom:10px">{{module}}</a>
+							</div>
 						</div>
 					</div>
 				</li>
 
 
-				<li *ngIf="(wordSel.keywords != undefined)" class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
+				<li class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
 					<div class='header'>Mots clés</div>
 					<div class='content'>
-						<span *ngIf="wordSel.keywords.length == 0" style="font-weight: bold; color:white; font-size:1em">Aucun mot clé est associé</span>
+						<span *ngIf="wordSel.keywords.length == 0" style="font-weight: bold; color:white; font-size:1em">Aucun mot clé n'est associé</span>
 						<a *ngFor="let tag of wordSel.keywords" class="ui grey tag label" style="margin-left:15px;  margin-top:5px;margin-bottom:10px">{{tag}}</a>
 					</div>
 				</li>
@@ -171,9 +178,10 @@
 		</button>
 
 		<br>
-		<canvas id="renderCanvas" style="outline: none;"></canvas>
+		<div *ngIf="!wordFind" style="color:black; margin-top:10%;font-size:2.5em"><i style="font-size: 2.5em" class="search icon"></i><i style="font-size: 1em;margin-left:-5px;margin-top:-10px" class="remove circle icon"></i><br>Aucun mot n'a été trouvé qui correspond à votre recherche</div>
+		<canvas *ngIf="wordFind" id="renderCanvas" style="outline: none;"></canvas>
 	</div>
-	<div *ngIf="user.group != 'Lambda'" class="" style="position:fixed;top:180px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
+	<div *ngIf="user.group != 'Lambda' && wordFind" class="" style="position:fixed;top:180px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
 		<button (click)="showModifications()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
 		 data-tooltip="Modifier le terme sélectionné" data-inverted="" data-position="right center">
 			<i class="icon pencil"></i>
@@ -190,7 +198,7 @@
 			 [ngClass]="{'minus': !collapsedActions, 'plus': collapsedActions}"> </i></div>
 	</div>
 
-	<div class="dg main a" style="width: 59%;left:0;position: fixed;right: 0; margin-right:0px!important;bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
+	<div *ngIf="wordFind" class="dg main a" style="width: 59%;left:0;position: fixed;right: 0; margin-right:0px!important;bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
 		 (click)="hideOrShow($event, 2)">Explications de <strong class="not-active" style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
 			<div class="not-active" style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedMeaning, 'plus': collapsedMeaning}"></i></div>
@@ -200,7 +208,7 @@
 			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;"><span style="font-size: 1.1em!important;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">{{wordSel.meaning}} [Source : {{wordSel.source}}]</span></li>
 		</ul>
 	</div>
-	<div class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
+	<div *ngIf="wordFind" class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
 		 (click)="hideOrShow($event, 3)">Espace commentaires et révisions
 			<div class="not-active" style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedComments, 'plus': collapsedComments}"></i></div>

@@ -37,6 +37,7 @@ export class AppSearch implements OnInit {
 	public loading = false
 	public loading2 = false
 	public loadingModif = false
+	public wordFind = true;
 	public wordSearch: Entry = new Entry()// The that we have searched
 	public wordSel: Entry = new Entry() // The word that is selected on the context
 	public hashWordSel: string = ""
@@ -102,6 +103,7 @@ export class AppSearch implements OnInit {
 
 
 	constructor(private _route: ActivatedRoute, private _router: Router, private _alert: AlertsService, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch: HistorySearchService) {
+		this._format.deleteAllModals()
 		this.loading = true;
 		this.user = this._userservice.currentUser;
 		this.lastModifItem = new EntryCowaboo("", "", "", "", "", "", "", "", "", "", "", [], [], false, "")
@@ -342,17 +344,21 @@ export class AppSearch implements OnInit {
 
 	initializeWordSearch(instance, response) {
 		let obj = response.dictionary.entries;
-		let word
-		for (let prop in obj) {
+		instance.wordSel.name = instance.id
+		let word, keys : string[] = Object.keys(obj), prop: string = ""
+		for (let i: number = keys.length-1; i >= 0; i--) {
+			prop = keys[i];
 			let tag = obj[prop].tags;
 			word = JSON.parse(obj[prop].value)
-			instance.dictionary.push(obj[prop]);
 			if ((tag.trim().toLowerCase() == "||" + instance.id.trim().toLowerCase() + "||") || (word.name.trim().toLowerCase() == instance.id.trim().toLowerCase())) {
+				this.wordFind = true;
 				/* Il faudrait mettre à jour un compteur pour la recherche */
 				let nbSearch: number = Number(obj[prop].conf.searchClick)
+				
 				nbSearch += 1
-				instance.hashWordSel = prop;
 
+				instance.hashWordSel = prop;
+				
 				instance.wordSearch.setData(JSON.parse(obj[prop].value));
 				var term = instance.constructLikeDislike(obj[prop].conf.like, 0, instance.wordSearch)
 				instance.wordSearch = instance.constructLikeDislike(obj[prop].conf.dislike, 1, term)
@@ -375,42 +381,39 @@ export class AppSearch implements OnInit {
 				}
 
 				instance.getAllWordsOfModules(response)
-				/*
-				for (var index = 0; index < instance.modulesOfWord.length; index++) {
-					var element = instance.modulesOfWord[index];
-					instance._httpservice.postObservatoryMetadata(element.id, JSON.stringify(element.allterms), AppSettings.API_WORDS, instance._userservice.currentUser.secretKey)
-					.subscribe(function(response){console.log(response);})
-				}*/
 
 				let tab: Array<string> = []
 				instance._httpservice.getEntryJSON(AppSettings.API_HISTORY)
 					.subscribe(
-					data => {
+						data => {
 
-						if (data.dictionary.conf[instance._userservice.currentUser.mail] != undefined) {
-							if (!data.dictionary.conf[instance._userservice.currentUser.mail].includes(instance.wordSearch.name)) {
-								if (data.dictionary.conf[instance._userservice.currentUser.mail] == "[]") {
-									instance._historysearch.lastSearches = []
-								} else {
-									instance._historysearch.lastSearches = data.dictionary.conf[instance._userservice.currentUser.mail]
+							if (data.dictionary.conf[instance._userservice.currentUser.mail] != undefined) {
+								if (!data.dictionary.conf[instance._userservice.currentUser.mail].includes(instance.wordSearch.name)) {
+									if (data.dictionary.conf[instance._userservice.currentUser.mail] == "[]") {
+										instance._historysearch.lastSearches = []
+									} else {
+										instance._historysearch.lastSearches = data.dictionary.conf[instance._userservice.currentUser.mail]
+									}
+									instance._historysearch.addSearch(instance.wordSearch.name)
 								}
+							} else {
+								instance._historysearch.lastSearches = []
 								instance._historysearch.addSearch(instance.wordSearch.name)
 							}
-						} else {
-							instance._historysearch.lastSearches = []
-							instance._historysearch.addSearch(instance.wordSearch.name)
-						}
-						instance._httpservice.postObservatoryMetadata(instance._userservice.currentUser.mail, JSON.stringify(instance._historysearch.getLastSearches()), AppSettings.API_HISTORY, instance._userservice.currentUser.secretKey)
-							.subscribe(function (response) { console.log(response); })
-					},
-					error => { }
+							instance._httpservice.postObservatoryMetadata(instance._userservice.currentUser.mail, JSON.stringify(instance._historysearch.getLastSearches()), AppSettings.API_HISTORY, instance._userservice.currentUser.secretKey)
+								.subscribe(function (response) { console.log(response); })
+						},
+						error => { }
 					)
 				instance.createContext(instance.wordSearch);
 				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop, instance._userservice.currentUser.secretKey) // Put searchClick to 0
-					.subscribe(function (resp) { console.log(resp) });
-				break;
+				.subscribe(function (resp) { console.log(resp) });
+				
+				return;
 			}
 		}
+		this.loading = false;
+		this.wordFind = false;
 	}
 
 	hideOrShow(ev, id) {
@@ -434,55 +437,52 @@ export class AppSearch implements OnInit {
 	}
 
 	showModifications() {
-		this.word = this.wordSel.name
-		//this.newModules = '168';
-		this.source = this.wordSel.source; // Separate with the comma
-		this.definition = this.wordSel.definition;
-		this.meaning = this.wordSel.meaning;
-		this.items.splice(0, this.items.length)
-		for (var index = 0; index < this.wordSel.keywords.length; index++) {
-			this.items.push({ display: this.wordSel.keywords[index], value: this.wordSel.keywords[index] })
-		}
-		//this.items.push(this.wordSel.keywords
-		$('.ui.modification.modal').modal('show')
+		if (this.wordFind) {
+			this.word = this.wordSel.name
+			//this.newModules = '168';
+			this.source = this.wordSel.source; // Separate with the comma
+			this.definition = this.wordSel.definition;
+			this.meaning = this.wordSel.meaning;
+			this.items.splice(0, this.items.length)
+			for (var index = 0; index < this.wordSel.keywords.length; index++) {
+				this.items.push({ display: this.wordSel.keywords[index], value: this.wordSel.keywords[index] })
+			}
+			//this.items.push(this.wordSel.keywords
+			$('.ui.modification.modal').modal('show')
 
-		for (var index = 0; index < this.types.length; index++) {
-			var element = this.types[index];
-			element.name = element.value
-			if (element.name == 'Aucun') {
-				element.selected = this.wordSel.type.trim() == ""
-			} else {
-				element.selected = element.value == this.wordSel.type.trim()
+			for (var index = 0; index < this.types.length; index++) {
+				var element = this.types[index];
+				element.name = element.value
+				if (element.name == 'Aucun') {
+					element.selected = this.wordSel.type.trim() == ""
+				} else {
+					element.selected = element.value == this.wordSel.type.trim()
+				}
+
 			}
 
-		}
-
-		for (var index = 0; index < this.contexts.length; index++) {
-			var element = this.contexts[index];
-			element.name = element.value
-			if (element.name == 'Aucun') {
-				element.selected = this.wordSel.context.trim() == ""
-			} else {
-				element.selected = element.value == this.wordSel.context.trim()
+			for (var index = 0; index < this.contexts.length; index++) {
+				var element = this.contexts[index];
+				element.name = element.value
+				if (element.name == 'Aucun') {
+					element.selected = this.wordSel.context.trim() == ""
+				} else {
+					element.selected = element.value == this.wordSel.context.trim()
+				}
 			}
+
+
+			for (var index = 0; index < this.valuesModules.length; index++) {
+				var ele = this.valuesModules[index];
+				ele.name = ele.value
+				ele.selected = this.wordSel.modules.id.indexOf(ele.value) != -1
+			}
+
+			$('#select-types').dropdown({ values: this.types })
+			$('#select-context').dropdown({ values: this.contexts })
+
+			$('.ui.dropdown.multiple').dropdown({ values: this.valuesModules })
 		}
-
-
-		for (var index = 0; index < this.valuesModules.length; index++) {
-			var ele = this.valuesModules[index];
-			ele.name = ele.value
-			ele.selected = this.wordSel.modules.id.indexOf(ele.value) != -1
-		}
-		/*$('#select-types').dropdown({activate : 2})
-		/*$('#select-types').dropdown('set text', this.wordSel.type)*/
-		/*$('#select-types').dropdown('set value', 2)
-		$('#select-types').dropdown('save defaults')*/
-		$('#select-types').dropdown({ values: this.types })
-		$('#select-context').dropdown({ values: this.contexts })
-
-		$('.ui.dropdown.multiple').dropdown({ values: this.valuesModules })
-		//$('#select-types').dropdown('set selected' 2)
-		//console.log()
 	}
 
 	ngAfterViewInit() {
@@ -1028,7 +1028,7 @@ export class AppSearch implements OnInit {
 	}
 
 	addComment() {
-		if (this.newComment != "") {
+		if (this.newComment != "" && this.wordFind) {
 			this.loadingAddComment = true
 			let dataInfo = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, this.wordSel.updates, this.wordSel.comments, false, this.wordSel.commentary)
 			let commentToInsert = new Comment(this.newComment, this._userservice.currentUser.mail + " [" + this._userservice.currentUser.group +"]", this._format.getTodayTimestamp(), [])

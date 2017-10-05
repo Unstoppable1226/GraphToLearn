@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Http, Response,  Headers, RequestOptions } from "@angular/http";
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AppSettings } from '../settings/app.settings';
+import { Formatter } from '../tools/app.formatter';
 import { HttpAPIService } from '../api/app.http-service'
 import { User } from './user'
 
@@ -14,7 +15,7 @@ export class UserService  {
 	private isConnected = false
 	public currentUser : User
 
-	constructor (private _http: Http, private _router: Router, private _httpservice : HttpAPIService) {}
+	constructor (private _http: Http, private _router: Router, private _format: Formatter, private _httpservice : HttpAPIService) {}
 
 	connect(secretKey : string) {
 		return this._httpservice.getUser(secretKey)
@@ -81,8 +82,7 @@ export class UserService  {
 
 	logout() {
 		this.currentUser = new User()
-		/*var el = document.getElementsByClassName('ui dimmer modals page transition hidden'); // Remove other modals
-		if (el.length > 0) {el[0].children[0].remove();}*/
+		$('.ui.dimmer.modals.page.transition.hidden').children()
 		localStorage.removeItem('currentUser');
 		this._router.navigate(['welcome']);
 	}

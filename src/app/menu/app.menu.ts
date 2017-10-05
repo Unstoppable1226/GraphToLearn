@@ -41,7 +41,7 @@ export class MenuComponent {
 	public error: boolean
 	public settingsReputation : SettingsReputation = new SettingsReputation()
 
-	constructor(private _httpService: HttpAPIService, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch: HistorySearchService) {
+	constructor(private _httpService: HttpAPIService, private _format: Formatter, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch: HistorySearchService) {
 		this.initVariables()
 		_userservice.getCurrentUser()
 			.then(
@@ -75,7 +75,6 @@ export class MenuComponent {
 				this.feedbacks = data.dictionary.conf[AppSettings.API_METAFEEDBACKPROP]
 				if (this.feedbacks != undefined) {
 					var el = null
-					console.log(this._userservice.currentUser.mail)
 					for (var index = 0; index < this.feedbacks.length; index++) {
 						var element: Feedback = this.feedbacks[index][Object.keys(this.feedbacks[index])[0]]
 						this.allFeedbacks.push(...element.propositions)
@@ -134,8 +133,6 @@ export class MenuComponent {
 		let props: Array<Proposition> = this.myFeedback.propositions
 
 		props.push(prop)
-
-		console.log(this.myFeedback)
 		this.myFeedback.propositions = props
 		this.myFeedback.rating = ($('.ui.rating').rating('get rating')[1] == undefined ? $('.ui.rating').rating('get rating') : $('.ui.rating').rating('get rating')[1])
 		this.myFeedback.author = this._userservice.currentUser.mail
@@ -150,8 +147,8 @@ export class MenuComponent {
 
 		this._httpService.postObservatoryMetadata(AppSettings.API_METAFEEDBACKPROP, JSON.stringify(this.feedbacks), AppSettings.API_FEEDBACK, this._userservice.currentUser.secretKey)
 			.subscribe(
-			data => { console.log(data); this.newProposition = "", this.allFeedbacks.splice(0, this.allFeedbacks.length); this.init(); this.loadingAdd = false },
-			err => { console.log(err) }
+				data => { console.log(data); this.newProposition = "", this.allFeedbacks.splice(0, this.allFeedbacks.length); this.init(); this.loadingAdd = false },
+				err => { console.log(err) }
 			)
 	}
 
@@ -215,8 +212,6 @@ export class MenuComponent {
 	}
 
 	searchSelectedWord(word) {
-
-		console.log(word)
 		$('.ui.sidebar').sidebar('toggle')
 		this._router.navigate(['search/' + word]);
 	}
@@ -251,9 +246,12 @@ export class MenuComponent {
 				closable: false,
 				onDeny: function () {
 					$('.ui.modal').modal('hide all')
+					instance._format.deleteAllModals()
 					return true;
 				},
 				onApprove: function () {
+					$('.ui.modal').modal('hide all')
+					instance._format.deleteAllModals()
 					instance._authservice.logout();
 				}
 			}).modal('show')

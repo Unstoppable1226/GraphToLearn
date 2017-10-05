@@ -4,6 +4,8 @@ import { AppSettings } from '../settings/app.settings';
 
 import 'rxjs/add/operator/map';
 
+declare var $: any;
+
 @Injectable()
 export class Formatter {
 	constructor() { }
@@ -150,6 +152,11 @@ export class Formatter {
 		let hours = string.substring(8, 10)
 		let minutes = string.substring(10, 12)
 		return new Date(year, month - 1, day, hours, minutes)
+	}
+
+	deleteAllModals() {
+		// Remove other modals
+		$('.ui.dimmer.modals.page.transition.hidden').children().remove()
 	}
 
 	getTodayTimestamp() {

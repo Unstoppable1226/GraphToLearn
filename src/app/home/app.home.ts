@@ -30,7 +30,8 @@ export class AppHome {
 	title = AppSettings.TITLE;
 	timeEstimated = ""
 
-	constructor(private _httpService: HttpAPIService, private _alert : AlertsService, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
+	constructor(private _httpService: HttpAPIService, private _alert : AlertsService, private _format : Formatter, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
+		this._format.deleteAllModals()
 		this._userservice.getCurrentUser()
 			.then(
 				resolve => {
@@ -83,10 +84,10 @@ export class AppHome {
 			if (data == undefined) {
 				alert('Attention data doit être le premier objet présent')
 			} else {
-				//instance._alert.create('error', "Cette fonctionnalitée a été désactivée, car elle est encore dans l'état expérimentale");
+				instance._alert.create('error', "Cette fonctionnalitée a été désactivée, car elle est encore dans l'état expérimentale");
 				console.log('expérimental')
-				
-				instance._httpService.getEntryJSON(AppSettings.API_WORDS)
+				return;
+				/*instance._httpService.getEntryJSON(AppSettings.API_WORDS)
 					.subscribe(function(res){
 						let words = res.dictionary.entries
 						let cpt = 0;
@@ -177,9 +178,21 @@ export class AppHome {
 							}
 						});*/
 					/*})	*/
-				})
+				//})
 			}
 		}
+	}
+
+	eventHandler(keyCode) {
+		if (keyCode != 13) {return;}
+		this.moveToSearch(this.searchWord)
+	}
+
+	moveToSearch(result) {
+		let name =result.replace(/\//g, AppSettings.FORWARD_SLACH);
+		name = name.replace(/\(/g, AppSettings.OPEN_PARENTHESIS).replace(/\)/g, AppSettings.CLOSE_PARENTHESIS)
+		//name = name.replace(/\s/g,"%20")
+		this._router.navigate(['search/' + name])
 	}
 
 	ngAfterViewInit() {
@@ -222,10 +235,7 @@ export class AppHome {
 					'title',
 				],
 				onSelect(result, response) {
-					let name = result.name.replace(/\//g, AppSettings.FORWARD_SLACH);
-					name = name.replace(/\(/g, AppSettings.OPEN_PARENTHESIS).replace(/\)/g, AppSettings.CLOSE_PARENTHESIS)
-					//name = name.replace(/\s/g,"%20")
-					instance._router.navigate(['search/' + name])
+					instance.moveToSearch(result.name)
 				}
 			});
 	}
