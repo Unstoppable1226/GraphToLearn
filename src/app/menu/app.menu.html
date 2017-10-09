@@ -3,7 +3,7 @@
 		<a class="item" [ngClass]="{'active': active[0]}" (click)="changeActiveMenuItem(0, 'home')">
 			Accueil <i class="right home icon" style="margin-left:5px"></i>
 		</a>
-		<a class="item" [ngClass]="{'active': active[1]}" (click)="changeActiveMenuItem(1, 'profile')">
+		<a class="item" [ngClass]="{'active': active[1]}">
 			{{user.mail}} [{{user.group}}] <i class="right user icon" style="margin-left:5px"></i>
 		</a>
 		<a class="item" [ngClass]="{'active': active[2]}" (click)="toggleSideBar()">
@@ -161,10 +161,12 @@
 				<div class="content">
 					<a class="header">Avis sur le contenu</a>
 					<div class="description">
-						<p>Une entrée a la priorité lorsqu’un meilleur score est obtenu pour la formule qui suit : <br>
-							• (Nombre de votes positifs - Nombre de votes négatifs) = score
+						<p>Une entrée a la priorité lorsqu’un meilleur score est obtenu pour la formule qui suit : <br> • (Nombre de votes positifs
+							- Nombre de votes négatifs) = score
 						</p>
-						<p>La soustraction de ces deux résultats fera ainsi variée le score. Si le score obtenu est négatif cela voudra dire que l’entrée possède plus d’avis négatifs que positifs. En conséquence, elle fera « théoriquement » baisser la réputation (importance du terme) dès l’application de cette règle.</p>
+						<p>La soustraction de ces deux résultats fera ainsi variée le score. Si le score obtenu est négatif cela voudra dire que
+							l’entrée possède plus d’avis négatifs que positifs. En conséquence, elle fera « théoriquement » baisser la réputation
+							(importance du terme) dès l’application de cette règle.</p>
 					</div>
 				</div>
 			</div>
@@ -173,7 +175,10 @@
 					<a class="header">Vue / Clic</a>
 					<div class="description">
 						<p>Une entrée a la priorité lorsqu’elle a été recherchée plus souvent et récemment.</p>
-						<p>Toutes les informations concernant une entrée sont stockées sur IPFS via l’API Cowaboo. GraphToLearn lance une fonction qui récupère le nombre de vues ou clics qu’une entrée possède. Ces données peuvent être consultées par les utilisateurs. C’est un choix que j’ai fait sur l’outil. De ce fait, je ne voulais pas privatiser les données concernant les actions d’un utilisateur.</p>
+						<p>Toutes les informations concernant une entrée sont stockées sur IPFS via l’API Cowaboo. GraphToLearn lance une fonction
+							qui récupère le nombre de vues ou clics qu’une entrée possède. Ces données peuvent être consultées par les utilisateurs.
+							C’est un choix que j’ai fait sur l’outil. De ce fait, je ne voulais pas privatiser les données concernant les actions
+							d’un utilisateur.</p>
 					</div>
 				</div>
 			</div>
@@ -182,7 +187,9 @@
 					<a class="header">Mise à jour (Non implémentée)</a>
 					<div class="description">
 						<p>Une entrée a la priorité lorsqu’elle a subi une mise à jour ou modification récente et fréquente.</p>
-						<p>Cette règle n’a pas encore été implémentée. En effet, il était question de pouvoir modifier une entrée. Malheureusement, cette fonctionnalité à l’heure où j’écris n’a pas encore été intégrée dans l’outil GraphToLearn. En conséquence, cette règle n’est pas utilisée par l’algorithme.</p>
+						<p>Cette règle n’a pas encore été implémentée. En effet, il était question de pouvoir modifier une entrée. Malheureusement,
+							cette fonctionnalité à l’heure où j’écris n’a pas encore été intégrée dans l’outil GraphToLearn. En conséquence, cette
+							règle n’est pas utilisée par l’algorithme.</p>
 					</div>
 				</div>
 			</div>
@@ -191,7 +198,8 @@
 					<a class="header">Timestamp création</a>
 					<div class="description">
 						<p>Une entrée insérée plus récemment, a la priorité sur les plus anciennes.</p>
-						<p>La date de création est stockée lorsqu’une entrée est insérée dans l’outil automatiquement grâce à l’API Cowaboo. L’outil compare ainsi les entrées entre elles et détermine lesquelles sont prioritaires.</p>
+						<p>La date de création est stockée lorsqu’une entrée est insérée dans l’outil automatiquement grâce à l’API Cowaboo. L’outil
+							compare ainsi les entrées entre elles et détermine lesquelles sont prioritaires.</p>
 					</div>
 				</div>
 			</div>
@@ -262,7 +270,7 @@
 		</div>
 		<div class="ui bottom attached tab segment active" data-tab="search" style="text-align:center">
 			<h4>Couleurs</h4>
-			<form class="ui form">
+			<form class="ui form" [ngClass]="{'loading': loadingSaveOptions}">
 				<div class="field">
 					<label>Terme recherché : </label>
 					<input type="text" [(ngModel)]="colSearchTerm" [ngModelOptions]="{standalone: true}" name="search-term" placeholder="Couleur ..."
@@ -299,37 +307,37 @@
 				<div class="header">
 					Modification de la distribution de la réputation
 				</div>
-				<p>Vous êtes administrateur de l'outil vous pouvez donc changer les niveaux de distributions de la réputation qui sont faites
-					dans l'outil en changeant les valeurs ci-dessous. <br><strong> Les changements effectué auront des repércussions pour le reste des utilisateurs à ne pas négliger! </strong></p>
+				<p>Vous êtes administrateur vous pouvez donc changer les niveaux de distribution de la réputation configurés
+					dans l'outil en changeant les valeurs ci-dessous. <br><strong> <span style="color:#C01515">Attention</span>, les changements effectués auront des repércussions sur l'ensemble des autres membres. En effet, les modifications seront apportées aussi sur tous les autres membres de la communauté, à ne pas négliger! </strong></p>
 			</div>
-			<form *ngIf="(user.group == 'Administrator')" class="ui form">
+			<form *ngIf="(user.group == 'Administrator')" [ngClass]="{'loading': loadingSaveOptions}" class="ui form">
 				<div class="field">
 					<label>Réputation nécessaire pour faire partie d'un groupe d'éditeurs :</label>
-					<input type="text" [(ngModel)]="settingsReputation.repIntegrationEditor" [ngModelOptions]="{standalone: true}" name="search-term"
-					 style="width: 60px">
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 1)"  [(ngModel)]="settingsReputation.repIntegrationEditor" [ngModelOptions]="{standalone: true}" name="search-term"
+					 style="width: 70px">
 				</div>
 				<div class="field">
 					<label>Réputation donné lorsqu'un utilisateur <span style="color:#C01515">apprécie le contenu d'un terme</span></label>
-					<input type="text" [(ngModel)]="settingsReputation.repContribution" [ngModelOptions]="{standalone: true}" name="key-word"
-					 style="width: 60px">
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 2)" [(ngModel)]="settingsReputation.repContribution" [ngModelOptions]="{standalone: true}" name="key-word"
+					 style="width: 70px">
 				</div>
 				<div class="field">
 					<label>Réputation donné lorsqu'un utilisateur <span style="color:#C01515">modifie le contenu d'un terme</span></label>
-					<input type="text" [(ngModel)]="settingsReputation.repModify" [ngModelOptions]="{standalone: true}" name="module" style="width: 60px">
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 3)" [(ngModel)]="settingsReputation.repModify" [ngModelOptions]="{standalone: true}" name="module" style="width: 70px">
 				</div>
 				<div class="field">
 					<label>Réputation donné lorsqu'un utilisateur <span style="color:#C01515">insére un nouveau terme</span></label>
-					<input type="text" [(ngModel)]="settingsReputation.repNew" [ngModelOptions]="{standalone: true}" name="other-terms" style="width: 60px">
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 4)" [(ngModel)]="settingsReputation.repNew" [ngModelOptions]="{standalone: true}" name="other-terms" style="width: 70px">
 				</div>
 				<div class="field">
 					<label>Réputation donné lorsqu'un utilisateur <span style="color:#C01515">fait une révision (commentaire) sur un terme</span></label>
-					<input type="text" [(ngModel)]="settingsReputation.repRevision" [ngModelOptions]="{standalone: true}" name="other-terms"
-					 style="width: 60px">
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 5)" [(ngModel)]="settingsReputation.repRevision" [ngModelOptions]="{standalone: true}" name="other-terms"
+					 style="width: 70px">
 				</div>
 
 			</form>
 		</div>
-		<div class="ui fluid large approve button button-blur" style="margin-left:0px" (click)="saveOptions()">Enregistrer modifications<i class="right checkmark icon"></i></div>
+		<div class="ui fluid large approve button button-blur" style="margin-left:0px"  [ngClass]="{'loading': loadingSaveOptions}"  (click)="saveOptions()">Enregistrer modifications<i class="right checkmark icon"></i></div>
 	</div>
 
 </div>
@@ -351,31 +359,14 @@
 		</div>
 	</div>
 </div>
-<!--
-<div class="ui left demo vertical inverted sidebar labeled icon menu">
-	<a class="item">
-		  <i class="home icon"></i>
-		  Home
-		</a>
-	<a class="item">
-		  <i class="block layout icon"></i>
-		  Topics
-		</a>
-	<a class="item">
-		  <i class="smile icon"></i>
-		  Friends
-		</a>
-</div>
--->
 <div class="ui sidebar inverted vertical menu">
 	<a class="item" style="font-size:1.1em;text-align:center;"> <span style="margin-bottom:10px">Historique de vos recherches</span>
-
-			<div class="ui animated fluid button" tabindex="0" style="margin-top:10px!important" (click)="delete()">
-					<div class="visible content">Tout effacer</div>
-					<div class="hidden content">
-						<i class="delete icon"></i>
-					</div>
-					</div>
+		<div class="ui animated fluid button" tabindex="0" style="margin-top:10px!important" (click)="delete()">
+			<div class="visible content">Tout effacer</div>
+			<div class="hidden content">
+				<i class="delete icon"></i>
+			</div>
+		</div>
 	</a>
 	<!-- href="http://localhost:4200/search/{{his}}" -->
 	<a *ngFor="let his of historySearch; let i = index" class="item" (click)="searchSelectedWord(his)">

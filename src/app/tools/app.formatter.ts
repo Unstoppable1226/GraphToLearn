@@ -159,9 +159,19 @@ export class Formatter {
 		$('.ui.dimmer.modals.page.transition.hidden').children().remove()
 	}
 
+	validateEmail(email) {
+		let re = /^(?:[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+\.)*[\w\!\#\$\%\&\'\*\+\-\/\=\?\^\`\{\|\}\~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$/;
+		return re.test(email);
+	}
+
 	getTodayTimestamp() {
 		let today = new Date();
 		return today.getDate() + "/" + (Number(today.getMonth()) + 1) + "/" + today.getFullYear() + " " + today.getHours() + ":" + today.getMinutes();
+	}
+
+	formatTimestampToDate(timestamp) {
+		let dateArray = timestamp.split(/ |\/|:/)
+		return new Date(dateArray[2], dateArray[1] - 1, dateArray[0], dateArray[3], dateArray[4])
 	}
 
 	cleanArray(array) {

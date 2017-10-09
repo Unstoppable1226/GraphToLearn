@@ -59,7 +59,9 @@ export class Entry {
         } catch (error) {
             this.updates = obj.updates == undefined ? [] : obj.updates;
         }
-       
+
+        
+        
         this.modules = {id:modules.split(/,|-/),name: modules};
         this.keywords = ((obj.keywords == undefined || obj.keywords == "") ? new Array() : obj.keywords.split(', '))
         this.commentary = obj.commentary == undefined ? "" : obj.commentary.trim()

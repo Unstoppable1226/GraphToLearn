@@ -76,8 +76,12 @@ export class HttpAPIService {
 		.map((res: Response) => res.json());
 	}
 
+	findFriendBot(pubKey) {
+		return this._http.get(AppSettings.API_STELLAR_FRIENDBOT + pubKey)
+		.map((res: Response) => res.json());
+	}
+
 	postObservatoryMetadata(name, value, idObservatory, secretKey) {
-		console.log('Observatory Metadata')
 		let headers = new Headers({'Content-Type' : 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
 		let options = new RequestOptions({ headers: headers});
 		return this._http.post(AppSettings.API_OBSERVATORYMETADATA  + "secretKey=" + secretKey + "&observatoryId=" + idObservatory + "&metadata%20name=" + name + "&metadata%20value=" + value, " ", options)
@@ -85,7 +89,6 @@ export class HttpAPIService {
 	}
 
 	postEntryMetadata(name, value, hashEntry, secretKey) {
-		console.log('Entry Metadata')
 		let headers = new Headers({'Content-Type' : 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
 		let options = new RequestOptions({ headers: headers});
 		return this._http.post(AppSettings.API_ENTRYMETADATA + "metadata%20name=" + name + "&metadata%20value=" + value, "secretKey=" + secretKey + "&observatoryId=Words&hash=" + hashEntry, options)

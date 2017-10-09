@@ -181,7 +181,7 @@
 		<div *ngIf="!wordFind" style="color:black; margin-top:10%;font-size:2.5em"><i style="font-size: 2.5em" class="search icon"></i><i style="font-size: 1em;margin-left:-5px;margin-top:-10px" class="remove circle icon"></i><br>Aucun mot n'a été trouvé qui correspond à votre recherche</div>
 		<canvas *ngIf="wordFind" id="renderCanvas" style="outline: none;"></canvas>
 	</div>
-	<div *ngIf="user.group != 'Lambda' && wordFind" class="" style="position:fixed;top:180px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
+	<div *ngIf="wordFind && user.group != 'Lambda'" class="" style="position:fixed;top:180px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
 		<button (click)="showModifications()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
 		 data-tooltip="Modifier le terme sélectionné" data-inverted="" data-position="right center">
 			<i class="icon pencil"></i>

@@ -11,7 +11,7 @@ declare var Button: any;
 @Injectable()
 export class Manager3D {
 	private canvas
-	private engine
+	public engine = null
 	private scene
 	private wordSearch : Entry
 	private wordSel : Entry
@@ -30,8 +30,9 @@ export class Manager3D {
 
 	startEngine(nameElement) {
 		this.canvas = document.getElementById(nameElement);
-		this.engine = new BABYLON.Engine(this.canvas, false);
-		
+		if (this.canvas != null) {
+			this.engine = new BABYLON.Engine(this.canvas, false);
+		}
 	}
 
 	createLabel(mesh, position, maxGap) {
@@ -203,6 +204,7 @@ export class Manager3D {
 
 	createScene(wordSearch, tags, wordSel, modules) {
 		this.wordSearch = wordSearch;
+		console.log(this.engine)
 		this.wordSel = wordSel;
 		this.scene = new BABYLON.Scene(this.engine);
 		this.scene.clearColor = new BABYLON.Color4(0, 0, 0, 0.0000000000000001);
@@ -256,7 +258,7 @@ export class Manager3D {
 		let maxGap = this.createPosition();
 		this.putSpheresOnScene(maxGap, label1);
 
-
+		
 		/*let positionX = (Math.floor((Math.random() * (tag.repRule1 * this._format.randomIntFromInterval(-100,100)) + (this._format.randomIntFromInterval(-1,1) * (i*2))) * (this._format.randomIntFromInterval(-1,1) * tag.repRule1)));
 		let positionY = (Math.floor((Math.random() * (tag.repRule1 * this._format.randomIntFromInterval(-100,100)) + (this._format.randomIntFromInterval(-1,1) * (i*2))) * (this._format.randomIntFromInterval(-1,1) * tag.repRule1)));
 		let positionZ = (Math.floor((Math.random() * (tag.repRule1 * this._format.randomIntFromInterval(-100,100)) + (this._format.randomIntFromInterval(-1,1) * (i*2))) * (this._format.randomIntFromInterval(-1,1) * tag.repRule1)));

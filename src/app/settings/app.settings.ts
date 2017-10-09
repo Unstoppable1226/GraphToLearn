@@ -51,6 +51,7 @@ export class AppSettings {
 	//https://fr.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Adresse%20IP&format=json&exintro=1
 
 	public static API_WIKI = "http://fr.wikipedia.org/w/api.php?"
+	public static API_STELLAR_FRIENDBOT = "https://horizon-testnet.stellar.org/friendbot?addr="
 
 	public static API_KEY = "SCD3L76IHDAZRVAY3MH2G3T2UAUMVFIR3I26RLLWEYIJ3EWHLD5G6QP4"
 
@@ -71,12 +72,13 @@ export class AppSettings {
 	public static MSGINCOMPLETED = "Vous n'avez pas renseigner tous les champs requis pour l'insertion des données !";
 	public static MSGWELCOME = "Vous êtes connecté sur GraphToLearn, Bienvenue ";
 	public static MSGMAILSUCCESS = "Votre compte a été créé, vous allez recevoir sous peu vos informations par mail et dès que votre demande d'adhésion est accepté par un membre de la communauté, vous pourrez utiliser l'outil";
-	public static MSG_ERROR_MAIL_EMPTY = "Veuillez renseigner le champ Mail ! ";
+	public static MSG_ERROR_MAIL_EMPTY = "Veuillez renseigner votre email ! ";
+	public static MSG_ERROR_MAIL_INVALID = "L'email saisi est invalide, veuillez insérer un email valide !"
 	public static MSG_ERROR_SECRETKEY_EMPTY = "Veuillez renseigner le champ Secret Key ! ";
 	public static MSG_ERROR_MAIL_TAKEN = "Attention, un utilisateur avec cet email existe déjà !";
 	public static MSG_ERROR_CREATE_USER = "Attention, un problème est survenu lors de la création du compte, veuillez réessayer !";
-	public static MSG_ERROR_LOG_IN = "La secret key donnée est incorrecte !";
-	public static MSG_SUCCESS_MODIFICATION = "La modification a été réalisé avec succès !";
+	public static MSG_ERROR_LOG_IN = "La secret key saisie est incorrecte !";
+	public static MSG_SUCCESS_MODIFICATION = "Les modifications ont été enregistrées avec succès !";
 
 	public static MSG_ERROR_INFO_MODULE_EMPTY = "Veuillez compléter tous les champs requis : N° du module, Nom du module et Objectifs du module"
 	public static MSG_ERROR_NO_MODULE_TAKEN = "Veuillez choisir un autre n° pour l'identifiant du module, car ce dernier a déjà été utilisé !"

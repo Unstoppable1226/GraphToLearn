@@ -21,6 +21,7 @@ declare var $:any; // This is necessary if you want to use jQuery in the app
 export class AppManagerMembers implements OnInit {
 	public allMembers = {};
 	public newMembers = [];
+	public loadingAddMembers = false
 
 	constructor(private _httpService : HttpAPIService, private _format: Formatter, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {
 		this._format.deleteAllModals()
@@ -41,7 +42,7 @@ export class AppManagerMembers implements OnInit {
 		)
 	}
 
-	addMember(i) {
+	addMember(i, all) {
 		let member = {
 			publicKey : this.newMembers[i].publicKey,
 			group : this.newMembers[i].group,
@@ -53,9 +54,26 @@ export class AppManagerMembers implements OnInit {
 		.subscribe(
 			data=> {
 				console.log(data)
-				this.newMembers.splice(i, this.newMembers.length)
+				if (i == this.newMembers.length-1 && all) {
+					this.newMembers.splice(0, this.newMembers.length)
+					this.loadingAddMembers = false
+				}
+				if (!all) {
+					this.newMembers.splice(i, 1)
+				}
+				
+			},
+			error => {
+				this.loadingAddMembers = false;
 			}
 		)
+	}
+
+	acceptAll() {
+		this.loadingAddMembers = true
+		for (let index = 0; index < this.newMembers.length; index++) {
+			this.addMember(index, true)			
+		}
 	}
 
 	refuseMember(i) {
@@ -66,12 +84,12 @@ export class AppManagerMembers implements OnInit {
 			refusedBy : this._userservice.currentUser.mail
 		}
 		this.allMembers[this.newMembers[i].mail] = member
-
+		
 		this._httpService.postEntryJSON(this.allMembers, AppSettings.API_MEMBERS, AppSettings.TAGMEMBERS, this._userservice.currentUser.secretKey)
 			.subscribe(
 				data=> {
 					console.log(data);
-					this.newMembers.splice(i, this.newMembers.length)
+					this.newMembers.splice(i, 1)
 				}
 			)
 			

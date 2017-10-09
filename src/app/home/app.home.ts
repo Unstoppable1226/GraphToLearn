@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { ActivatedRoute } from '@angular/router';
 import { HttpAPIService } from '../api/app.http-service';
@@ -7,6 +7,8 @@ import { Formatter } from '../tools/app.formatter';
 import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 import { AuthService } from '../login/app.authservice';
 import { UserService } from '../model/user-service';
+import { WordsService } from '../model/words-service';
+
 import { EntryCowaboo } from '../model/entrycowaboo';
 import { Comment } from '../model/comment';
 //import { Observable } from 'rxjs/Observable';
@@ -22,7 +24,7 @@ declare var $: any;
 	styleUrls: ['./app.home.css'],
 })
 
-export class AppHome {
+export class AppHome implements OnInit {
 	public id = "";
 	searchWord: string = "";
 	content = [];
@@ -30,15 +32,20 @@ export class AppHome {
 	title = AppSettings.TITLE;
 	timeEstimated = ""
 
-	constructor(private _httpService: HttpAPIService, private _alert : AlertsService, private _format : Formatter, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
+	constructor(private _httpService: HttpAPIService, private _wordsservice : WordsService,  private _alert : AlertsService, private _format : Formatter, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
 		this._format.deleteAllModals()
 		this._userservice.getCurrentUser()
 			.then(
 				resolve => {
-					console.log(resolve)
+					//console.log(resolve)
 				}
 			)
 		
+	}
+	ngOnInit() {
+		this._wordsservice.getWords()
+		this._wordsservice.getModules()
+		this._wordsservice.getUsers()
 	}
 
 	insertWithFile() {
@@ -185,7 +192,9 @@ export class AppHome {
 
 	eventHandler(keyCode) {
 		if (keyCode != 13) {return;}
-		this.moveToSearch(this.searchWord)
+		if (this.searchWord != "") {
+			this.moveToSearch(this.searchWord)
+		}
 	}
 
 	moveToSearch(result) {
@@ -193,6 +202,7 @@ export class AppHome {
 		name = name.replace(/\(/g, AppSettings.OPEN_PARENTHESIS).replace(/\)/g, AppSettings.CLOSE_PARENTHESIS)
 		//name = name.replace(/\s/g,"%20")
 		this._router.navigate(['search/' + name])
+		
 	}
 
 	ngAfterViewInit() {

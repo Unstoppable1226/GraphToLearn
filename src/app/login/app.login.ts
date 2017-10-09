@@ -37,14 +37,15 @@ export class AppLogin implements OnInit {
 	getReputation(publicKey: string, resp, infoMembers) { // Get the stellar coins of the user => his reputation
 		let instance = this;
 		this._httpservice.getUserReputation(publicKey)
-			.subscribe(function (response) {
-				let user = new User();
-				user.mail = resp.email;
-				user.reputation = !response ? 0 : response;
-				user.publicKey = publicKey;
-				user.secretKey = instance.secretKey;
-				user.group = infoMembers.group;
-				user.validated = infoMembers.validated
+		.subscribe(
+			response=> {
+			let user = new User();
+			user.mail = resp.email;
+			user.reputation = !response ? 0 : (response == -10000 ? 0 : response);
+			user.publicKey = publicKey;
+			user.secretKey = instance.secretKey;
+			user.group = infoMembers.group;
+			user.validated = infoMembers.validated
 				instance._httpservice.getEntryJSON(AppSettings.API_SETTINGS)
 				.subscribe(
 					dataSettings => {
@@ -56,8 +57,14 @@ export class AppLogin implements OnInit {
 						instance._alert.create('success', AppSettings.MSGWELCOME + " " + resp.email + " !")
 					}
 				)
-				
-			})
+			},
+			error => {
+				//instance._alert.create('error', AppSettings.MSG_ERROR_LOG_IN)
+				setTimeout(function(){
+					instance.getReputation(publicKey, resp, infoMembers)
+				}, 300)
+			}
+		)
 	}
 
 	initVariables() {
@@ -115,11 +122,10 @@ export class AppLogin implements OnInit {
 								} else {
 									if (dataInfo[mail].validated == false && dataInfo[mail].refusedBy == undefined) {
 										$('.ui.modal').modal('hide');
-										instance._alert.create('info', "Votre compte n'a pas encore été accepté par la communauté, votre demande est en attente et sera traitée lorsqu'un membre l'acceptera !", { duration: 25000 })
+										instance._alert.create('info', "Votre compte n'a pas encore été accepté par la communauté, votre demande est en attente et sera traitée lorsqu'un membre l'acceptera !", { duration: 30000 })
 									} else if (dataInfo[mail].validated == false && dataInfo[mail].refusedBy != undefined) {
 										$('.ui.modal').modal('hide');
-										instance._alert.create('error', "Votre demande d'accès a été refusée", { duration: 25000 })
-										
+										instance._alert.create('error', "Votre demande d'accès a été refusée par : " + dataInfo[mail].refusedBy, { duration: 30000 })
 									} else {
 										$('.ui.modal').modal('hide');
 										instance.loading = true
@@ -151,61 +157,74 @@ export class AppLogin implements OnInit {
 		}
 	}
 
-	launchRegistration() {
-		let instance = this;
-		if (instance.mail.length > 0) {
-			instance.loadingButton = true
-			instance._authservice.join(instance.mail)
+	isEmailValid() {
+		return this._format.validateEmail(this.mail)
+	}
+
+	redirectToHome() {
+		$('.ui.modal').modal('hide')
+		this.loadingButton = false
+		this._alert.create('success', AppSettings.MSGMAILSUCCESS, { duration: 15000 })
+	}
+
+	prepareUser() {
+		this._httpservice.getUsers()
+		.subscribe(
+			users => {
+				this._httpservice.findFriendBot(users.user_list.list[this.mail])
 				.subscribe(
 					data => {
-						instance._httpservice.getEntryJSON(AppSettings.API_MEMBERS)
+						this._httpservice.getEntryJSON(AppSettings.API_MEMBERS)
 						.subscribe(
 							dataMembers => {
 								let dataInfo = JSON.parse(dataMembers.dictionary.entries[Object.keys(dataMembers.dictionary.entries)[0]].value)
-								let mail : string = instance.mail
-			
+								let mail : string = this.mail
+		
 								if (dataInfo[mail] == undefined) {
 									dataInfo[mail] = {
-										publicKey: "",
+										publicKey: users.user_list.list[this.mail],
 										group: AppSettings.RULELAMBDA,
 										validated: false
 									}
-
-									instance._httpservice.postEntryJSON(dataInfo, AppSettings.API_MEMBERS, "members", AppSettings.API_KEY)
+									this._httpservice.postEntryJSON(dataInfo, AppSettings.API_MEMBERS, AppSettings.TAGMEMBERS, AppSettings.API_KEY)
 									.subscribe(
 										datas => {
-											console.log(datas)
-											$('.ui.modal').modal('hide')
-											instance.loadingButton = false
-											instance._alert.create('success', AppSettings.MSGMAILSUCCESS, { duration: 15000 })
+											this.redirectToHome()
 											return true;
 										},
 										error => { }
 									)
 								} else {
-									$('.ui.modal').modal('hide all');
-									instance.loadingButton = false
-									instance._alert.create('success', AppSettings.MSGMAILSUCCESS, { duration: 15000 })
+									this.redirectToHome()
 									return true;
 								}
 							}
 						)
+					}
+				)
+			}
+		)
+	}
+
+	launchRegistration() {
+		let instance = this, isMailNotNull = instance.mail.trim().length > 0, isMailValid = this.isEmailValid()
+		if (isMailNotNull && isMailValid) {
+			instance.loadingButton = true
+			instance._authservice.join(instance.mail)
+				.subscribe(
+					data => {
+						this.prepareUser()
 					},
 					err => {
 						instance.loadingButton = false;
 						instance.errorMail = true;
-						if (err.status == 409) { // User already exists
-							instance.errorTextMail = AppSettings.MSG_ERROR_MAIL_TAKEN
-						} else if (err.status == 500) {
-							instance.errorTextMail = AppSettings.MSG_ERROR_CREATE_USER
-						}
+						instance.errorTextMail = err.status == 409 ? AppSettings.MSG_ERROR_MAIL_TAKEN : AppSettings.MSG_ERROR_CREATE_USER
 					}
 				)
 			return false;
 		} else {
-			console.log(instance.mail)
 			instance.errorMail = true;
-			instance.errorTextMail = AppSettings.MSG_ERROR_MAIL_EMPTY;
+			instance.errorTextMail = isMailNotNull ? AppSettings.MSG_ERROR_MAIL_INVALID : AppSettings.MSG_ERROR_MAIL_EMPTY;
 			return false;
 		}
 	}

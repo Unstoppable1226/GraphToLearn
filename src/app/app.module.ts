@@ -33,6 +33,7 @@ import { AuthGuard } from './login/app.authguard';
 import { AuthService } from './login/app.authservice';
 import { UserService } from './model/user-service';
 import { HistorySearchService } from './model/history-search';
+import { WordsService } from './model/words-service'
 
 @NgModule({
 	declarations: [
@@ -63,6 +64,7 @@ import { HistorySearchService } from './model/history-search';
 		AuthService,
 		UserService,
 		HistorySearchService,
+		WordsService
 	],
 	bootstrap: [AppComponent]
 })

@@ -1,10 +1,11 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { ActivatedRoute } from '@angular/router';
 import { HttpAPIService } from '../api/app.http-service';
 import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
 import { AuthService } from '../login/app.authservice';
+import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { User } from '../model/user'
 import { Feedback } from '../model/feedback'
@@ -12,6 +13,7 @@ import { SettingsReputation } from '../model/settings-reputation'
 import { Proposition } from '../model/proposition'
 import { UserService } from '../model/user-service'
 import { HistorySearchService } from '../model/history-search'
+import { WordsService } from '../model/words-service'
 
 declare var $: any;
 
@@ -21,7 +23,7 @@ declare var $: any;
 	styleUrls: ['../app.component.css'],
 })
 
-export class MenuComponent {
+export class MenuComponent implements OnInit {
 
 	public isConnected
 	public nbNewMembers = 0
@@ -37,34 +39,38 @@ export class MenuComponent {
 	public feedbacks: any
 	public allFeedbacks: Array<Proposition>
 	public modifyFeedback: number
+	public loadingSaveOptions: boolean
 	public loadingAdd: boolean
 	public error: boolean
 	public settingsReputation : SettingsReputation = new SettingsReputation()
 
-	constructor(private _httpService: HttpAPIService, private _format: Formatter, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch: HistorySearchService) {
+	
+
+	constructor(private _httpService: HttpAPIService, private _alert : AlertsService, private _wordsservice : WordsService, private _format: Formatter, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch: HistorySearchService) {}
+
+	ngOnInit() {
 		this.initVariables()
-		_userservice.getCurrentUser()
-			.then(
-				data => { 
-					this.user = this._userservice.currentUser ; 
-					this.init()
-					this._httpService.getEntryJSON(AppSettings.API_MEMBERS)
-					.subscribe(
-						data=> {
-							let entries = JSON.parse(data.dictionary.entries[Object.keys(data.dictionary.entries)[0]].value)
-							let members = [];
-							for (let prop in entries) {
-								if (entries[prop].validated == false && entries[prop].refusedBy == undefined) {
-									entries[prop].mail = prop
-									members.push(entries[prop])
-								}
+		this._userservice.getCurrentUser()
+		.then(
+			data => { 
+				this.user = this._userservice.currentUser ; 
+				this.init()
+				this._httpService.getEntryJSON(AppSettings.API_MEMBERS)
+				.subscribe(
+					data=> {
+						let entries = JSON.parse(data.dictionary.entries[Object.keys(data.dictionary.entries)[0]].value)
+						let members = [];
+						for (let prop in entries) {
+							if (entries[prop].validated == false && entries[prop].refusedBy == undefined) {
+								entries[prop].mail = prop
+								members.push(entries[prop])
 							}
-							this.nbNewMembers = members.length
 						}
-					)
-				}
-			)
-		
+						this.nbNewMembers = members.length
+					}
+				)
+			}
+		)
 	}
 
 	init() {
@@ -113,8 +119,32 @@ export class MenuComponent {
 		this.myFeedback = new Feedback()
 		this.newProposition = "";
 		this.modifyFeedback = -1;
+		this.loadingSaveOptions = false;
 		this.loadingAdd = false;
 		this.error = false;
+	}
+
+	isValidNumber(value, id) {
+		let instance = this;
+		setTimeout(function(){
+			switch (id) {
+				case 1:
+					if(value.repIntegrationEditor>20){value.repIntegrationEditor=20;}else if(value.repIntegrationEditor<1){value.repIntegrationEditor=1;}
+					break;
+				case 2:
+					if(value.repContribution>20){value.repContribution=20;}else if(value.repContribution<1){value.repContribution=1;}
+					break;
+				case 3:
+					if(value.repModify>20){value.repModify=20;}else if(value.repModify<1){value.repModify=1;}
+					break;
+				case 4:
+					if(value.repNew>20){value.repNew=20;}else if(value.repNew<1){value.repNew=1;}	
+					break;
+				case 5:
+					if(value.repRevision>20){value.repRevision=20;}else if(value.repRevision<1){value.repRevision=1;}
+					break;
+			}
+		}, 1)
 	}
 
 	focusProposition() {
@@ -192,6 +222,7 @@ export class MenuComponent {
 	}
 
 	saveOptions() {
+		this.loadingSaveOptions = true
 		AppSettings.COL_SEARCH_TERM = this.colSearchTerm
 		AppSettings.COL_KEY_WORDS = this.colKeyWords
 		AppSettings.COL_MODULE = this.colModule
@@ -205,10 +236,11 @@ export class MenuComponent {
 	
 			this._httpService.postEntryJSON(this.settingsReputation, AppSettings.API_SETTINGS, AppSettings.TAGSETTINGS, this.user.secretKey)
 				.subscribe(
-					res => {console.log(res); this._userservice.currentUser.settingsReputation = this.settingsReputation; $('.ui.modal').modal('hide all')}
-				)		
+					res => {console.log(res); this._userservice.currentUser.settingsReputation = this.settingsReputation; this.loadingSaveOptions = false; this._alert.create('success', AppSettings.MSG_SUCCESS_MODIFICATION); $('.ui.modal').modal('hide all')}
+				)
+		} else {
+			this.loadingSaveOptions = false
 		}
-	
 	}
 
 	searchSelectedWord(word) {
