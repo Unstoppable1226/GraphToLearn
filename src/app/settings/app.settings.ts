@@ -53,7 +53,7 @@ export class AppSettings {
 	public static API_WIKI = "http://fr.wikipedia.org/w/api.php?"
 	public static API_STELLAR_FRIENDBOT = "https://horizon-testnet.stellar.org/friendbot?addr="
 
-	public static API_KEY = "SCD3L76IHDAZRVAY3MH2G3T2UAUMVFIR3I26RLLWEYIJ3EWHLD5G6QP4"
+	public static API_KEY = "SCD3L76IHDAZRVAY3MH2G3T2UAUMVFIR3I26RLLWEYIJ3EWHLD5G6QP4" // This key is used for transactions like give when an entry is added
 
 	/* Colors */
 	public static GREY = "#333";
@@ -79,6 +79,7 @@ export class AppSettings {
 	public static MSG_ERROR_CREATE_USER = "Attention, un problème est survenu lors de la création du compte, veuillez réessayer !";
 	public static MSG_ERROR_LOG_IN = "La secret key saisie est incorrecte !";
 	public static MSG_SUCCESS_MODIFICATION = "Les modifications ont été enregistrées avec succès !";
+	public static MSG_ERROR_MODIFICATION = "Les modifications n'ont pas pu être enregistrées veuillez réassayer !"
 
 	public static MSG_ERROR_INFO_MODULE_EMPTY = "Veuillez compléter tous les champs requis : N° du module, Nom du module et Objectifs du module"
 	public static MSG_ERROR_NO_MODULE_TAKEN = "Veuillez choisir un autre n° pour l'identifiant du module, car ce dernier a déjà été utilisé !"

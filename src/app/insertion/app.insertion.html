@@ -40,15 +40,22 @@
 				<label>Type</label>
 				<div class="ui icon input">
 					<i class="left info icon"></i>
-					<div class="ui fluid selection dropdown input-insert" style="text-align: center">
-						<input type="hidden" name="gender" value="default">
+					<div id="select-types" class="ui fluid selection dropdown insert-input types" style="text-align: center">
+						<input name="types" type="hidden">
 						<i class="dropdown icon"></i>
-						<div class="default text" id="select-types">Type du terme : Acronyme, Expression ou Terme</div>
+						<div class="default text">Sélectionnez les types</div>
 						<div class="menu">
-							<div class="item" data-value="default">Aucun</div>
-							<div class="item" *ngFor="let type of types; let i = index" data-value="{i}">{{type.value}}</div>
 						</div>
 					</div>
+				</div>
+			</div>
+			<br>
+			<div *ngIf="showDefinition" class="field icon">
+				<label>Définition pour l'acronyme</label>
+				<div class="ui icon input">
+					<i class="left info icon"></i>
+					<input class="input-insert" style="text-align: center" [(ngModel)]="definition" [ngModelOptions]="{standalone: true}" type="text"
+					 placeholder="AAA, Module, ...">
 				</div>
 			</div>
 
@@ -58,14 +65,7 @@
 				<textarea class="input-insert" [(ngModel)]="meaning" [ngModelOptions]="{standalone: true}" rows="3" style="text-align: left!important"></textarea>
 			</div>
 
-			<div class="field icon">
-				<label>Définition (Seulement si Acronyme)</label>
-				<div class="ui icon input">
-					<i class="left info icon"></i>
-					<input class="input-insert" style="text-align: center" [(ngModel)]="definition" [ngModelOptions]="{standalone: true}" type="text"
-					 placeholder="AAA, Module, ...">
-				</div>
-			</div>
+			
 
 			<div class="field icon required">
 				<label>Source</label>
@@ -138,7 +138,7 @@
 				<div class="ui icon input">
 					<div class="ui icon input">
 						<i class="left info icon"></i>
-						<div class="ui fluid selection dropdown input-insert" style="text-align: center">
+						<div class="ui fluid selection dropdown input-insert context" style="text-align: center">
 							<input type="hidden" name="gender" value="default">
 							<i class="dropdown icon"></i>
 							<div class="default text" id="select-context">Sécurité, Juridique, ...</div>

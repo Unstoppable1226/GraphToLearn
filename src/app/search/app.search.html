@@ -3,10 +3,10 @@
 <div style="width: 100%;text-align: center!important;">
 	<div style="background-color:#1B1C1D;height: 45px;width: 500px;position: fixed;top: 56px;right: 0px;color: #eee;font-weight: bold;border-radius: 5px;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;">
 		<div style="margin-top:3px">Légende</div>
-		<div [ngStyle]="{'background-color': col1}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Terme recherché</span>
-		<div [ngStyle]="{'background-color': col2}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Mot clé</span>
-		<div [ngStyle]="{'background-color': col3}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Module</span>
-		<div [ngStyle]="{'background-color': col4}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Autres termes</span>
+		<div [ngStyle]="{'background-color': user.settingsGeneral.colSearchTerm}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Terme recherché</span>
+		<div [ngStyle]="{'background-color': user.settingsGeneral.colKeyWords}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Mot clé</span>
+		<div [ngStyle]="{'background-color': user.settingsGeneral.colModule}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Module</span>
+		<div [ngStyle]="{'background-color': user.settingsGeneral.colOtherTerms}" style="width:12px; height: 12px; border-radius:12px; display: inline-block;margin-right: 6px"></div><span style="font-size:0.9em; margin-right: 12px">Autres termes</span>
 	</div>
 
 	<div></div>
@@ -179,7 +179,7 @@
 
 		<br>
 		<div *ngIf="!wordFind" style="color:black; margin-top:10%;font-size:2.5em"><i style="font-size: 2.5em" class="search icon"></i><i style="font-size: 1em;margin-left:-5px;margin-top:-10px" class="remove circle icon"></i><br>Aucun mot n'a été trouvé qui correspond à votre recherche</div>
-		<canvas *ngIf="wordFind" id="renderCanvas" style="outline: none;"></canvas>
+		<canvas *ngIf="wordFind" id="renderCanvas" style="outline: none;user-select: none !important;"></canvas>
 	</div>
 	<div *ngIf="wordFind && user.group != 'Lambda'" class="" style="position:fixed;top:180px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
 		<button (click)="showModifications()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
@@ -208,13 +208,13 @@
 			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;"><span style="font-size: 1.1em!important;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">{{wordSel.meaning}} [Source : {{wordSel.source}}]</span></li>
 		</ul>
 	</div>
-	<div *ngIf="wordFind" class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
+	<div *ngIf="wordFind"  class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
 		 (click)="hideOrShow($event, 3)">Espace commentaires et révisions
 			<div class="not-active" style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedComments, 'plus': collapsedComments}"></i></div>
 		</div>
 		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
-		<ul class="collapse" style="height: auto;">
+		<ul id="commentsAndRevisions" class="collapse" style="height: auto;">
 			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;">
 				<div class="ui comments" [ngClass]="{'loading': loadingAddComment}" style="max-height: 300px; overflow: auto">
 					<div class="ui dimmer" [ngClass]="{'active': loadingAddComment}">
@@ -246,7 +246,7 @@
 			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;">
 				<div class="ui form">
 					<div class="field">
-						<textarea rows="2" [(ngModel)]="newComment" [ngModelOptions]="{standalone: true}" placeholder="Écriver un commentaire"></textarea>
+						<textarea id="newComment" rows="2" [(ngModel)]="newComment" [ngModelOptions]="{standalone: true}" placeholder="Écriver un commentaire"></textarea>
 					</div>
 					<div class="ui blue fluid labeled submit icon button" [ngClass]="{'loading': loadingAddComment}" (click)="addComment()">
 						<i class="icon comment"></i> Ajouter commentaire
@@ -333,7 +333,7 @@
 							<div id="select-types" class="ui fluid selection dropdown insert-input" style="text-align: center">
 								<input name="types" type="hidden">
 								<i class="dropdown icon"></i>
-								<div class="default text">Sélectionnez les modules</div>
+								<div class="default text">Sélectionnez les types</div>
 								<div class="menu">
 								</div>
 							</div>

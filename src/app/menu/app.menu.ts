@@ -10,6 +10,7 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from
 import { User } from '../model/user'
 import { Feedback } from '../model/feedback'
 import { SettingsReputation } from '../model/settings-reputation'
+import { SettingsGeneral } from '../model/settings-general'
 import { Proposition } from '../model/proposition'
 import { UserService } from '../model/user-service'
 import { HistorySearchService } from '../model/history-search'
@@ -42,7 +43,8 @@ export class MenuComponent implements OnInit {
 	public loadingSaveOptions: boolean
 	public loadingAdd: boolean
 	public error: boolean
-	public settingsReputation : SettingsReputation = new SettingsReputation()
+	public settingsReputation : SettingsReputation
+	public settingsGeneral : SettingsGeneral
 
 	
 
@@ -53,7 +55,8 @@ export class MenuComponent implements OnInit {
 		this._userservice.getCurrentUser()
 		.then(
 			data => { 
-				this.user = this._userservice.currentUser ; 
+				this.user = this._userservice.currentUser ;
+				this.settingsGeneral = this._userservice.currentUser.settingsGeneral;
 				this.init()
 				this._httpService.getEntryJSON(AppSettings.API_MEMBERS)
 				.subscribe(
@@ -74,7 +77,7 @@ export class MenuComponent implements OnInit {
 	}
 
 	init() {
-		this.historySearch = this._historysearch.getLastSearches()
+		//this.historySearch = this._historysearch.getLastSearches()
 		this._httpService.getEntryJSON(AppSettings.API_FEEDBACK)
 			.subscribe(
 			data => {
@@ -116,6 +119,8 @@ export class MenuComponent implements OnInit {
 		this.historySearch = []
 		this.feedbacks = []
 		this.allFeedbacks = []
+		this.settingsReputation = new SettingsReputation()
+		this.settingsGeneral = new SettingsGeneral()
 		this.myFeedback = new Feedback()
 		this.newProposition = "";
 		this.modifyFeedback = -1;
@@ -223,24 +228,41 @@ export class MenuComponent implements OnInit {
 
 	saveOptions() {
 		this.loadingSaveOptions = true
-		AppSettings.COL_SEARCH_TERM = this.colSearchTerm
-		AppSettings.COL_KEY_WORDS = this.colKeyWords
-		AppSettings.COL_MODULE = this.colModule
-		AppSettings.COL_OTHER_TERMS = this.colOtherTerms
-		if (this._userservice.currentUser.group == AppSettings.RULEADMINISTRATOR) {
-			this.settingsReputation.repIntegrationEditor = Number(this.settingsReputation.repIntegrationEditor)
-			this.settingsReputation.repContribution = Number(this.settingsReputation.repContribution)
-			this.settingsReputation.repNew = Number(this.settingsReputation.repNew)
-			this.settingsReputation.repModify = Number(this.settingsReputation.repModify)
-			this.settingsReputation.repRevision = Number(this.settingsReputation.repRevision)
-	
-			this._httpService.postEntryJSON(this.settingsReputation, AppSettings.API_SETTINGS, AppSettings.TAGSETTINGS, this.user.secretKey)
+		this._userservice.currentUser.settingsGeneral = this.settingsGeneral
+		this._httpService.getEntryJSON(AppSettings.API_MEMBERS)
+		.subscribe(
+			users => {
+				let props = Object.keys(users.dictionary.entries)
+				let allUsers = JSON.parse(users.dictionary.entries[props[0]].value)
+				allUsers[this._userservice.currentUser.mail].settingsGeneral = this.settingsGeneral
+				this._httpService.postEntryJSON(allUsers, AppSettings.API_MEMBERS, AppSettings.TAGMEMBERS, this._userservice.currentUser.secretKey)
 				.subscribe(
-					res => {console.log(res); this._userservice.currentUser.settingsReputation = this.settingsReputation; this.loadingSaveOptions = false; this._alert.create('success', AppSettings.MSG_SUCCESS_MODIFICATION); $('.ui.modal').modal('hide all')}
+					data=> {
+						console.log(data)
+						if (this._userservice.currentUser.group == AppSettings.RULEADMINISTRATOR) {
+							this.settingsReputation.repIntegrationEditor = Number(this.settingsReputation.repIntegrationEditor)
+							this.settingsReputation.repContribution = Number(this.settingsReputation.repContribution)
+							this.settingsReputation.repNew = Number(this.settingsReputation.repNew)
+							this.settingsReputation.repModify = Number(this.settingsReputation.repModify)
+							this.settingsReputation.repRevision = Number(this.settingsReputation.repRevision)
+							
+							this._httpService.postEntryJSON(this.settingsReputation, AppSettings.API_SETTINGS, AppSettings.TAGSETTINGS, this.user.secretKey)
+							.subscribe(
+								res => {console.log(res); this._userservice.currentUser.settingsReputation = this.settingsReputation; this.loadingSaveOptions = false; this._alert.create('success', AppSettings.MSG_SUCCESS_MODIFICATION); $('.ui.modal').modal('hide all')}
+							)
+						} else {
+							this.loadingSaveOptions = false
+						}
+					},
+					error=> {
+						this.loadingSaveOptions = false; this._alert.create('error', AppSettings.MSG_ERROR_MODIFICATION)
+					}
 				)
-		} else {
-			this.loadingSaveOptions = false
-		}
+			}, 
+			error => {
+				this.loadingSaveOptions = false; this._alert.create('error', AppSettings.MSG_ERROR_MODIFICATION);
+			}
+		)
 	}
 
 	searchSelectedWord(word) {

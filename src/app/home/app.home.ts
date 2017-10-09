@@ -91,9 +91,10 @@ export class AppHome implements OnInit {
 			if (data == undefined) {
 				alert('Attention data doit être le premier objet présent')
 			} else {
+				$('#modalInsertion').modal('hide');
 				instance._alert.create('error', "Cette fonctionnalitée a été désactivée, car elle est encore dans l'état expérimentale");
 				console.log('expérimental')
-				return;
+				
 				/*instance._httpService.getEntryJSON(AppSettings.API_WORDS)
 					.subscribe(function(res){
 						let words = res.dictionary.entries

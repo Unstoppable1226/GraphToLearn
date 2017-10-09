@@ -8,7 +8,7 @@ import { AppSettings } from '../settings/app.settings';
 import { Formatter } from '../tools/app.formatter';
 import { Manager3D } from '../3D/app.components3d'
 import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
-import { WordsService} from '../model/words-service';
+import { WordsService } from '../model/words-service';
 
 import { Entry } from '../model/entry'
 import { EntryCowaboo } from '../model/entrycowaboo'
@@ -58,10 +58,10 @@ export class AppSearch implements OnInit {
 	private allModules = []
 	private modulesOfWord = {}
 	private totalPoints = 0
-	public col1 = AppSettings.COL_SEARCH_TERM
-	public col2 = AppSettings.COL_KEY_WORDS
-	public col3 = AppSettings.COL_MODULE
-	public col4 = AppSettings.COL_OTHER_TERMS
+	public col1
+	public col2
+	public col3
+	public col4
 
 	public newModule = false;
 	public nameTaken = false;
@@ -107,7 +107,7 @@ export class AppSearch implements OnInit {
 
 
 
-	constructor(private _route: ActivatedRoute, private _wordsservice : WordsService, private _router: Router, private _alert: AlertsService, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch: HistorySearchService) {
+	constructor(private _route: ActivatedRoute, private _wordsservice: WordsService, private _router: Router, private _alert: AlertsService, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch: HistorySearchService) {
 		this._format.deleteAllModals()
 		this.user = new User()
 		this.lastModifItem = new EntryCowaboo("", "", "", "", "", "", "", "", "", "", "", [], [], false, "")
@@ -115,17 +115,17 @@ export class AppSearch implements OnInit {
 		this._manager3d = new Manager3D(this._format)
 	}
 
-	initializeAll(){
+	initializeAll() {
 		let instance = this;
 		if (instance._wordsservice.modules == null) {
 			instance._httpservice.getEntryJSON(AppSettings.API_MODULES)
-			.subscribe(function (modules) {
-				instance._wordsservice.modules = modules
-				let obj = modules.dictionary.entries;
-				for (let prop in obj) {
-					instance.allModules.push(JSON.parse(obj[prop].value))
-				}
-			})
+				.subscribe(function (modules) {
+					instance._wordsservice.modules = modules
+					let obj = modules.dictionary.entries;
+					for (let prop in obj) {
+						instance.allModules.push(JSON.parse(obj[prop].value))
+					}
+				})
 			this._wordsservice.getUsers()
 		} else {
 			let obj = instance._wordsservice.modules.dictionary.entries;
@@ -133,7 +133,7 @@ export class AppSearch implements OnInit {
 				instance.allModules.push(JSON.parse(obj[prop].value))
 			}
 		}
-		
+
 		instance.user = instance._userservice.currentUser
 		instance._route.params.subscribe(routeParams => {
 			instance.id = routeParams.id;
@@ -143,16 +143,16 @@ export class AppSearch implements OnInit {
 			if (instance.id != undefined) {
 				if (instance._wordsservice.words == null) {
 					instance._httpservice.getEntryJSON(AppSettings.API_WORDS)
-					.subscribe(
+						.subscribe(
 						response => {
 							instance._wordsservice.words = response
 							instance.initializeWordSearch(instance, response)
 						}
-					)
+						)
 				} else {
 					instance.initializeWordSearch(instance, instance._wordsservice.words)
 				}
-				
+
 			}
 		})
 	}
@@ -161,7 +161,7 @@ export class AppSearch implements OnInit {
 		let instance = this;
 		if (this._userservice.currentUser == undefined) {
 			this._userservice.getCurrentUser().then(
-				(res : User) => {
+				(res: User) => {
 					this._userservice.currentUser = res;
 					this.user = this._userservice.currentUser
 					this.initializeAll()
@@ -173,7 +173,9 @@ export class AppSearch implements OnInit {
 		}
 	}
 	focusAddComment() {
-
+		$('#commentsAndRevisions').removeClass('collapse')
+		$('#newComment').focus()
+		this.collapsedComments = false;
 	}
 
 	refresh() {
@@ -190,10 +192,10 @@ export class AppSearch implements OnInit {
 		this.collapsedActions = false;
 		this.modulesOfWord = {}
 		this.totalPoints = 0
-		this.col1 = AppSettings.COL_SEARCH_TERM
-		this.col2 = AppSettings.COL_KEY_WORDS
-		this.col3 = AppSettings.COL_MODULE
-		this.col4 = AppSettings.COL_OTHER_TERMS
+		this.col1 = this.user.settingsGeneral.colSearchTerm
+		this.col2 = this.user.settingsGeneral.colKeyWords
+		this.col3 = this.user.settingsGeneral.colModule
+		this.col4 = this.user.settingsGeneral.colOtherTerms
 		this.allModules = []
 		this.dictionary = []
 		this.contextEntrys = []
@@ -233,7 +235,7 @@ export class AppSearch implements OnInit {
 								let amount: number = Number(this._userservice.currentUser.settingsReputation.repContribution) - (0.25 * this.wordSel.updates.length)
 								this._httpservice.postBalance(this._userservice.currentUser.publicKey, this._userservice.currentUser.secretKey, data.user_list.list[this.wordSel.author.name], amount)
 									.subscribe(function (balance) {
-										if (balance) {instance._userservice.currentUser.reputation -= amount}
+										if (balance) { instance._userservice.currentUser.reputation -= amount }
 									})
 							},
 							error => { }
@@ -376,7 +378,7 @@ export class AppSearch implements OnInit {
 					objInsert.timestamp = this._format.formatDate(obj[prop].date)
 					objInsert.timestampCreation = this._format.getDate(obj[prop].date);
 					objInsert.author = { name: obj[prop].author, search: "" };
-					this.allUsers[obj[prop].author] = {publicKey: this._wordsservice.users.user_list.list[obj[prop].author], reputation : 0}
+					this.allUsers[obj[prop].author] = { publicKey: this._wordsservice.users.user_list.list[obj[prop].author], reputation: 0 }
 					element.allterms.push(objInsert)
 				}
 			}
@@ -405,13 +407,14 @@ export class AppSearch implements OnInit {
 			word = JSON.parse(obj[prop].value)
 			if ((tag.trim().toLowerCase() == "||" + instance.id.trim().toLowerCase() + "||") || (word.name.trim().toLowerCase() == instance.id.trim().toLowerCase())) {
 				this.wordFind = true;
-				
+
 				/* Il faudrait mettre à jour un compteur pour la recherche */
 				let nbSearch: number = Number(obj[prop].conf.searchClick)
-				nbSearch += 1
 
+				if (isNaN(nbSearch)) {nbSearch = 0}
+				nbSearch += 1
 				instance._httpservice.postEntryMetadata(AppSettings.API_METASEARCHCLICK, nbSearch, prop, instance._userservice.currentUser.secretKey) // Put searchClick to 0
-				.subscribe(function (resp) { console.log(resp) });
+					.subscribe(function (resp) { console.log(resp) });
 
 				instance.hashWordSel = prop;
 
@@ -424,10 +427,10 @@ export class AppSearch implements OnInit {
 				instance.wordSearch.searchClick = nbSearch
 				instance.wordSearch.timestamp = instance._format.formatDate(obj[prop].date);
 				instance.wordSearch.timestampCreation = instance._format.getDate(obj[prop].date);
-				instance.wordSearch.author = { name: obj[prop].author, search: ""};
+				instance.wordSearch.author = { name: obj[prop].author, search: "" };
 
-				
-				instance.allUsers[obj[prop].author] = {publicKey: instance._wordsservice.users.user_list.list[obj[prop].author], reputation : 0}
+
+				instance.allUsers[obj[prop].author] = { publicKey: instance._wordsservice.users.user_list.list[obj[prop].author], reputation: 0 }
 
 				var term = instance.constructLikeDislike(obj[prop].conf.like, 0, instance.wordSearch)
 				instance.wordSearch = instance.constructLikeDislike(obj[prop].conf.dislike, 1, term)
@@ -442,10 +445,10 @@ export class AppSearch implements OnInit {
 				}
 
 				console.log(response)
-				
+
 				instance.getAllWordsOfModules(response)
 				instance.createContext(instance.wordSearch);
-				
+
 				let tab: Array<string> = []
 				/*
 				instance.updateHistorySearch
@@ -472,7 +475,7 @@ export class AppSearch implements OnInit {
 						error => { }
 					)
 				*/
-				
+
 
 				return;
 			}
@@ -553,7 +556,7 @@ export class AppSearch implements OnInit {
 	ngAfterViewInit() {
 		this._manager3d.startEngine('renderCanvas');
 		if (this.allEntries != undefined) {
-			this._manager3d.createScene(this.wordSearch, this.allEntries, this.wordSel, this.modulesOfWord);
+			this._manager3d.createScene(this.wordSearch, this.allEntries, this.wordSel, this.modulesOfWord, this.user);
 			this._manager3d.runRender();
 		}
 
@@ -828,8 +831,8 @@ export class AppSearch implements OnInit {
 				element = entry.modulesReputation[index];
 				if (moduleName.trim() == element.id.id.trim()) {
 					obj = { nbDays: 0, reputation: 0 }
-					if (entry.updates[entry.updates.length-1] != undefined) {
-						obj = this.getTimestamp(entry.updates[entry.updates.length-1].timestamp, today, AppSettings.COEFRULES[3])
+					if (entry.updates[entry.updates.length - 1] != undefined) {
+						obj = this.getTimestamp(entry.updates[entry.updates.length - 1].timestamp, today, AppSettings.COEFRULES[3])
 						element.repRule4 = obj.reputation
 					}
 				}
@@ -983,7 +986,7 @@ export class AppSearch implements OnInit {
 
 
 	createContext(wordSearch) {
-		
+
 		let today = moment()
 		let instance = this;
 		var allEntries: Array<Entry> = []
@@ -1015,7 +1018,7 @@ export class AppSearch implements OnInit {
 			this.createRep6(el.id, allEntries)
 		}
 
-		
+
 		this.countTotalReputationForModule(allEntries)
 
 
@@ -1039,16 +1042,16 @@ export class AppSearch implements OnInit {
 		}, 2500);*/
 
 		if (instance._manager3d.engine != null) {
-			instance._manager3d.createScene(wordSearch, allEntries, instance.wordSel, instance.modulesOfWord);
+			instance._manager3d.createScene(wordSearch, allEntries, instance.wordSel, instance.modulesOfWord, this.user);
 			instance._manager3d.runRender();
 		}
-		setTimeout(function() {
+		setTimeout(function () {
 			instance.loading = false;
 		}, 1);
-		
+
 		/*
 		instance._manager3d.startEngine('renderCanvas');*/
-		
+
 		//console.log('#popupKeywords')
 		/*
 		
@@ -1262,7 +1265,6 @@ export class AppSearch implements OnInit {
 				for (let prop in obj) { table.push(table == instance.modules ? JSON.parse(obj[prop].value) : obj[prop]); }
 				if (table == instance.modules) {
 					instance.getModulesValues()
-
 				}
 			},
 		)
@@ -1270,6 +1272,10 @@ export class AppSearch implements OnInit {
 
 	ngOnInit() {
 		this.loading = true;
+		this.col1 = this.user.settingsGeneral.colSearchTerm
+		this.col2 = this.user.settingsGeneral.colKeyWords
+		this.col3 = this.user.settingsGeneral.colModule
+		this.col4 = this.user.settingsGeneral.colOtherTerms
 		this.onCreate();
 		let instance = this;
 		instance.types.splice(0, instance.types.length);

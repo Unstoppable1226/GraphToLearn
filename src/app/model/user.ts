@@ -1,4 +1,6 @@
 import { SettingsReputation } from '../model/settings-reputation'
+import { SettingsGeneral } from '../model/settings-general'
+
 export class User {
 	mail: string
 	reputation: number
@@ -8,6 +10,7 @@ export class User {
 	validated : boolean
 	group : string
 	settingsReputation
+	settingsGeneral
 
 	constructor() {
 		this.mail = ""
@@ -18,5 +21,6 @@ export class User {
 		this.validated = false
 		this.group = ""
 		this.settingsReputation = new SettingsReputation()
+		this.settingsGeneral = new SettingsGeneral()
 	}
 }

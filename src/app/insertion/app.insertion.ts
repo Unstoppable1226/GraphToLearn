@@ -30,7 +30,7 @@ export class AppInsertion implements OnInit{
 
 	public nameChosen = false;
 	public nameChosenModule = false;
-
+	public showDefinition = false;
 	public loadingAddModule = false;
 	public newModuleObj : any= {id: "", name:"", goals: ""}
 
@@ -62,6 +62,7 @@ export class AppInsertion implements OnInit{
 	constructor(private _httpService : HttpAPIService, private _format : Formatter, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {}
 
 	ngOnInit() {
+		
 		this._format.deleteAllModals()
 		this._userservice.getCurrentUser()
 		console.log(this._historysearch.getLastSearches())
@@ -69,13 +70,16 @@ export class AppInsertion implements OnInit{
 		instance.types.splice(0,instance.types.length);
 		instance.contexts.splice(0,instance.contexts.length);
 		instance.modules.splice(0,instance.contexts.length);
+		instance.types.push({ name: 'Aucun', value: 'Aucun', selected: true })
 		this.getData(AppSettings.API_TYPES, instance.types); // Get the data of types
 		this.getData(AppSettings.API_CONTEXT, instance.contexts); // Get the data of contexts
 		this.getData(AppSettings.API_MODULES, instance.modules); // Get the data of contexts
 	}
 
 	ngAfterViewInit(){
-		$('.ui.dropdown').dropdown();
+		let instance = this;
+		console.log(this.types)
+		$('.ui.dropdown.context').dropdown();
 		$('.ui.dropdown.multiple').dropdown({allowAdditions: true,});
 		this.isUnique(0, '#wordInfo', 'name');
 	}
@@ -173,8 +177,23 @@ export class AppInsertion implements OnInit{
 		this._httpService.getEntryJSON(observatory).subscribe(
 			response => {
 				let obj = response.dictionary.entries;
+				
 				for (let prop in obj){ table.push(isModules ? JSON.parse(obj[prop].value) : obj[prop]);}
 				if (isModules) {instance.getModulesValues()}
+				if (table == instance.types) {
+					for (var index = 0; index < instance.types.length; index++) {
+						var element = instance.types[index];
+						element.name = element.value
+						element.selected = false;
+					}
+					$('#select-types').dropdown({ values: instance.types })
+					$('#select-types').dropdown('set selected', 'Aucun')
+					$('#select-types').dropdown({action : function(text, value, element){
+						$('#select-types').dropdown('set selected', value)
+						$('#select-types').dropdown('hide')
+						instance.showDefinition = (text == 'Acronyme')
+					}});
+				}
 			},
 			error => { console.log(error) }
 		)
@@ -203,7 +222,7 @@ export class AppInsertion implements OnInit{
 			
 			let modules = this.newModules.split(',');
 			let modulesNotNew = $('.ui.dropdown.multiple').dropdown('get value');
-			let type = $('#select-types').text() == "Aucun" ? "" :  $('#select-types').text()
+			let type = $('#select-types').dropdown('get value') == "Aucun" ? "" :  $('#select-types').dropdown('get value')
 			let context = $('#select-context').text() == "Aucun" ? "" : $('#select-context').text()
 			
 			let dataInfo = new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, "", tags, "", this._format.getTodayTimestamp(), [], [], false, "")

@@ -273,23 +273,23 @@
 			<form class="ui form" [ngClass]="{'loading': loadingSaveOptions}">
 				<div class="field">
 					<label>Terme recherché : </label>
-					<input type="text" [(ngModel)]="colSearchTerm" [ngModelOptions]="{standalone: true}" name="search-term" placeholder="Couleur ..."
-					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': colSearchTerm}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
+					<input type="text" [(ngModel)]="settingsGeneral.colSearchTerm" [ngModelOptions]="{standalone: true}" name="search-term" placeholder="Couleur ..."
+					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colSearchTerm}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
 				</div>
 				<div class="field">
 					<label>Mots clés: </label>
-					<input type="text" [(ngModel)]="colKeyWords" [ngModelOptions]="{standalone: true}" name="key-word" placeholder="Couleur ..."
-					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': colKeyWords}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
+					<input type="text" [(ngModel)]="settingsGeneral.colKeyWords" [ngModelOptions]="{standalone: true}" name="key-word" placeholder="Couleur ..."
+					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colKeyWords}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
 				</div>
 				<div class="field">
 					<label>Module : </label>
-					<input type="text" [(ngModel)]="colModule" [ngModelOptions]="{standalone: true}" name="module" placeholder="Couleur ..."
-					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': colModule}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
+					<input type="text" [(ngModel)]="settingsGeneral.colModule" [ngModelOptions]="{standalone: true}" name="module" placeholder="Couleur ..."
+					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colModule}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
 				</div>
 				<div class="field">
 					<label>Autres termes : </label>
-					<input type="text" [(ngModel)]="colOtherTerms" [ngModelOptions]="{standalone: true}" name="other-terms" placeholder="Couleur ..."
-					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': colOtherTerms}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
+					<input type="text" [(ngModel)]="settingsGeneral.colOtherTerms" [ngModelOptions]="{standalone: true}" name="other-terms" placeholder="Couleur ..."
+					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colOtherTerms}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
 				</div>
 
 			</form>

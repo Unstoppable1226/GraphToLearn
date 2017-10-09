@@ -35,10 +35,11 @@ export class Manager3D {
 		}
 	}
 
-	createLabel(mesh, position, maxGap) {
+	createLabel(mesh, position, maxGap, user) {
 
 		var materialSphere1 = new BABYLON.StandardMaterial("texture1", this.scene);
-		materialSphere1.diffuseColor = new BABYLON.Color3.FromHexString(AppSettings.COLORSSPHERES[maxGap - position]);
+		//AppSettings.COLORSSPHERES[maxGap - position]
+		materialSphere1.diffuseColor = new BABYLON.Color3.FromHexString(user.settingsGeneral.colOtherTerms);
 		mesh.material = materialSphere1
 
 		var label = new BABYLON.GUI.Rectangle("label" + mesh.name);
@@ -168,7 +169,7 @@ export class Manager3D {
 	}
 	
 
-	putSpheresOnScene(maxGap, label1) {
+	putSpheresOnScene(maxGap, label1, user) {
 		let space = 10, sphere, tag, minX, maxX, line;
 		for (let i = 0; i <= this.spheres.length - 1; i++) {
 			tag = this.spheres[i].tag;
@@ -186,7 +187,7 @@ export class Manager3D {
 			sphere.position.y = this._format.randomIntFromInterval(-minX, minX)
 			sphere.position.z = this._format.randomIntFromInterval(-minX, minX)
 
-			this.createLabel(sphere, tag.position, maxGap);
+			this.createLabel(sphere, tag.position, maxGap, user);
 			this.registerAction(sphere, tag);
 
 			line = new BABYLON.GUI.Line('line' + tag.name);
@@ -202,7 +203,7 @@ export class Manager3D {
 		}
 	}
 
-	createScene(wordSearch, tags, wordSel, modules) {
+	createScene(wordSearch, tags, wordSel, modules, user) {
 		this.wordSearch = wordSearch;
 		console.log(this.engine)
 		this.wordSel = wordSel;
@@ -229,7 +230,7 @@ export class Manager3D {
 			var sphere = BABYLON.Mesh.CreateSphere(element.id, 80.0, 25 , this.scene);
 			var label = new BABYLON.GUI.Rectangle("label" + sphere.name);
 			this.lines.push(label);
-			this.createMainMesh(sphere, label, (-50 * Object.keys(modules).length + (i * 100)), 50, AppSettings.COL_MODULE);
+			this.createMainMesh(sphere, label, (-50 * Object.keys(modules).length + (i * 100)), 50, user.settingsGeneral.colModule);
 			var line = new BABYLON.GUI.Line('line' + element.name);
 			
 			line.alpha = 1;
@@ -243,7 +244,7 @@ export class Manager3D {
 		}
 		
 
-		this.createMainMesh(sphere1, label1, 0, 15, AppSettings.COL_SEARCH_TERM);
+		this.createMainMesh(sphere1, label1, 0, 15, user.settingsGeneral.colSearchTerm);
 
 		
 		for (var cpt = tags.length - 1; cpt >= 0; cpt--) {
@@ -256,7 +257,7 @@ export class Manager3D {
 		}
 
 		let maxGap = this.createPosition();
-		this.putSpheresOnScene(maxGap, label1);
+		this.putSpheresOnScene(maxGap, label1, user);
 
 		
 		/*let positionX = (Math.floor((Math.random() * (tag.repRule1 * this._format.randomIntFromInterval(-100,100)) + (this._format.randomIntFromInterval(-1,1) * (i*2))) * (this._format.randomIntFromInterval(-1,1) * tag.repRule1)));

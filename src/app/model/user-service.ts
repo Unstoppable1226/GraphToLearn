@@ -57,16 +57,17 @@ export class UserService  {
 								let mail : string = response.email
 								instance.currentUser.group = dataInfo[mail].group
 								instance.currentUser.validated = dataInfo[mail].validated
+								if (dataInfo[mail].settingsGeneral != undefined) {instance.currentUser.settingsGeneral = dataInfo[mail].settingsGeneral}
 								instance.getReputation(response.publicAddress)
 								.subscribe(function(resp){
 									instance._httpservice.getEntryJSON(AppSettings.API_SETTINGS)
-										.subscribe(
-											dataSettings => {
-												instance.currentUser.settingsReputation = JSON.parse(dataSettings.dictionary.entries[Object.keys(dataSettings.dictionary.entries)[0]].value)
-												instance.currentUser.reputation = !resp ? 0 : resp;
-												resolve(instance.currentUser);
-											}
-										)
+									.subscribe(
+										dataSettings => {
+											instance.currentUser.settingsReputation = JSON.parse(dataSettings.dictionary.entries[Object.keys(dataSettings.dictionary.entries)[0]].value)
+											instance.currentUser.reputation = !resp ? 0 : resp;
+											resolve(instance.currentUser);
+										}
+									)
 									
 								})
 							}

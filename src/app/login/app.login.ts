@@ -46,6 +46,7 @@ export class AppLogin implements OnInit {
 			user.secretKey = instance.secretKey;
 			user.group = infoMembers.group;
 			user.validated = infoMembers.validated
+			if (infoMembers.settingsGeneral != undefined) {user.settingsGeneral = infoMembers.settingsGeneral}
 				instance._httpservice.getEntryJSON(AppSettings.API_SETTINGS)
 				.subscribe(
 					dataSettings => {
