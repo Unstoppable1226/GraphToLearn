@@ -72,7 +72,11 @@ export class MenuComponent implements OnInit {
 								members.push(entries[prop])
 							}
 						}
-						this.nbNewMembers = members.length
+						this._httpService.getEntryJSON(AppSettings.API_REQUESTS)
+						.subscribe(
+							requests => {this.nbNewMembers = (Object.keys(requests.dictionary.entries).length + members.length)}
+						)
+						
 					}
 				)
 			}, error => {

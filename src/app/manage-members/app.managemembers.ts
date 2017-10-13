@@ -8,6 +8,8 @@ import { Formatter } from '../tools/app.formatter';
 
 import { Entry } from '../model/entry'
 import { User } from '../model/user'
+import { Request } from '../model/request'
+import { RequestType } from '../model/request-type'
 import { UserService } from '../model/user-service';
 import { HistorySearchService } from '../model/history-search';
 
@@ -27,6 +29,7 @@ export class AppManagerMembers implements OnInit {
 	public numberLambda : number = 0
 	public allMembers = {};
 	public allMembersArray = [];
+	public allRequests = [];
 	public newMembers = [];
 	public loadingAddMembers = false
 	public loadingModifyRule = false
@@ -154,8 +157,44 @@ export class AppManagerMembers implements OnInit {
 		
 	}
 
+	acceptRequest(index, request) {
+		console.log(request)
+		if (request.type == 1) {
+			this.allMembers[request.user].group = request.content
+			this._httpService.postEntryJSON(this.allMembers, AppSettings.API_MEMBERS, AppSettings.TAGMEMBERS, this._userservice.currentUser.secretKey)
+			.subscribe(
+				data => {
+					console.log(data);
+					request.validatedBy = this._userservice.currentUser.mail
+					this._httpService.postEntryJSON(request, AppSettings.API_REQUESTS, AppSettings.TYPEREQUESTRULE + "-" + request.user, this._userservice.currentUser.secretKey)
+					.subscribe(
+						res => { console.log(res)}
+					)
+				}
+			)
+		}
+	}
+
+	refuseRequest(index, request) {
+
+	}
+
 	ngOnInit() {
 		this.user = new User()
+		this._httpService.getEntryJSON(AppSettings.API_REQUESTS)
+		.subscribe(
+			requests => {
+				let entries = requests.dictionary.entries
+				for (let prop in entries) {
+					let element = JSON.parse(entries[prop].value);
+					if (element.type == 1) {
+						element.textType = "Changement de rôle"
+						element.text = "Ce membre souhaite devenir [" + element.content +"] dans l'outil."
+					}
+					this.allRequests.push(element)
+				}
+			}
+		)
 		if (this._userservice.currentUser == undefined) {
 			this._userservice.getCurrentUser().then(
 				(user : User) => {this.user = user;this.getMembers()}

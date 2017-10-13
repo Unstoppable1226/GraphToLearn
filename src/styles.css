@@ -13,3 +13,15 @@
 	background-color: #0c5a4a;
 	color:white;
 }
+
+.group-Administrator {
+	color:#c0392b!important;
+}
+
+.group-Editor {
+	color:#27ae60!important;
+}
+
+.group-Lambda {
+	color:#2980b9!important;
+}

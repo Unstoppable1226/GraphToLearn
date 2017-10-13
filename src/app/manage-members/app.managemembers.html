@@ -22,11 +22,11 @@
         </div>
         <div class="ui bottom attached tab segment active" data-tab="demandes" style="text-align:center">
             <form id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
-                <h2>Nouvelles demandes
+                <h2>Nouvelles demandes d'accès
                     <a class="ui green circular label">{{newMembers.length}}</a>
                     <div class="ui button" style="margin-left: 20px" *ngIf="newMembers.length != 0" (click)="acceptAll()">Tout accepter</div>
                 </h2>
-                <div *ngIf="newMembers.length == 0" class="ui teal message">Aucune nouvelle demande</div>
+                <div *ngIf="newMembers.length == 0" class="ui teal message">Aucune nouvelle demande d'accès</div>
                 <div class="ui middle aligned animated list">
                     <div *ngFor="let member of newMembers; let i = index" class="item">
                         <div class="right floated content">
@@ -36,6 +36,29 @@
                         <img class="ui avatar image" src="../assets/images/new-user.png">
                         <div class="content">
                             <div class="header">{{member.mail}}</div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <hr>
+                <h2>Autres nouvelles demandes
+                    <a class="ui green circular label">{{allRequests.length}}</a>
+                </h2>
+                <div class="ui divided items">
+                    <div *ngFor="let request of allRequests; let i = index" class="item">
+                        <div class="content">
+                            <a class="header">Type de demande : <span style="color:#1e70bf">{{request.textType}}</span></a>
+                            <div class="meta">
+                                <span class="cinema">{{request.user}}</span>
+                            </div>
+                            <div class="description" style="font-weight: bold;">
+                                <p>{{request.text}}</p>
+                            </div>
+                            <div class="extra">
+                                <div class="ui button positive" (click)="acceptRequest(i, request)">Accepter</div>
+                                <div class="ui button negative" (click)="refuseRequest(i, request)">Refuser</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -109,19 +132,28 @@
                                                     <h4 class="ui header group-Lambda">Lambda</h4>
                                                     <p>Il peut rechercher des termes, donner son avis sur un terme, donner un
                                                         commentaire et proposer de nouveaux termes.</p>
-                                                    <div class="ui button basic blue" (click)="modifyRule(i, 'Lambda')">Affecter</div>
+                                                    <div *ngIf="memb.group == 'Lambda'" class="ui message">
+                                                        <p>Son rôle</p>
+                                                    </div>
+                                                    <div *ngIf="memb.group != 'Lambda'" class="ui button basic blue" (click)="modifyRule(i, 'Lambda')">Affecter</div>
                                                 </div>
                                                 <div class="column">
                                                     <h4 class="ui header group-Editor">Editor</h4>
                                                     <p>Il peut en plus d'un utilisateur Lambda : modifier un terme ou le désactiver
                                                         et accepter des demandes d'accès d'autres membres</p>
-                                                    <div class="ui button basic green" (click)="modifyRule(i, 'Editor')">Affecter</div>
+                                                    <div *ngIf="memb.group == 'Editor'" class="ui message">
+                                                        <p>Son rôle</p>
+                                                    </div>
+                                                    <div *ngIf="memb.group != 'Editor'" class="ui button basic green" (click)="modifyRule(i, 'Editor')">Affecter</div>
                                                 </div>
                                                 <div class="column">
                                                     <h4 class="ui header group-Administrator">Administrator</h4>
                                                     <p>Il a accès a toutes les fonctionnalités de l'outil comme l'affectation
                                                         des rôles des membres ou modifier la distribution de la réputation.</p>
-                                                    <div class="ui button basic red" (click)="modifyRule(i, 'Administrator')">Affecter</div>
+                                                    <div *ngIf="memb.group == 'Administrator'" class="ui message">
+                                                        <p>Son rôle</p>
+                                                    </div>
+                                                    <div *ngIf="memb.group != 'Administrator'" class="ui button basic red" (click)="modifyRule(i, 'Administrator')">Affecter</div>
                                                 </div>
                                             </div>
 

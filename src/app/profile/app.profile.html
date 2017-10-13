@@ -1,0 +1,119 @@
+<app-menu></app-menu>
+<div style="width: 100%;text-align: center!important; margin-top: 10px">
+    <div style="width: 95%;display: inline-block;">
+
+        <h2 class="ui icon header" style="text-align:center!important;margin-bottom: -200px">
+            <i class="address card icon" style="color:white"></i>
+            <div class="content" style="color:white">
+                Informations sur votre profil
+            </div>
+        </h2>
+
+        <button style="display:block; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home"
+            [routerLink]="['/home']">
+            <i class="reply icon"></i> Retour
+            <span style="margin-left:8px">|</span>
+            <i class="home icon" style="margin-left:10px"></i>
+        </button>
+
+        <div class="ui grid" style="margin-top:20px!important; width: 80%; margin:auto;background-color:white;">
+            <div class="five wide column">
+                <div class="ui card" style="padding: 50px;width: auto">
+                    <a class="image">
+                        <img src="../assets/images/user.jpg">
+                    </a>
+                    <div class="content" style="padding:0px!important;padding-top: 35px!important;margin:0px!important;">
+                        <a class="header">{{user.mail}}</a>
+                        <div class="meta">
+                            <span [ngClass]="{'group-Administrator': user.group == 'Administrator', 'group-Editor' : user.group == 'Editor', 'group-Lambda' : user.group == 'Lambda'}"
+                                style="font-weight: bold;">{{ user.group }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="eleven wide column">
+                <div class="ui two statistics">
+                    <div class="teal statistic">
+                        <div class="value">
+                            {{nbWordsInserted}}
+                        </div>
+                        <div class="label">
+                            Nombre d'entrées insérées
+                        </div>
+                    </div>
+                    <div class="blue statistic">
+                        <div class="value">
+                            {{user.reputation}}
+                        </div>
+                        <div class="label">
+                            Votre Réputation P
+                        </div>
+                    </div>
+                </div>
+                <div class="ui message">
+                    <div class="header">
+                        Changement de rôle
+                    </div>
+                    <p>Vous êtes actuellement un membre
+                        <span [ngClass]="{'group-Administrator': user.group == 'Administrator', 'group-Editor' : user.group == 'Editor', 'group-Lambda' : user.group == 'Lambda'}"
+                            style="font-weight: bold;">{{user.group}}</span>, mais vous avez la possibilité de changer votre rôle si vous possèdez une
+                        <strong>Réputation P</strong> supérieure ou égale à
+                        <span style="color:#2185d0;font-weight: bold">{{user.settingsReputation.repIntegrationEditor}}.</span>
+                    </p>
+                </div>
+
+                <div *ngIf="user.reputation <= user.settingsReputation.repIntegrationEditor" class="ui message">
+                    <div class="header">
+                        Changement de rôle <span class="group-Administrator">non autorisé</span>
+                    </div>
+                    <ul class="list">
+                        <li>Vous ne pouvez pas faire de demande de changement de rôle, car votre réputation P est inférieur à
+                            <strong style="color:#2185d0">{{ user.settingsReputation.repIntegrationEditor }}</strong> ! 
+                        </li>
+                        <li>Cependant, vous pouvez augmenter votre <strong>Réputation P</strong> en étant plus impliqué dans l'outil.</li>
+                        <li>Insérer de nouveaux mots qui seront accepté par les autres membres augmentera votre réputation de <strong style="color:#2185d0">{{user.settingsReputation.repNew}}</strong>.</li>
+                        <li>Apporter des modifications acceptées par les membres augmentera votre réputation de <strong style="color:#2185d0">{{user.settingsReputation.repModify}}</strong>.</li>
+                    </ul>
+                </div>
+                
+                <div *ngIf="user.reputation >= user.settingsReputation.repIntegrationEditor" class="ui three column divided center aligned grid"
+                    style="margin-top:20px">
+                    <div class="column">
+                        <h4 class="ui header group-Lambda">Lambda</h4>
+                        <p>Il peut rechercher des termes, donner son avis sur un terme, donner un commentaire et proposer de
+                            nouveaux termes.</p>
+                        <div *ngIf="user.group == 'Lambda'" class="ui message">
+                            <p>Votre rôle</p>
+                        </div>
+                        <div *ngIf="user.group != 'Lambda' && user.group != 'Administrator'" class="ui button basic blue" [ngClass]="{'loading' : loadingChangeRuleLambda}"
+                            (click)="sendChangeRule('Lambda')">Faire la demande</div>
+                        <div *ngIf="user.group == 'Administrator'" class="ui button basic blue" [ngClass]="{'loading' : loadingChangeRuleLambda}"
+                            (click)="sendChangeRule('Lambda')">Changer (Attention vous perdrez les droits que vous avez)</div>
+                    </div>
+                    <div class="column">
+                        <h4 class="ui header group-Editor">Editor</h4>
+                        <p>Il peut en plus d'un utilisateur Lambda : modifier un terme ou le désactiver et accepter des demandes
+                            d'accès d'autres membres</p>
+                        <div *ngIf="user.group == 'Editor'" class="ui message">
+                            <p>Votre rôle</p>
+                        </div>
+                        <div *ngIf="user.group != 'Editor' && user.group != 'Administrator'" class="ui button basic green" [ngClass]="{'loading' : loadingChangeRuleEditor}"
+                            (click)="sendChangeRule('Editor')">Faire la demande</div>
+                        <div *ngIf="user.group == 'Administrator'" class="ui button basic green" [ngClass]="{'loading' : loadingChangeRuleEditor}"
+                            (click)="sendChangeRule('Editor')">Changer (Attention vous perdrez les droits que vous avez)</div>
+                    </div>
+                    <div class="column">
+                        <h4 class="ui header group-Administrator">Administrator</h4>
+                        <p>Il a accès a toutes les fonctionnalités de l'outil comme l'affectation des rôles des membres ou modifier
+                            la distribution de la réputation.</p>
+                        <div *ngIf="user.group == 'Administrator'" class="ui message">
+                            <p>Votre rôle</p>
+                        </div>
+                        <div *ngIf="user.group != 'Administrator'" class="ui button basic red" [ngClass]="{'loading' : loadingChangeRuleAdministrator}"
+                            (click)="sendChangeRule('Administrator')">Faire la demande</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>

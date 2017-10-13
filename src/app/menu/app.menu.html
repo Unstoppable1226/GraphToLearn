@@ -3,10 +3,12 @@
 		<a class="item" [ngClass]="{'active': active[0]}" (click)="changeActiveMenuItem(0, 'home')">
 			Accueil <i class="right home icon" style="margin-left:5px"></i>
 		</a>
-		<a class="item" [ngClass]="{'active': active[1]}">
-			{{user.mail}} [{{user.group}}] <i class="right user icon" style="margin-left:5px"></i>
+		<a class="item" [ngClass]="{'active': active[1]}" data-tooltip="Consulter votre profil" data-inverted=""
+		data-position="bottom center" (click)="changeActiveMenuItem(1, 'profile')">
+			{{user.mail}} <span style="margin-left:5px" [ngClass]="{'group-Administrator': user.group == 'Administrator', 'group-Editor' : user.group == 'Editor', 'group-Lambda' : user.group == 'Lambda'}">[{{user.group}}]</span> <i class="right user icon" style="margin-left:5px"></i>
 		</a>
-		<a class="item" [ngClass]="{'active': active[2]}" (click)="toggleSideBar()">
+		<a class="item" [ngClass]="{'active': active[2]}" (click)="toggleSideBar()" data-tooltip="Consulter l'historique de vos dernières recherches" data-inverted=""
+		data-position="bottom center">
 			Récentes recherches <i class="right history icon" style="margin-left:5px"></i>
 		</a>
 

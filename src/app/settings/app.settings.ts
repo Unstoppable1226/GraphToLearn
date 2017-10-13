@@ -23,6 +23,7 @@ export class AppSettings {
 	public static API_FEEDBACK= "Feedback";
 	public static API_SETTINGS= "Settings";
 	public static API_CONTEXT= "Context";
+	public static API_REQUESTS= "Requests";
 	
 	public static API_METASEARCHCLICK= "searchClick";
 	public static API_METALIKE= "like";
@@ -35,6 +36,11 @@ export class AppSettings {
 	public static RULELAMBDA= "Lambda";
 	public static RULEEDITOR= "Editor";
 	public static RULEADMINISTRATOR= "Administrator";
+
+	public static TYPEREQUESTRULE = "rule"
+	public static TYPEREQUESTNEW = "new"
+	public static TYPEREQUESTMODIFY = "modify"
+	public static TYPEREQUESTREVISION = "revision"
 
 
 	public static TAGMEMBERS = "members"

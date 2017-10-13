@@ -15,6 +15,7 @@ import { AppLogin } from './login/app.login';
 import { AppSearch } from './search/app.search';
 import { AppInsertion } from './insertion/app.insertion';
 import { AppManagerMembers } from './manage-members/app.managemembers';
+import { AppProfile } from './profile/app.profile';
 import { MenuComponent } from './menu/app.menu';
 import { PageNotFoundComponent } from './app.pagenotfound';
 
@@ -44,6 +45,7 @@ import { WordsService } from './model/words-service'
 		AppInsertion,
 		RoundPipe,
 		AppManagerMembers,
+		AppProfile,
 		MenuComponent,
 		PageNotFoundComponent,
 	],
