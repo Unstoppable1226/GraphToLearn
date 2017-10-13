@@ -1,14 +1,23 @@
+/* Core */
 import { Component, AfterViewInit, OnInit } from '@angular/core';
-import { AppComponent } from '../app.component';
-import { ActivatedRoute } from '@angular/router';
+import { Router, CanActivate, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+
+/* Services */
 import { HttpAPIService } from '../api/app.http-service';
-import { AppSettings } from '../settings/app.settings';
-import { Formatter } from '../tools/app.formatter';
 import { AuthService } from '../login/app.authservice';
-import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
-import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+
+/* Models */
 import { User } from '../model/user';
 import { UserService } from '../model/user-service';
+
+/* Constants */
+import { AppSettings } from '../settings/app.settings';
+
+/* Tools */
+import { Formatter } from '../tools/app.formatter';
+
+/* Alerts */
+import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 
 declare var $: any;
 
@@ -19,53 +28,26 @@ declare var $: any;
 })
 
 export class AppLogin implements OnInit {
-	public secretKey
-	public mail
-	public modal
 
-	public error
-	public errorTextSecretKey
+	public secretKey : string // Secret Key gaved by the user
+	public mail : string // Mail gived for the user
 
-	public errorMail
-	public errorTextMail
+	public error : boolean // Error occured in the modal connection
+	public errorTextSecretKey : string // Error that the user commited on modal connection
 
-	public loading
-	public loadingButton
-	public title
+	public errorMail : boolean // Error occured in the modal join
+	public errorTextMail : string // Error taht the user commited on modal join
 
+	public loading : boolean // Loading to indicate when the user must be patient
+	public loadingButton : boolean // Loading for the button to indicate when the user must be patient
+	public title : string // Title of the application
 
-	getReputation(publicKey: string, resp, infoMembers) { // Get the stellar coins of the user => his reputation
-		let instance = this;
-		this._httpservice.getUserReputation(publicKey)
-		.subscribe(
-			response=> {
-			let user = new User();
-			user.mail = resp.email;
-			user.reputation = !response ? 0 : (response == -10000 ? 0 : response);
-			user.publicKey = publicKey;
-			user.secretKey = instance.secretKey;
-			user.group = infoMembers.group;
-			user.validated = infoMembers.validated
-			if (infoMembers.settingsGeneral != undefined) {user.settingsGeneral = infoMembers.settingsGeneral}
-				instance._httpservice.getEntryJSON(AppSettings.API_SETTINGS)
-				.subscribe(
-					dataSettings => {
-						user.settingsReputation = JSON.parse(dataSettings.dictionary.entries[Object.keys(dataSettings.dictionary.entries)[0]].value)
-						instance._userservice.setCurrentUser(user);
-						sessionStorage.setItem('currentUser', window.btoa(instance.secretKey));
-						instance.loading = false
-						instance._router.navigate(['home']);
-						instance._alert.create('success', AppSettings.MSGWELCOME + " " + resp.email + " !")
-					}
-				)
-			},
-			error => {
-				//instance._alert.create('error', AppSettings.MSG_ERROR_LOG_IN)
-				setTimeout(function(){
-					instance.getReputation(publicKey, resp, infoMembers)
-				}, 300)
-			}
-		)
+	constructor(private _authservice: AuthService, private _router: Router, private _alert: AlertsService, private _userservice: UserService, private _httpservice: HttpAPIService,  private _format: Formatter) {
+		this._format.deleteAllModals()
+	}
+
+	ngOnInit() {
+		this.initVariables();
 	}
 
 	initVariables() {
@@ -80,80 +62,98 @@ export class AppLogin implements OnInit {
 		this.title = AppSettings.TITLE
 	}
 
-	constructor(private _authservice: AuthService, private _router: Router, private _alert: AlertsService, private _userservice: UserService, private _httpservice: HttpAPIService,  private _format: Formatter) {}
+	constructReputation(publicKey, response, resp, infoMembers) {
+		let instance = this, user = new User();
+		user.mail = resp.email;
+		user.reputation = !response ? 0 : (response == -10000 ? 0 : response);
+		user.publicKey = publicKey;
+		user.secretKey = instance.secretKey;
+		user.group = infoMembers.group;
+		user.validated = infoMembers.validated
+		if (infoMembers.settingsGeneral != undefined) {user.settingsGeneral = infoMembers.settingsGeneral}
+		instance._httpservice.getEntryJSON(AppSettings.API_SETTINGS)
+		.subscribe(
+			dataSettings => {
+				user.settingsReputation = JSON.parse(dataSettings.dictionary.entries[Object.keys(dataSettings.dictionary.entries)[0]].value)
+				instance._userservice.setCurrentUser(user);
+				sessionStorage.setItem('currentUser', window.btoa(instance.secretKey));
+				instance.loading = false
+				instance._router.navigate(['home']);
+				instance._alert.create('success', AppSettings.MSGWELCOME + " " + resp.email + " !")
+			}
+		)
+	}
 
-	ngOnInit() {
+	getReputation(publicKey: string, resp, infoMembers) { // Get the stellar coins of the user => his reputation
 		let instance = this;
-		this._format.deleteAllModals()
-		instance.initVariables();
+		this._httpservice.getUserReputation(publicKey)
+		.subscribe(
+			reputation=> {
+				if (isNaN(reputation)) {
+					this._httpservice.findFriendBot(publicKey)
+					.subscribe(
+						find => { this.constructReputation(publicKey, 0, resp, infoMembers) }
+					)
+				} else { this.constructReputation(publicKey, reputation, resp, infoMembers) }
+			},
+		)
+	}
+
+	checkResultConnection(data) {
+		this.loadingButton = false
+		if (data.publicAddress != undefined) {
+			this._httpservice.getEntryJSON(AppSettings.API_MEMBERS)
+			.subscribe(
+				allMembers => {
+					let dataInfo = JSON.parse(allMembers.dictionary.entries[Object.keys(allMembers.dictionary.entries)[0]].value)
+					let mail : string = data.email
+
+					if (dataInfo[mail] == undefined) {
+						dataInfo[mail] = {
+							publicKey: data.publicAddress,
+							group: AppSettings.RULELAMBDA,
+							validated: false
+						}
+						this._httpservice.postEntryJSON(dataInfo, AppSettings.API_MEMBERS, AppSettings.TAGMEMBERS, this.secretKey)
+						.subscribe(resultPostMembers => { console.log(resultPostMembers) })
+					} else {
+						$('.ui.modal').modal('hide');
+						if (dataInfo[mail].validated == false && dataInfo[mail].refusedBy == undefined) {
+							this._alert.create('info', AppSettings.MSG_USER_WAITS_ACCEPTATION, { duration: 30000 })
+						} else if (dataInfo[mail].validated == false && dataInfo[mail].refusedBy != undefined) {
+							this._alert.create('error', AppSettings.MSG_USER_REFUSED_BY + dataInfo[mail].refusedBy, { duration: 30000 })
+						} else {
+							this.loading = true
+							this.getReputation(data.publicAddress, data, dataInfo[mail])
+						}	
+					}
+				}
+			)
+		}
 	}
 
 	startConnection() {
-		let instance = this;
-		if (instance.secretKey.length > 0) {
-			instance.loadingButton = true
-			var resp = instance._authservice.connect(instance.secretKey)
-				.subscribe(
+		if (this.secretKey.length > 0) { // Not empty
+			this.loadingButton = true
+			this._authservice.connect(this.secretKey)
+			.subscribe(
 				data => {
 					console.log(data)
-					instance.loadingButton = false
-					if (data.publicAddress == undefined) {
-						return false;
-					} else {
-						instance._httpservice.getEntryJSON(AppSettings.API_MEMBERS)
-						.subscribe(
-							dataMembers => {
-								let dataInfo = JSON.parse(dataMembers.dictionary.entries[Object.keys(dataMembers.dictionary.entries)[0]].value)
-								let mail : string = data.email
-
-								if (dataInfo[mail] == undefined) {
-									dataInfo[mail] = {
-										publicKey: data.publicAddress,
-										group: AppSettings.RULELAMBDA,
-										validated: false
-									}
-									instance._httpservice.postEntryJSON(dataInfo, AppSettings.API_MEMBERS, "members", instance.secretKey)
-									.subscribe(
-										datas => {
-											console.log(datas)
-										},
-										error => { }
-									)
-								
-								} else {
-									if (dataInfo[mail].validated == false && dataInfo[mail].refusedBy == undefined) {
-										$('.ui.modal').modal('hide');
-										instance._alert.create('info', "Votre compte n'a pas encore été accepté par la communauté, votre demande est en attente et sera traitée lorsqu'un membre l'acceptera !", { duration: 30000 })
-									} else if (dataInfo[mail].validated == false && dataInfo[mail].refusedBy != undefined) {
-										$('.ui.modal').modal('hide');
-										instance._alert.create('error', "Votre demande d'accès a été refusée par : " + dataInfo[mail].refusedBy, { duration: 30000 })
-									} else {
-										$('.ui.modal').modal('hide');
-										instance.loading = true
-										instance.getReputation(data.publicAddress, data, dataInfo[mail])
-									}
-									
-								}
-
-							}
-						)
-						
-					}
+					this.checkResultConnection(data)
 				},
 				err => {
-					instance.loadingButton = false;
-					instance.error = true;
+					this.loadingButton = false;
+					this.error = true;
 					if (err.status == 401) { // User already exists
-						instance.errorTextSecretKey = AppSettings.MSG_ERROR_LOG_IN
+						this.errorTextSecretKey = AppSettings.MSG_ERROR_LOG_IN
 					}
-					
 				}
 			)
 			return false;
-		} else {
-			instance.loadingButton = false
-			instance.error = true;
-			instance.errorTextSecretKey = AppSettings.MSG_ERROR_SECRETKEY_EMPTY;
+		} else { // The information is empty
+			this.loadingButton = false
+			this.error = true;
+			this.errorTextSecretKey = AppSettings.MSG_ERROR_SECRETKEY_EMPTY;
 			return false;
 		}
 	}
@@ -191,13 +191,10 @@ export class AppLogin implements OnInit {
 									.subscribe(
 										datas => {
 											this.redirectToHome()
-											return true;
 										},
-										error => { }
 									)
 								} else {
 									this.redirectToHome()
-									return true;
 								}
 							}
 						)
@@ -208,26 +205,23 @@ export class AppLogin implements OnInit {
 	}
 
 	launchRegistration() {
-		let instance = this, isMailNotNull = instance.mail.trim().length > 0, isMailValid = this.isEmailValid()
+		let isMailNotNull = this.mail.trim().length > 0, isMailValid = this.isEmailValid()
 		if (isMailNotNull && isMailValid) {
-			instance.loadingButton = true
-			instance._authservice.join(instance.mail)
-				.subscribe(
-					data => {
-						this.prepareUser()
-					},
-					err => {
-						instance.loadingButton = false;
-						instance.errorMail = true;
-						instance.errorTextMail = err.status == 409 ? AppSettings.MSG_ERROR_MAIL_TAKEN : AppSettings.MSG_ERROR_CREATE_USER
-					}
-				)
-			return false;
+			this.loadingButton = true
+			this._authservice.join(this.mail)
+			.subscribe(
+				data => { this.prepareUser() },
+				err => {
+					this.loadingButton = false;
+					this.errorMail = true;
+					this.errorTextMail = err.status == 409 ? AppSettings.MSG_ERROR_MAIL_TAKEN : AppSettings.MSG_ERROR_CREATE_USER
+				}
+			)
 		} else {
-			instance.errorMail = true;
-			instance.errorTextMail = isMailNotNull ? AppSettings.MSG_ERROR_MAIL_INVALID : AppSettings.MSG_ERROR_MAIL_EMPTY;
-			return false;
+			this.errorMail = true;
+			this.errorTextMail = isMailNotNull ? AppSettings.MSG_ERROR_MAIL_INVALID : AppSettings.MSG_ERROR_MAIL_EMPTY;
 		}
+		return false;
 	}
 
 	focusPassword() {

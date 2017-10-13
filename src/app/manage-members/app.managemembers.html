@@ -8,22 +8,136 @@
             </div>
         </h2>
         <button style="display:block; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home"
-            [routerLink]="['/home']"> <i class="reply icon"></i> Retour <span style="margin-left:8px">|</span><i class="home icon" style="margin-left:10px"></i></button>
-        <form id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
-            <h2>Nouvelles demandes <a class="ui green circular label">{{newMembers.length}}</a> <div class="ui button" style="margin-left: 20px" *ngIf="newMembers.length != 0" (click)="acceptAll()">Tout accepter</div></h2>
-            <div *ngIf="newMembers.length == 0"class="ui teal message">Aucune nouvelle demande</div>
-            <div class="ui middle aligned animated list">
-                <div *ngFor="let member of newMembers; let i = index" class="item">
-                    <div class="right floated content">
-                        <div class="ui button positive" (click)="addMember(i, false)">Accepter</div>
-                        <div class="ui button negative" (click)="refuseMember(i)">Refuser</div>
-                    </div>
-                    <img class="ui avatar image" src="../assets/images/new-user.png">
-                    <div class="content">
-                        <div class="header">{{member.mail}}</div>
+            [routerLink]="['/home']">
+            <i class="reply icon"></i> Retour
+            <span style="margin-left:8px">|</span>
+            <i class="home icon" style="margin-left:10px"></i>
+        </button>
+
+        <div class="ui top attached tabular menu">
+            <div class="item active" data-tab="demandes" style="cursor:pointer!important; width: 50%;font-size:1.3em;padding-left:18%;background: rgba(255, 255, 255, 0.55)">
+                <div>Liste des demandes</div>
+            </div>
+            <div [hidden]="user.group != 'Administrator'" class="item" data-tab="rules" style="cursor:pointer!important;width: 50%;font-size:1.3em;padding-left:18%;background: rgba(255, 255, 255, 0.55)">Gestion des rôles</div>
+        </div>
+        <div class="ui bottom attached tab segment active" data-tab="demandes" style="text-align:center">
+            <form id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
+                <h2>Nouvelles demandes
+                    <a class="ui green circular label">{{newMembers.length}}</a>
+                    <div class="ui button" style="margin-left: 20px" *ngIf="newMembers.length != 0" (click)="acceptAll()">Tout accepter</div>
+                </h2>
+                <div *ngIf="newMembers.length == 0" class="ui teal message">Aucune nouvelle demande</div>
+                <div class="ui middle aligned animated list">
+                    <div *ngFor="let member of newMembers; let i = index" class="item">
+                        <div class="right floated content">
+                            <div class="ui button positive" (click)="addMember(i, false)">Accepter</div>
+                            <div class="ui button negative" (click)="refuseMember(i)">Refuser</div>
+                        </div>
+                        <img class="ui avatar image" src="../assets/images/new-user.png">
+                        <div class="content">
+                            <div class="header">{{member.mail}}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
+        <div [hidden]="user.group != 'Administrator'" class="ui bottom attached tab segment" data-tab="rules" style="text-align:center">
+
+            <form *ngIf="user.group == 'Administrator'" id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white; padding: 25px; text-align: center;">
+                <div class="ui icon message">
+                    <i class="id badge icon" style="color:black"></i>
+                    <div class="content">
+                        <div class="header">
+                            Modification des rôles
+                        </div>
+                        <p>Vous êtes un administrateur, vous avez les droits pour modifier les rôles des membres de la communauté
+                            de GraphToLearn.</p>
+                    </div>
+                </div>
+
+                <div class="ui three statistics">
+                    <div class="blue statistic">
+                        <div class="value">
+                            {{numberLambda}}
+                        </div>
+                        <div class="label">
+                            Membres Lambda
+                        </div>
+                    </div>
+                    <div class="green statistic">
+                        <div class="value">
+                            {{numberEditors}}
+                        </div>
+                        <div class="label">
+                            Membres Editor
+                        </div>
+                    </div>
+                    <div class="red statistic">
+                        <div class="value">
+                            {{numberAdmins}}
+                        </div>
+                        <div class="label">
+                            Membres Administrator
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui middle aligned animated list">
+                    <table id="example" class="table-boot table-boot-striped table-boot-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Rôle</th>
+                                <th>Public Key</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let memb of allMembersArray; let i = index">
+                                <td>{{memb.mail}}</td>
+                                <td [ngClass]="{'group-Administrator': memb.group == 'Administrator', 'group-Editor' : memb.group == 'Editor', 'group-Lambda' : memb.group == 'Lambda'}">{{memb.group}}</td>
+                                <td>{{memb.publicKey}}</td>
+                                <td>
+                                    <div id="modifyRule{{i}}" class="ui modifyRule button" (mouseover)='activatePopover(i)'>Modifier rôle</div>
+                                    <div id="customRule{{i}}" class="ui flowing popup top left transition hidden">
+                                        <div class="ui segment">
+                                            <div class="ui dimmer" [ngClass]="{'active' : loadingModifyRule}">
+                                                <div class="ui text loader">Mises à jour des modifications</div>
+                                            </div>
+                                            <div class="ui three column divided center aligned grid">
+                                                <div class="column">
+                                                    <h4 class="ui header group-Lambda">Lambda</h4>
+                                                    <p>Il peut rechercher des termes, donner son avis sur un terme, donner un
+                                                        commentaire et proposer de nouveaux termes.</p>
+                                                    <div class="ui button basic blue" (click)="modifyRule(i, 'Lambda')">Affecter</div>
+                                                </div>
+                                                <div class="column">
+                                                    <h4 class="ui header group-Editor">Editor</h4>
+                                                    <p>Il peut en plus d'un utilisateur Lambda : modifier un terme ou le désactiver
+                                                        et accepter des demandes d'accès d'autres membres</p>
+                                                    <div class="ui button basic green" (click)="modifyRule(i, 'Editor')">Affecter</div>
+                                                </div>
+                                                <div class="column">
+                                                    <h4 class="ui header group-Administrator">Administrator</h4>
+                                                    <p>Il a accès a toutes les fonctionnalités de l'outil comme l'affectation
+                                                        des rôles des membres ou modifier la distribution de la réputation.</p>
+                                                    <div class="ui button basic red" (click)="modifyRule(i, 'Administrator')">Affecter</div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </form>
+        </div>
+
+
+
     </div>
 </div>

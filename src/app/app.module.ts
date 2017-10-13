@@ -20,7 +20,7 @@ import { PageNotFoundComponent } from './app.pagenotfound';
 
 
 /* Pipes */
-import { RoundPipe } from './tools/round'
+import { RoundPipe } from './tools/round-pipe'
 /* Constants*/
 import { routing } from './app.routing';
 

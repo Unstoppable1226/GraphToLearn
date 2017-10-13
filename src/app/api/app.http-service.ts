@@ -4,6 +4,8 @@ import { AppSettings } from '../settings/app.settings';
 import { Observable } from 'rxjs/Observable';
 
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/retryWhen';
+import 'rxjs/add/operator/delay';
 
 @Injectable()
 export class HttpAPIService {
@@ -45,12 +47,14 @@ export class HttpAPIService {
 
 	getUserReputation(pubKey) {
 		return this._http.get(AppSettings.API_USERS + "/balance?public=" + pubKey)
-			.map((res: Response) => res.json());
+			.map((res: Response) => res.json())
+			.retryWhen(error => error.delay(1000));
 	}
 
 	getEntryJSON(observatory) {
 		return this._http.get(AppSettings.API_OBSERVATORY + "?observatoryId=" + observatory)
-			.map((res: Response) => res.json());
+			.map((res: Response) => res.json())
+			.retryWhen(error => error.delay(1000));
 	}
 
 	postEntryJSON(dataInfo, observatory, tags, secretKey) {

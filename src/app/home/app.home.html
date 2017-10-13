@@ -13,7 +13,7 @@
 			<input type="radio" id="tab1" name="tab-control" checked>
 			<input type="radio" id="tab2" name="tab-control">
 			<ul>
-				<li title="Rechercher un terme">
+				<li data-inverted="" data-position="top center" data-tooltip="Rechercher un terme">
 					<label for="tab1" role="button" routerLink="/home">
 						<svg viewBox="0 0 24 24"><path d="M17.7,16.1c-0.9,0-1.7-0.3-2.3-1c-0.6-0.6-1-1.4-1-2.3c0-0.9,0.3-1.7,1-2.3c0.6-0.6,1.4-1,2.3-1
 							c0.9,0,1.7,0.3,2.3,1c0.6,0.6,1,1.4,1,2.3c0,0.9-0.3,1.7-1,2.3C19.4,15.8,18.5,16.1,17.7,16.1z M21.7,8.8c-1.1-1.1-2.5-1.7-4-1.7
@@ -23,7 +23,7 @@
 						<span>Rechercher</span>
 					</label>
 				</li>
-				<li title="Insérer un terme">
+				<li data-inverted="" data-position="top center" data-tooltip="Insérer un terme (1 par 1 ou à partir d'1 fichier)">
 					<label for="tab2" role="button">
 						<svg viewBox="0 -5 30 30">
 							<path d="m23,10h-8.5c-0.3,0-0.5-0.2-0.5-0.5v-8.5c0-0.6-0.4-1-1-1h-2c-0.6,0-1,0.4-1,1v8.5c0,0.3-0.2,0.5-0.5,0.5h-8.5c-0.6,0-1,0.4-1,1v2c0,0.6 0.4,1 1,1h8.5c0.3,0 0.5,0.2 0.5,0.5v8.5c0,0.6 0.4,1 1,1h2c0.6,0 1-0.4 1-1v-8.5c0-0.3 0.2-0.5 0.5-0.5h8.5c0.6,0 1-0.4 1-1v-2c0-0.6-0.4-1-1-1z"/>
@@ -49,8 +49,9 @@
 					<br>
 					<br>
 					<div class="ui fluid big category search searchWord">
-						<div class="ui icon input" style="width: 80%;margin-top:20px;border:2px solid #333; border-radius:100%">
-							<input style="text-align:center; color:black!important" class="prompt" type="text" [(ngModel)]="searchWord" (keypress)="eventHandler($event.keyCode)" placeholder="Rechercher ...">
+						<div class="ui icon input" style="width: 80%;margin-top:20px;border:1px solid #1678c2!important;
+						border-radius: 40px;; border-radius:100%">
+							<input style="text-align:center; color:black!important" class="prompt" type="text" [(ngModel)]="searchWord" (keypress)="eventHandler($event.keyCode)" placeholder="Rechercher un mot ...">
 							<i class="search icon"></i>
 						</div>
 					</div>

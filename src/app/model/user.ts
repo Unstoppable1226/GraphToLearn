@@ -2,16 +2,16 @@ import { SettingsReputation } from '../model/settings-reputation'
 import { SettingsGeneral } from '../model/settings-general'
 
 export class User {
-	mail: string
-	reputation: number
-	publicKey: string
-	secretKey: string
-	observatories : Array<Object>
-	validated : boolean
+	mail : string
+	reputation : number
+	publicKey : string
+	secretKey : string
 	group : string
-	settingsReputation
-	settingsGeneral
-
+	validated : boolean
+	observatories : Array<Object>
+	settingsReputation : SettingsReputation
+	settingsGeneral : SettingsGeneral
+	
 	constructor() {
 		this.mail = ""
 		this.reputation = 0

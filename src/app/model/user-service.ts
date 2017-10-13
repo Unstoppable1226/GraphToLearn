@@ -29,7 +29,7 @@ export class UserService  {
 		let instance = this;
 		return instance._httpservice.getUserReputation(publicKey)
 	}
-
+	
 	getCurrentUser() {
 		return new Promise((resolve, reject) => {
 			let instance = this;
@@ -59,17 +59,22 @@ export class UserService  {
 								instance.currentUser.validated = dataInfo[mail].validated
 								if (dataInfo[mail].settingsGeneral != undefined) {instance.currentUser.settingsGeneral = dataInfo[mail].settingsGeneral}
 								instance.getReputation(response.publicAddress)
-								.subscribe(function(resp){
-									instance._httpservice.getEntryJSON(AppSettings.API_SETTINGS)
-									.subscribe(
-										dataSettings => {
-											instance.currentUser.settingsReputation = JSON.parse(dataSettings.dictionary.entries[Object.keys(dataSettings.dictionary.entries)[0]].value)
-											instance.currentUser.reputation = !resp ? 0 : resp;
-											resolve(instance.currentUser);
-										}
-									)
-									
-								})
+								.subscribe(
+									resp => {
+										instance._httpservice.getEntryJSON(AppSettings.API_SETTINGS)
+										.subscribe(
+											dataSettings => {
+												instance.currentUser.settingsReputation = JSON.parse(dataSettings.dictionary.entries[Object.keys(dataSettings.dictionary.entries)[0]].value)
+												instance.currentUser.reputation = (resp == -10000 ? 0 : resp);
+												resolve(instance.currentUser);
+											}
+										)
+									},
+									error => {
+										//instance._alert.create('error', AppSettings.MSG_ERROR_LOG_IN)
+										reject(error)
+									}
+								)
 							}
 						)		
 					}

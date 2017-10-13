@@ -53,13 +53,16 @@ export class AppSettings {
 	public static API_WIKI = "http://fr.wikipedia.org/w/api.php?"
 	public static API_STELLAR_FRIENDBOT = "https://horizon-testnet.stellar.org/friendbot?addr="
 
-	public static API_KEY = "SCD3L76IHDAZRVAY3MH2G3T2UAUMVFIR3I26RLLWEYIJ3EWHLD5G6QP4" // This key is used for transactions like give when an entry is added
+	public static API_KEY = "SD645Z3U3DFTDCYQ2RCBL3F7JAXZJKWUCPSA4VHAJ3AO6QKVCWSCPMEH" // This key is used for transactions like give when an entry is added
+	public static API_PUBKEY = "GBIFOMK4KT5QD3Q5WQYZRDSTVC4KFMYX4LXV7V7M5IBEXRCZIVYJF3ZM"
 
 	/* Colors */
 	public static GREY = "#333";
 	public static WHITEMOREDARK = "#EEE";
 	public static BLACK = "#000";
 	public static WHITE = "#FFF";
+
+	public static CURRENTUSER = "currentUser"
 
 	public static COL_SEARCH_TERM = "#0D47A1";
 	public static COL_KEY_WORDS = "#95A5A6";
@@ -72,6 +75,10 @@ export class AppSettings {
 	public static MSGINCOMPLETED = "Vous n'avez pas renseigner tous les champs requis pour l'insertion des données !";
 	public static MSGWELCOME = "Vous êtes connecté sur GraphToLearn, Bienvenue ";
 	public static MSGMAILSUCCESS = "Votre compte a été créé, vous allez recevoir sous peu vos informations par mail et dès que votre demande d'adhésion est accepté par un membre de la communauté, vous pourrez utiliser l'outil";
+	
+	public static MSG_USER_WAITS_ACCEPTATION = "Votre compte n'a pas encore été accepté par la communauté, votre demande est en attente et sera traitée lorsqu'un membre l'acceptera !"
+	public static MSG_USER_REFUSED_BY = "Votre demande d'accès a été refusée par : "
+	
 	public static MSG_ERROR_MAIL_EMPTY = "Veuillez renseigner votre email ! ";
 	public static MSG_ERROR_MAIL_INVALID = "L'email saisi est invalide, veuillez insérer un email valide !"
 	public static MSG_ERROR_SECRETKEY_EMPTY = "Veuillez renseigner le champ Secret Key ! ";

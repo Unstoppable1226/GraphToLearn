@@ -1,15 +1,24 @@
+/* Core */
 import { Component, AfterViewInit } from '@angular/core';
 import { OnInit } from '@angular/core';
+
+/* Alerts */
 import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 
+/* Services */
 import { HttpAPIService } from '../api/app.http-service';
+import { HistorySearchService } from '../model/history-search';
+import { UserService } from '../model/user-service';
+
+/* Constants */ 
 import { AppSettings } from '../settings/app.settings';
 
+/* Models  */
 import { Entry } from '../model/entry'
 import { EntryCowaboo } from '../model/entrycowaboo'
-import { UserService } from '../model/user-service';
+
+/* Tools  */
 import { Formatter } from '../tools/app.formatter';
-import { HistorySearchService } from '../model/history-search';
 
 declare var $:any; // This is necessary if you want to use jQuery in the app
 
@@ -22,7 +31,6 @@ declare var $:any; // This is necessary if you want to use jQuery in the app
 export class AppInsertion implements OnInit{
 
 	public loading : boolean = false
-
 
 	public newModule = false;
 	public nameTaken = false;
@@ -44,6 +52,7 @@ export class AppInsertion implements OnInit{
 	public styleModuleNewCol = AppSettings.BLACK;
 	public styleModuleEx = AppSettings.GREY;
 	public styleModuleExCol = AppSettings.WHITE;
+
 	public data = {};
 	public types = [];
 	
@@ -62,18 +71,17 @@ export class AppInsertion implements OnInit{
 	constructor(private _httpService : HttpAPIService, private _format : Formatter, private _alert: AlertsService, private _userservice : UserService, private _historysearch : HistorySearchService) {}
 
 	ngOnInit() {
-		
 		this._format.deleteAllModals()
 		this._userservice.getCurrentUser()
 		console.log(this._historysearch.getLastSearches())
-		let instance = this;
-		instance.types.splice(0,instance.types.length);
-		instance.contexts.splice(0,instance.contexts.length);
-		instance.modules.splice(0,instance.contexts.length);
-		instance.types.push({ name: 'Aucun', value: 'Aucun', selected: true })
-		this.getData(AppSettings.API_TYPES, instance.types); // Get the data of types
-		this.getData(AppSettings.API_CONTEXT, instance.contexts); // Get the data of contexts
-		this.getData(AppSettings.API_MODULES, instance.modules); // Get the data of contexts
+		
+		this.types.splice(0,this.types.length);
+		this.contexts.splice(0,this.contexts.length);
+		this.modules.splice(0,this.contexts.length);
+		this.types.push({ name: 'Aucun', value: 'Aucun', selected: true })
+		this.getData(AppSettings.API_TYPES, this.types); // Get the data of types
+		this.getData(AppSettings.API_CONTEXT, this.contexts); // Get the data of contexts
+		this.getData(AppSettings.API_MODULES, this.modules); // Get the data of contexts
 	}
 
 	ngAfterViewInit(){
@@ -112,15 +120,16 @@ export class AppInsertion implements OnInit{
 			this.loadingAddModule = true;
 			
 			this._httpService.postEntryJSON(this.newModuleObj, AppSettings.API_MODULES, this.newModuleObj.id, this._userservice.currentUser.secretKey)
-				.subscribe(
-					data => {
-						this.afterModuleInserted(data)
-					},
-					error => {
-						this._alert.create('error', AppSettings.MSG_MODULE_INSERT_ERROR);
-					}
-					
-				)
+			.subscribe(
+				data => {
+					this.afterModuleInserted(data)
+				},
+				error => {
+					this._alert.create('error', AppSettings.MSG_MODULE_INSERT_ERROR);
+				}
+				
+			)
+
 		}
 	}
 
@@ -229,20 +238,30 @@ export class AppInsertion implements OnInit{
 			
 			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name, instance._userservice.currentUser.secretKey)
 			.subscribe(
-				function(response) { // The communication with the API has matched
+				response => { // The communication with the API has matched
 					console.log(response)
 					instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, response, instance._userservice.currentUser.secretKey) // Put searchClick to 0
 					.subscribe(
-						function(resp) {
-							instance.loading = false;
-							instance._alert.create('success', AppSettings.MSGSUCCESS)
-							data => instance.data = data
-							instance.reinit();
+						resp =>  {
+							instance._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, instance._userservice.currentUser.publicKey, Number(instance._userservice.currentUser.settingsReputation.repNew))
+							.subscribe(
+								transferResponse => {
+									console.log(transferResponse)
+									if (transferResponse) {
+										instance.loading = false;
+										instance._alert.create('success', AppSettings.MSGSUCCESS)
+										this._userservice.currentUser.reputation += instance._userservice.currentUser.settingsReputation.repNew
+										data => instance.data = data
+										instance.reinit();
+									}
+								}
+							)
+							
 						}	
 					)
 				},
 				// The communication with the API has not matched
-				function(error) {instance.loading = false; instance._alert.create('error', AppSettings.MSGERROR); },
+				error => {instance.loading = false; instance._alert.create('error', AppSettings.MSGERROR); },
 			);
 		} else {
 			 this._alert.create('warning', AppSettings.MSGINCOMPLETED);

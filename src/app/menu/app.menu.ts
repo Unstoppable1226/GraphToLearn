@@ -48,9 +48,12 @@ export class MenuComponent implements OnInit {
 
 	
 
-	constructor(private _httpService: HttpAPIService, private _alert : AlertsService, private _wordsservice : WordsService, private _format: Formatter, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch: HistorySearchService) {}
+	constructor(private _httpService: HttpAPIService, private _alert : AlertsService, private _wordsservice : WordsService, private _format: Formatter, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch: HistorySearchService) {
+		$('.ui.left.vertical.menu.sidebar.inverted').remove()
+	}
 
 	ngOnInit() {
+		let instance = this;
 		this.initVariables()
 		this._userservice.getCurrentUser()
 		.then(
@@ -72,6 +75,10 @@ export class MenuComponent implements OnInit {
 						this.nbNewMembers = members.length
 					}
 				)
+			}, error => {
+				setTimeout(function(){
+					instance.ngOnInit()	
+				}, 300);
 			}
 		)
 	}
@@ -187,28 +194,30 @@ export class MenuComponent implements OnInit {
 			)
 	}
 
+	showHistorySearch() {
+		$('.ui.sidebar').sidebar({transition : 'overlay', useLegacy : true}).sidebar('toggle').sidebar('setting', {onHide : function() {
+			$('.pusher').removeClass('pusher dimmed')
+		}})
+	}
 
 	toggleSideBar() {
 		if (this.historySearch.length == 0) {
 			this._httpService.getEntryJSON(AppSettings.API_HISTORY)
-				.subscribe(
+			.subscribe(
 				data => {
 					try {
 						this._historysearch.lastSearches = JSON.parse(data.dictionary.conf[this._userservice.currentUser.mail])
 					} catch (error) {
 						this._historysearch.lastSearches = data.dictionary.conf[this._userservice.currentUser.mail]
 					}
-
 					this.historySearch = this._historysearch.getLastSearches()
-					$('.ui.sidebar').sidebar('toggle')
-				},
-				error => { }
-				)
+					this.showHistorySearch()
+				}
+			)
 		} else {
 			this.historySearch = this._historysearch.getLastSearches()
-			$('.ui.sidebar').sidebar('toggle')
+			this.showHistorySearch()
 		}
-
 	}
 
 	ngAfterViewInit() {
@@ -266,7 +275,7 @@ export class MenuComponent implements OnInit {
 	}
 
 	searchSelectedWord(word) {
-		$('.ui.sidebar').sidebar('toggle')
+		$('.ui.sidebar').sidebar('hide')
 		this._router.navigate(['search/' + word]);
 	}
 

@@ -37,7 +37,7 @@
 			</div>
 		</h2>
 
-		<div *ngIf="wordFind" class="scrollbar" style="position: fixed;top: 430px;left: 0px;max-width: 400px; overflow-x: scroll;max-height: 210px">
+		<div *ngIf="wordFind" class="scrollbar" style="position: fixed;top: 430px;left: 0px;max-width: 400px; overflow:auto;max-height: 210px">
 			<a class="ui pointing below label" style="color: #eee; background-color:#1B1C1D;text-align: center;font-size: 1em;font-weight: 600;margin-right: 0px;display:block; margin-bottom:-5px">Réputation du terme recherché <strong style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong> dans les modules suivants :</a>
 			<div *ngIf="wordSel.modulesReputation.length == 0" style="font-size: 1em;font-weight: bold;padding-top: 10px;padding-bottom: 10px;background-color: rgba(26, 26, 26, 0.79);color: white;">Aucun module n'est associé à ce mot</div>
 			<div (mouseover)="showInfos($event, i)" (mouseleave)="showInfosLeave($event, i)" *ngFor="let mod of wordSel.modulesReputation; let i = index"
@@ -236,7 +236,7 @@
 							</div>
 							<div class="actions">
 								<a class="like" style="user-select:none" style="color:#eee!important" (click)="addLikeToComment(i)"><i class="thumbs up icon"></i> {{comment.likes.length}}</a>
-								<a class="reply" style="color:#63924D!important">Répondre</a>
+								<!--<a class="reply" style="color:#63924D!important">Répondre</a>-->
 								<a class="delete" style="color:rgb(100, 55, 55)!important" (click)="deleteComment(i)">Supprimer</a>
 							</div>
 						</div>

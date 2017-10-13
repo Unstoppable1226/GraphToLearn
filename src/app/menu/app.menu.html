@@ -359,8 +359,10 @@
 		</div>
 	</div>
 </div>
-<div class="ui sidebar inverted vertical menu">
-	<a class="item" style="font-size:1.1em;text-align:center;"> <span style="margin-bottom:10px">Historique de vos recherches</span>
+
+<!--The content below is only a placeholder and can be replaced.-->
+<div class="ui left vertical menu sidebar inverted">
+	<a class="item" style="font-size:1.1em;text-align:center;"> <span style="margin-bottom:10px">Historique de vos 15 dernières recherches</span>
 		<div class="ui animated fluid button" tabindex="0" style="margin-top:10px!important" (click)="delete()">
 			<div class="visible content">Tout effacer</div>
 			<div class="hidden content">
@@ -369,7 +371,7 @@
 		</div>
 	</a>
 	<!-- href="http://localhost:4200/search/{{his}}" -->
-	<a *ngFor="let his of historySearch; let i = index" class="item" (click)="searchSelectedWord(his)">
+	<a *ngFor="let his of historySearch.reverse(); let i = index" class="item" (click)="searchSelectedWord(his)">
 		{{his}} <i class="search icon"></i>
-	</a>
+    </a>
 </div>

@@ -17,15 +17,34 @@ export class HistorySearchService  {
         this.lastSearches = []
     }
 
+    getLast15() {
+        if (this.lastSearches.length > 15) {
+            this.lastSearches = this.lastSearches.slice(this.lastSearches.length - 15, this.lastSearches.length)
+        }
+    }
+
     getLastSearches() {
-		return this.lastSearches
+        this.getLast15()
+    	return this.lastSearches
+    }
+
+    existantSoUpdate(name) {
+        if (name != "" && name != null) {
+            if (this.lastSearches.includes(name)) {
+                this.lastSearches.splice(this.lastSearches.indexOf(name), 1)
+            }
+            this.lastSearches.push(name)
+        }
     }
     
     addSearch(name) {
         if (this.lastSearches == undefined) {
             this.lastSearches = []
         }
-        this.lastSearches.push(name)
+        if (name != "" && name != null) {
+            this.lastSearches.push(name)
+            this.getLast15()
+        }
     }
 
 }

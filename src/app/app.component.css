@@ -6,22 +6,6 @@
 	text-align:center;
 }
 
-
-.button-home {
-	background-color: #1B1C1D;
-	color:rgba(255,255,255,.7)!important;
-}
-
-.button-home:hover {
-	background-color: rgba(255,255,255,.7)!important;
-	color:#1B1C1D!important;
-}
-
-.button-home:active {
-	background-color: #0c5a4a;
-	color:white;
-}
-
 .margin-top-xl{
 	margin-top: 60px;
 }
@@ -105,3 +89,17 @@
 #container{
 	min-height: 100%!important;
 }
+
+.group-Administrator {
+	color:#c0392b!important;
+}
+
+.group-Editor {
+	color:#27ae60!important;
+}
+
+.group-Lambda {
+	color:#2980b9!important;
+}
+
+

@@ -96,16 +96,14 @@ export class AppSearch implements OnInit {
 	public newComment: string = "";
 
 	public lastModifItem: EntryCowaboo
-	difName: boolean = false
-	difType: boolean = false
-	difMeaning: boolean = false
-	difDefinition: boolean = false
-	difSource: boolean = false
-	difContext: boolean = false
-	difKeywords: boolean = false
+	public difName: boolean = false
+	public difType: boolean = false
+	public difMeaning: boolean = false
+	public difDefinition: boolean = false
+	public difSource: boolean = false
+	public difContext: boolean = false
+	public difKeywords: boolean = false
 	public items = [];
-
-
 
 	constructor(private _route: ActivatedRoute, private _wordsservice: WordsService, private _router: Router, private _alert: AlertsService, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch: HistorySearchService) {
 		this._format.deleteAllModals()
@@ -119,13 +117,13 @@ export class AppSearch implements OnInit {
 		let instance = this;
 		if (instance._wordsservice.modules == null) {
 			instance._httpservice.getEntryJSON(AppSettings.API_MODULES)
-				.subscribe(function (modules) {
-					instance._wordsservice.modules = modules
-					let obj = modules.dictionary.entries;
-					for (let prop in obj) {
-						instance.allModules.push(JSON.parse(obj[prop].value))
-					}
-				})
+			.subscribe(function (modules) {
+				instance._wordsservice.modules = modules
+				let obj = modules.dictionary.entries;
+				for (let prop in obj) {
+					instance.allModules.push(JSON.parse(obj[prop].value))
+				}
+			})
 			this._wordsservice.getUsers()
 		} else {
 			let obj = instance._wordsservice.modules.dictionary.entries;
@@ -183,6 +181,8 @@ export class AppSearch implements OnInit {
 		this.nbTimes = 0;
 		this.loading = false
 		this.loading2 = false
+		delete(this.wordSearch)
+		delete(this.wordSel)
 		this.wordSearch = new Entry()// The that we have searched
 		this.wordSel = new Entry() // The word that is selected on the context
 		this.hashWordSel = ""
@@ -190,12 +190,16 @@ export class AppSearch implements OnInit {
 		this.collapsedInfos = false
 		this.collapsedComments = true
 		this.collapsedActions = false;
+		delete(this.modulesOfWord)
 		this.modulesOfWord = {}
 		this.totalPoints = 0
 		this.col1 = this.user.settingsGeneral.colSearchTerm
 		this.col2 = this.user.settingsGeneral.colKeyWords
 		this.col3 = this.user.settingsGeneral.colModule
 		this.col4 = this.user.settingsGeneral.colOtherTerms
+		this.allModules.splice(0, this.allModules.length)
+		this.dictionary.splice(0, this.dictionary.length)
+		this.contextEntrys.splice(0, this.contextEntrys.length)
 		this.allModules = []
 		this.dictionary = []
 		this.contextEntrys = []
@@ -235,7 +239,7 @@ export class AppSearch implements OnInit {
 								let amount: number = Number(this._userservice.currentUser.settingsReputation.repContribution) - (0.25 * this.wordSel.updates.length)
 								this._httpservice.postBalance(this._userservice.currentUser.publicKey, this._userservice.currentUser.secretKey, data.user_list.list[this.wordSel.author.name], amount)
 									.subscribe(function (balance) {
-										if (balance) { instance._userservice.currentUser.reputation -= amount }
+										if (balance && instance._userservice.currentUser.mail != instance.wordSel.author.name) { instance._userservice.currentUser.reputation -= amount }
 									})
 							},
 							error => { }
@@ -342,7 +346,6 @@ export class AppSearch implements OnInit {
 
 	getSameModule(word) {
 		var element;
-		console.log(this.allModules)
 		for (var index = 0; index < this.allModules.length; index++) {
 			element = this.allModules[index];
 			if (element.id == word) {
@@ -450,33 +453,30 @@ export class AppSearch implements OnInit {
 				instance.createContext(instance.wordSearch);
 
 				let tab: Array<string> = []
-				/*
-				instance.updateHistorySearch
+				
 				instance._httpservice.getEntryJSON(AppSettings.API_HISTORY)
-					.subscribe(
-						data => {
-
-							if (data.dictionary.conf[instance._userservice.currentUser.mail] != undefined) {
-								if (!data.dictionary.conf[instance._userservice.currentUser.mail].includes(instance.wordSearch.name)) {
-									if (data.dictionary.conf[instance._userservice.currentUser.mail] == "[]") {
-										instance._historysearch.lastSearches = []
-									} else {
-										instance._historysearch.lastSearches = data.dictionary.conf[instance._userservice.currentUser.mail]
-									}
-									instance._historysearch.addSearch(instance.wordSearch.name)
-								}
-							} else {
-								instance._historysearch.lastSearches = []
+				.subscribe(
+					data => {
+						let listHistory = data.dictionary.conf[instance._userservice.currentUser.mail]
+						console.log(listHistory)
+						if (listHistory != undefined) {
+							if (!listHistory.includes(instance.wordSearch.name)) {
+								instance._historysearch.lastSearches = listHistory == "[]" ? [] : listHistory
 								instance._historysearch.addSearch(instance.wordSearch.name)
+							} else {
+								instance._historysearch.lastSearches = listHistory
+								instance._historysearch.existantSoUpdate(instance.wordSearch.name)
 							}
-							instance._httpservice.postObservatoryMetadata(instance._userservice.currentUser.mail, JSON.stringify(instance._historysearch.getLastSearches()), AppSettings.API_HISTORY, instance._userservice.currentUser.secretKey)
-								.subscribe(function (response) { console.log(response); })
-						},
-						error => { }
-					)
-				*/
+						} else {
+							instance._historysearch.lastSearches = []
+							instance._historysearch.addSearch(instance.wordSearch.name)
+						}
+						instance._httpservice.postObservatoryMetadata(instance._userservice.currentUser.mail, JSON.stringify(instance._historysearch.getLastSearches()), AppSettings.API_HISTORY, instance._userservice.currentUser.secretKey)
+						.subscribe(function (response) { console.log(response); })
 
-
+					},
+					error => { }
+				)
 				return;
 			}
 		}
@@ -874,7 +874,7 @@ export class AppSearch implements OnInit {
 
 	timestampInsertion(nbDays, coef) {
 		var idRule = 5
-		while (nbDays < AppSettings.TIMESTAMPRULE[idRule][0]) {
+		while (idRule > 0 && nbDays < AppSettings.TIMESTAMPRULE[idRule][0]) {
 			idRule--;
 		}
 		return { nbDays: nbDays, reputation: (AppSettings.TIMESTAMPRULE[idRule][1] * coef) }
@@ -1281,11 +1281,11 @@ export class AppSearch implements OnInit {
 		instance.types.splice(0, instance.types.length);
 		instance.contexts.splice(0, instance.contexts.length);
 		instance.modules.splice(0, instance.contexts.length);
-		this.types.push({ name: 'Aucun', value: 'Aucun', selected: true })
-		this.contexts.push({ name: 'Aucun', value: 'Aucun', selected: true })
-		this.getData(AppSettings.API_TYPES, instance.types); // Get the data of types
-		this.getData(AppSettings.API_CONTEXT, instance.contexts); // Get the data of contexts
-		this.getData(AppSettings.API_MODULES, instance.modules); // Get the data of contexts
+		instance.types.push({ name: 'Aucun', value: 'Aucun', selected: true })
+		instance.contexts.push({ name: 'Aucun', value: 'Aucun', selected: true })
+		instance.getData(AppSettings.API_TYPES, instance.types); // Get the data of types
+		instance.getData(AppSettings.API_CONTEXT, instance.contexts); // Get the data of contexts
+		instance.getData(AppSettings.API_MODULES, instance.modules); // Get the data of contexts
 	}
 
 	validated() { // Function who validates if everything is ok before the insert
@@ -1298,7 +1298,6 @@ export class AppSearch implements OnInit {
 		this.definition = "";
 		this.meaning = "";
 		this.newModules = "";
-		this.ngOnInit();
 	}
 
 	saveModifications() {

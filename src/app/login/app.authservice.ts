@@ -1,9 +1,15 @@
+/* Core */
 import { Injectable } from "@angular/core";
-import { Http, Response, Headers, RequestOptions } from "@angular/http";
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { AppSettings } from '../settings/app.settings';
-import { Formatter } from '../tools/app.formatter';
+import { Http, Response, Headers, RequestOptions } from "@angular/http";
+/* Services */
 import { HttpAPIService } from '../api/app.http-service'
+
+/* Constants */
+import { AppSettings } from '../settings/app.settings';
+
+/* Tools */
+import { Formatter } from '../tools/app.formatter';
 
 declare var $: any;
 import 'rxjs/add/operator/map';
@@ -20,7 +26,7 @@ export class AuthService {
 	join(mail: string) { return this._httpservice.joinCommunity(mail)  }
 
 	logout() {
-		sessionStorage.removeItem('currentUser');
+		sessionStorage.removeItem(AppSettings.CURRENTUSER);
 		this._router.navigate(['welcome']);
 	}
 }

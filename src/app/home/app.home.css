@@ -75,7 +75,7 @@
 /* on complète l'information d'un contenu textuel
    uniquement lorsque le paragraphe n'est pas vide */
 .js .file-return:not(:empty):before {
-  content: "Selected file: ";
+  content: "Fichier sélectionné: ";
   font-style: normal;
   font-weight: normal;
 }
