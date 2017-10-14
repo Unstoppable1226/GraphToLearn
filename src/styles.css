@@ -25,3 +25,74 @@
 .group-Lambda {
 	color:#2980b9!important;
 }
+
+/* */
+.tabacc {
+	position: relative;
+	margin-bottom: 1px;
+	width: 100%;
+	color: #fff;
+	overflow: hidden;
+  }
+  .input-tabacc {
+	position: absolute;
+	opacity: 0;
+	z-index: -1;
+  }
+  .label-tabacc {
+	position: relative!important;
+	display: block!important;
+	padding: 0 0 0 1em!important;
+	background: #1b1c1d!important;
+	font-weight: bold!important;
+	line-height: 3!important;
+	cursor: pointer!important;
+	user-select: none!important;
+    font-size: 1.2em!important;
+  }
+
+  .tabacc-content {
+	max-height: 0;
+	overflow: hidden;
+	background: white;
+	-webkit-transition: max-height .35s;
+	-o-transition: max-height .35s;
+	transition: max-height .35s;
+  }
+  .blue .tabacc-content {
+	background: #3498db;
+  }
+  .tabacc-content p {
+	margin: 1em;
+  }
+  /* :checked */
+  .input-tabacc:checked ~ .tabacc-content {
+	max-height: 10em;
+  }
+  /* Icon */
+  .label-tabacc::after {
+	position: absolute;
+	right: 0;
+	top: 0;
+	display: block;
+	width: 3em;
+	height: 3em;
+	line-height: 3;
+	text-align: center;
+	-webkit-transition: all .35s;
+	-o-transition: all .35s;
+	transition: all .35s;
+  }
+  .input-tabacc[type=checkbox] + .label-tabacc::after {
+	content: "+";
+  }
+  .input-tabacc[type=radio] + .label-tabacc::after {
+	content: "\25BC";
+  }
+  .input-tabacc[type=checkbox]:checked + .label-tabacc::after {
+	transform: rotate(315deg);
+  }
+  .input-tabacc[type=radio]:checked + .label-tabacc::after {
+	transform: rotateX(180deg);
+  }
+  

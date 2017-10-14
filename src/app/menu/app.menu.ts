@@ -15,6 +15,7 @@ import { Proposition } from '../model/proposition'
 import { UserService } from '../model/user-service'
 import { HistorySearchService } from '../model/history-search'
 import { WordsService } from '../model/words-service'
+import { Observable } from 'rxjs/Rx';
 
 declare var $: any;
 
@@ -28,6 +29,7 @@ export class MenuComponent implements OnInit {
 
 	public isConnected
 	public nbNewMembers = 0
+	public requestsAnswered = []
 	public active
 	public user
 	public colSearchTerm
@@ -41,6 +43,7 @@ export class MenuComponent implements OnInit {
 	public allFeedbacks: Array<Proposition>
 	public modifyFeedback: number
 	public loadingSaveOptions: boolean
+	public loadingRequests : boolean
 	public loadingAdd: boolean
 	public error: boolean
 	public settingsReputation : SettingsReputation
@@ -64,17 +67,33 @@ export class MenuComponent implements OnInit {
 				this._httpService.getEntryJSON(AppSettings.API_MEMBERS)
 				.subscribe(
 					data=> {
-						let entries = JSON.parse(data.dictionary.entries[Object.keys(data.dictionary.entries)[0]].value)
 						let members = [];
-						for (let prop in entries) {
-							if (entries[prop].validated == false && entries[prop].refusedBy == undefined) {
-								entries[prop].mail = prop
-								members.push(entries[prop])
+						if (this.user.group == 'Administrator' || this.user.group == 'Editor') {
+							let entries = JSON.parse(data.dictionary.entries[Object.keys(data.dictionary.entries)[0]].value)
+							for (let prop in entries) {
+								if (entries[prop].validated == false && entries[prop].refusedBy == undefined) {
+									entries[prop].mail = prop
+									members.push(entries[prop])
+								}
 							}
 						}
+						
 						this._httpService.getEntryJSON(AppSettings.API_REQUESTS)
 						.subscribe(
-							requests => {this.nbNewMembers = (Object.keys(requests.dictionary.entries).length + members.length)}
+
+							requests => {
+								this.nbNewMembers = (Object.keys(requests.dictionary.entries).length + members.length)
+								for (let prop in requests.dictionary.entries) {
+									var element = JSON.parse(requests.dictionary.entries[prop].value);
+									if (element.user == this._userservice.currentUser.mail && element.result != null && element.isVisited == undefined) {
+										element.hash = prop
+										this.requestsAnswered.push(element)
+									}
+								}
+								if (this.requestsAnswered.length > 0) {
+									$('#requests').modal({closable: false}).modal('show')
+								}
+							}
 						)
 						
 					}
@@ -135,9 +154,25 @@ export class MenuComponent implements OnInit {
 		this.myFeedback = new Feedback()
 		this.newProposition = "";
 		this.modifyFeedback = -1;
+		this.requestsAnswered = [];
 		this.loadingSaveOptions = false;
+		this.loadingRequests = false;
 		this.loadingAdd = false;
 		this.error = false;
+	}
+
+	hideModalMyRequests() {
+		let length = this.requestsAnswered.length -1
+		let promisesAll = []
+		for (let index = 0; index < this.requestsAnswered.length;index++) {
+			let element = this.requestsAnswered[index];
+			promisesAll.push(this._httpService.deleteEntryJSON(this._userservice.currentUser.secretKey, AppSettings.API_REQUESTS, element.hash))
+		}
+		Observable.forkJoin(promisesAll)
+		.subscribe((response) => {
+		   this.requestsAnswered.splice(0, this.requestsAnswered.length)
+		   $('#requests').modal('hide')
+		});
 	}
 
 	isValidNumber(value, id) {
@@ -148,15 +183,18 @@ export class MenuComponent implements OnInit {
 					if(value.repIntegrationEditor>20){value.repIntegrationEditor=20;}else if(value.repIntegrationEditor<1){value.repIntegrationEditor=1;}
 					break;
 				case 2:
-					if(value.repContribution>20){value.repContribution=20;}else if(value.repContribution<1){value.repContribution=1;}
+					if(value.repIntegrationAdministrator>100){value.repIntegrationAdministrator=100;}else if(value.repIntegrationAdministrator<1){value.repIntegrationAdministrator=1;}
 					break;
 				case 3:
-					if(value.repModify>20){value.repModify=20;}else if(value.repModify<1){value.repModify=1;}
+					if(value.repContribution>20){value.repContribution=20;}else if(value.repContribution<1){value.repContribution=1;}
 					break;
 				case 4:
-					if(value.repNew>20){value.repNew=20;}else if(value.repNew<1){value.repNew=1;}	
+					if(value.repModify>20){value.repModify=20;}else if(value.repModify<1){value.repModify=1;}
 					break;
 				case 5:
+					if(value.repNew>20){value.repNew=20;}else if(value.repNew<1){value.repNew=1;}	
+					break;
+				case 6:
 					if(value.repRevision>20){value.repRevision=20;}else if(value.repRevision<1){value.repRevision=1;}
 					break;
 			}
@@ -231,6 +269,7 @@ export class MenuComponent implements OnInit {
 				maxRating: 5
 			});
 		$('.menu .item').tab();
+		
 	}
 
 	delete() {
@@ -254,6 +293,7 @@ export class MenuComponent implements OnInit {
 						console.log(data)
 						if (this._userservice.currentUser.group == AppSettings.RULEADMINISTRATOR) {
 							this.settingsReputation.repIntegrationEditor = Number(this.settingsReputation.repIntegrationEditor)
+							this.settingsReputation.repIntegrationAdministrator = Number(this.settingsReputation.repIntegrationAdministrator)
 							this.settingsReputation.repContribution = Number(this.settingsReputation.repContribution)
 							this.settingsReputation.repNew = Number(this.settingsReputation.repNew)
 							this.settingsReputation.repModify = Number(this.settingsReputation.repModify)

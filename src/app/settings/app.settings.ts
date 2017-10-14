@@ -42,6 +42,11 @@ export class AppSettings {
 	public static TYPEREQUESTMODIFY = "modify"
 	public static TYPEREQUESTREVISION = "revision"
 
+	public static TEXTREQUESTRULE = "Changement de rôle"
+	public static TEXTREQUESTNEW = "Insertion d'un nouvelle entrée"
+	public static TEXTREQUESTMODIFY = "Modification d'une entrée"
+	public static TEXTREQUESTREVISON = "Ajout d'un nouveau commentaire"
+
 
 	public static TAGMEMBERS = "members"
 	public static TAGSETTINGS = "settings"

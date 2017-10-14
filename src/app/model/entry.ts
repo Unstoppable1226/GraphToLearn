@@ -46,7 +46,7 @@ export class Entry {
     updates : Array<Update> = [];
     comments : Array<Comment> = [];
 
-    setData(obj) {
+    setData(obj, entry) {
         this.context = obj.context.trim();
         this.definition = obj.definition.trim();
         this.meaning = obj.meaning
@@ -81,6 +81,8 @@ export class Entry {
         } else {
             this.lastUpdatedAuthor = ""
         }
+
+        this.author = { name: ((obj.author == undefined || obj.author == "") ? entry.author : obj.author), search: "" }
         
         this.parent = obj.parent == undefined ? "": obj.parent;
         this.inactive = obj.inactive == undefined ? "": obj.inactive;

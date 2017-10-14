@@ -56,9 +56,12 @@
                     </div>
                     <p>Vous êtes actuellement un membre
                         <span [ngClass]="{'group-Administrator': user.group == 'Administrator', 'group-Editor' : user.group == 'Editor', 'group-Lambda' : user.group == 'Lambda'}"
-                            style="font-weight: bold;">{{user.group}}</span>, mais vous avez la possibilité de changer votre rôle si vous possèdez une
+                            style="font-weight: bold;">{{user.group}}</span>. 
+                            <br>
+                            Pour devenir un membre <span class="group-Editor">[Editor]</span>, il est nécessaire d'avoir une
                         <strong>Réputation P</strong> supérieure ou égale à
-                        <span style="color:#2185d0;font-weight: bold">{{user.settingsReputation.repIntegrationEditor}}.</span>
+                        <span style="color:#2185d0;font-weight: bold">{{user.settingsReputation.repIntegrationEditor}}</span> et pour devenir un membre <span class="group-Administrator">[Administrator]</span>, il est nécessaire d'avoir une
+                        <strong>Réputation P</strong> supérieure ou égale à <span style="color:#2185d0;font-weight: bold">{{user.settingsReputation.repIntegrationAdministrator}}</span>. 
                     </p>
                 </div>
 
@@ -88,29 +91,32 @@
                         <div *ngIf="user.group != 'Lambda' && user.group != 'Administrator'" class="ui button basic blue" [ngClass]="{'loading' : loadingChangeRuleLambda}"
                             (click)="sendChangeRule('Lambda')">Faire la demande</div>
                         <div *ngIf="user.group == 'Administrator'" class="ui button basic blue" [ngClass]="{'loading' : loadingChangeRuleLambda}"
-                            (click)="sendChangeRule('Lambda')">Changer (Attention vous perdrez les droits que vous avez)</div>
+                            (click)="sendChangeRule('Lambda')">Changer (<span class="group-Administrator">Attention*</span> vous perdrez les droits que possède un Administrator dans l'outil)</div>
                     </div>
                     <div class="column">
                         <h4 class="ui header group-Editor">Editor</h4>
-                        <p>Il peut en plus d'un utilisateur Lambda : modifier un terme ou le désactiver et accepter des demandes
-                            d'accès d'autres membres</p>
+                        <p>Il peut en plus d'un utilisateur Lambda : modifier un terme ou le désactiver et accepter les demandes
+                            d'autres membres</p>
                         <div *ngIf="user.group == 'Editor'" class="ui message">
                             <p>Votre rôle</p>
                         </div>
                         <div *ngIf="user.group != 'Editor' && user.group != 'Administrator'" class="ui button basic green" [ngClass]="{'loading' : loadingChangeRuleEditor}"
                             (click)="sendChangeRule('Editor')">Faire la demande</div>
                         <div *ngIf="user.group == 'Administrator'" class="ui button basic green" [ngClass]="{'loading' : loadingChangeRuleEditor}"
-                            (click)="sendChangeRule('Editor')">Changer (Attention vous perdrez les droits que vous avez)</div>
+                            (click)="sendChangeRule('Editor')">Changer (<span class="group-Administrator">Attention*</span> vous perdrez les droits que possède un Administrator dans l'outil)</div>
                     </div>
                     <div class="column">
                         <h4 class="ui header group-Administrator">Administrator</h4>
-                        <p>Il a accès a toutes les fonctionnalités de l'outil comme l'affectation des rôles des membres ou modifier
-                            la distribution de la réputation.</p>
+                        <p>Il a accès a toutes les fonctionnalités de l'outil comme l'affectation des rôles des membres ou la modification de
+                            la distribution de la réputation au sein de l'outil pour l'ensemble de la communauté.</p>
                         <div *ngIf="user.group == 'Administrator'" class="ui message">
                             <p>Votre rôle</p>
                         </div>
-                        <div *ngIf="user.group != 'Administrator'" class="ui button basic red" [ngClass]="{'loading' : loadingChangeRuleAdministrator}"
+                        <div *ngIf="user.group != 'Administrator' && user.reputation >= user.settingsReputation.repIntegrationAdministrator" class="ui button basic red" [ngClass]="{'loading' : loadingChangeRuleAdministrator}"
                             (click)="sendChangeRule('Administrator')">Faire la demande</div>
+                        <div *ngIf="user.reputation < user.settingsReputation.repIntegrationAdministrator" class="ui red message">
+                            <p>Vous n'avez pas encore assez de Réputation P</p>
+                        </div>
                     </div>
                 </div>
             </div>

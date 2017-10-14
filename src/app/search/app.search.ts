@@ -108,7 +108,7 @@ export class AppSearch implements OnInit {
 	constructor(private _route: ActivatedRoute, private _wordsservice: WordsService, private _router: Router, private _alert: AlertsService, private _httpservice: HttpAPIService, private _format: Formatter, private _manager3d: Manager3D, private _userservice: UserService, public _historysearch: HistorySearchService) {
 		this._format.deleteAllModals()
 		this.user = new User()
-		this.lastModifItem = new EntryCowaboo("", "", "", "", "", "", "", "", "", "", "", [], [], false, "")
+		this.lastModifItem = new EntryCowaboo("", "", "", "", "", "", "", "", "", "", "", [], [], false, "", "")
 		delete (this._manager3d)
 		this._manager3d = new Manager3D(this._format)
 	}
@@ -373,7 +373,7 @@ export class AppSearch implements OnInit {
 				var element = this.modulesOfWord[props];
 				if (entry.modules.includes(element.id.trim())) {
 					objInsert = new Entry()
-					objInsert.setData(JSON.parse(obj[prop].value));
+					objInsert.setData(JSON.parse(obj[prop].value), obj[prop]);
 					objInsert.searchClick = obj[prop].conf[AppSettings.API_METASEARCHCLICK] == undefined || obj[prop].conf[AppSettings.API_METASEARCHCLICK] == 'NaN' ? 0 : obj[prop].conf[AppSettings.API_METASEARCHCLICK]
 
 					objInsert = this.constructLikeDislike(obj[prop].conf.like, 0, objInsert)
@@ -421,7 +421,7 @@ export class AppSearch implements OnInit {
 
 				instance.hashWordSel = prop;
 
-				instance.wordSearch.setData(JSON.parse(obj[prop].value));
+				instance.wordSearch.setData(JSON.parse(obj[prop].value), obj[prop]);
 
 				for (let i = 0; i < instance.wordSearch.modules.id.length; i++) {
 					instance.getSameModule(instance.wordSearch.modules.id[i].trim())
@@ -430,7 +430,6 @@ export class AppSearch implements OnInit {
 				instance.wordSearch.searchClick = nbSearch
 				instance.wordSearch.timestamp = instance._format.formatDate(obj[prop].date);
 				instance.wordSearch.timestampCreation = instance._format.getDate(obj[prop].date);
-				instance.wordSearch.author = { name: obj[prop].author, search: "" };
 
 
 				instance.allUsers[obj[prop].author] = { publicKey: instance._wordsservice.users.user_list.list[obj[prop].author], reputation: 0 }
@@ -641,7 +640,7 @@ export class AppSearch implements OnInit {
 	}
 
 	modifyWordOnAPI() {
-		let dataInfo = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, this.wordSel.updates, this.wordSel.comments, false, this.wordSel.commentary)
+		let dataInfo = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, this.wordSel.updates, this.wordSel.comments, false, this.wordSel.commentary, this.wordSel.author.name)
 
 		let dataInfoString = {
 			name: dataInfo.name,
@@ -1117,7 +1116,7 @@ export class AppSearch implements OnInit {
 	addComment() {
 		if (this.newComment != "" && this.wordFind) {
 			this.loadingAddComment = true
-			let dataInfo = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, this.wordSel.updates, this.wordSel.comments, false, this.wordSel.commentary)
+			let dataInfo = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, this.wordSel.updates, this.wordSel.comments, false, this.wordSel.commentary, this.wordSel.author.name)
 			let commentToInsert = new Comment(this.newComment, this._userservice.currentUser.mail + " [" + this._userservice.currentUser.group + "]", this._format.getTodayTimestamp(), [])
 			dataInfo.comments.push(commentToInsert)
 			let dataInfoString = {
@@ -1318,14 +1317,14 @@ export class AppSearch implements OnInit {
 			let context = $('#select-context').dropdown('get value') == "Aucun" ? "" : $('#select-context').dropdown('get value')
 
 			let updatesVersions: Array<Update> = Object.assign([], this.wordSel.updates)
-			let lastVersion = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, [], [], false, this.wordSel.commentary)
+			let lastVersion = new EntryCowaboo(this.wordSel.name, this.wordSel.type, this.wordSel.source, this.wordSel.modules.name, this.wordSel.definition, this.wordSel.meaning, this.wordSel.context, this.wordSel.review, this._format.getOneStringFromArrayString(this.wordSel.keywords), this.wordSel.parent, this.wordSel.timestampCreation, [], [], false, this.wordSel.commentary, this.wordSel.author.name)
 
 			updatesVersions.push(new Update(lastVersion, this._format.getTodayTimestamp(), this._userservice.currentUser.mail, true))
 
 
 
 
-			let dataInfo = new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, this.wordSel.review, tags, this.wordSel.parent, this.wordSel.timestampCreation, updatesVersions, this.wordSel.comments, false, this.wordSel.commentary)
+			let dataInfo = new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, this.wordSel.review, tags, this.wordSel.parent, this.wordSel.timestampCreation, updatesVersions, this.wordSel.comments, false, this.wordSel.commentary, this.wordSel.author.name)
 
 			let dataInfoString = {
 				name: dataInfo.name,

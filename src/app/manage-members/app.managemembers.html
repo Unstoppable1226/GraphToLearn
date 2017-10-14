@@ -15,56 +15,111 @@
         </button>
 
         <div class="ui top attached tabular menu">
-            <div class="item active" data-tab="demandes" style="cursor:pointer!important; width: 50%;font-size:1.3em;padding-left:18%;background: rgba(255, 255, 255, 0.55)">
+            <div class="item active" data-tab="demandes" style="cursor:pointer!important; width: 50%;font-size:1.3em;padding-left:18%;opacity: 0.8;background: white;">
                 <div>Liste des demandes</div>
             </div>
-            <div [hidden]="user.group != 'Administrator'" class="item" data-tab="rules" style="cursor:pointer!important;width: 50%;font-size:1.3em;padding-left:18%;background: rgba(255, 255, 255, 0.55)">Gestion des rôles</div>
+            <div [hidden]="user.group != 'Administrator'" class="item" data-tab="rules" style="cursor:pointer!important;width: 50%;font-size:1.3em;padding-left:18%;opacity: 0.8;background: white;">
+                <div class="ui button" [ngClass]="{'loading': loading}" style="background:none"></div>
+                Gestion des rôles
+            </div>
         </div>
-        <div class="ui bottom attached tab segment active" data-tab="demandes" style="text-align:center">
-            <form id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white; padding: 25px; text-align: center; margin-top:50px">
-                <h2>Nouvelles demandes d'accès
-                    <a class="ui green circular label">{{newMembers.length}}</a>
-                    <div class="ui button" style="margin-left: 20px" *ngIf="newMembers.length != 0" (click)="acceptAll()">Tout accepter</div>
-                </h2>
-                <div *ngIf="newMembers.length == 0" class="ui teal message">Aucune nouvelle demande d'accès</div>
-                <div class="ui middle aligned animated list">
-                    <div *ngFor="let member of newMembers; let i = index" class="item">
-                        <div class="right floated content">
-                            <div class="ui button positive" (click)="addMember(i, false)">Accepter</div>
-                            <div class="ui button negative" (click)="refuseMember(i)">Refuser</div>
-                        </div>
-                        <img class="ui avatar image" src="../assets/images/new-user.png">
-                        <div class="content">
-                            <div class="header">{{member.mail}}</div>
-                        </div>
-                    </div>
+        <div class="ui bottom attached tab segment active" data-tab="demandes" style="text-align:center" style="background: white!important;">
+            <form id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white!important; padding: 25px; text-align: center; margin-top:50px">
 
-
-                </div>
-                <hr>
-                <h2>Autres nouvelles demandes
-                    <a class="ui green circular label">{{allRequests.length}}</a>
-                </h2>
-                <div class="ui divided items">
-                    <div *ngFor="let request of allRequests; let i = index" class="item">
-                        <div class="content">
-                            <a class="header">Type de demande : <span style="color:#1e70bf">{{request.textType}}</span></a>
-                            <div class="meta">
-                                <span class="cinema">{{request.user}}</span>
-                            </div>
-                            <div class="description" style="font-weight: bold;">
-                                <p>{{request.text}}</p>
-                            </div>
-                            <div class="extra">
-                                <div class="ui button positive" (click)="acceptRequest(i, request)">Accepter</div>
-                                <div class="ui button negative" (click)="refuseRequest(i, request)">Refuser</div>
+                <div class="tabacc">
+                    <input class="input-tabacc" id="tabacc-one" type="checkbox" name="tabs">
+                    <label class="label-tabacc" for="tabacc-one">
+                        Vos demandes
+                        <a class="ui green circular label">{{yourRequests.length}}</a>
+                    </label>
+                    <div class="tabacc-content">
+                        <div *ngIf="yourRequests.length == 0" class="ui basic message">Vous n'avez aucune demande en cours ou traitée</div>
+                        <div class="ui divided items" style="margin-top:15px!important">
+                            <div *ngFor="let yrequest of yourRequests; let i = index" class="item">
+                                <div class="content">
+                                    <a class="header">Type de demande :
+                                        <span style="color:#1e70bf">{{yrequest.textType}}</span>
+                                    </a>
+                                    <div class="meta">
+                                        <span class="cinema">{{yrequest.user}} le {{yrequest.timestamp}}</span>
+                                    </div>
+                                    <div class="description" style="font-weight: bold;">
+                                        <p>{{yrequest.text}}</p>
+                                    </div>
+                                    <div class="extra">
+                                        <div *ngIf="yrequest.result == null" class="ui label orange">En cours de traitement</div>
+                                        <div *ngIf="yrequest.result && yrequest != null" class="ui label green">Votre demande a été accepté par {{yrequest.validatedBy}}</div>
+                                        <div *ngIf="yrequest != null && yrequest.result == false" class="ui label red">Votre demande a été refusé par {{yrequest.validatedBy}}</div>
+                                        <div *ngIf="yrequest.type == 1 || yrequest.type == 2" class="ui button">Plus de détails</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div *ngIf="user.group == 'Editor' || user.group == 'Administrator'" class="tabacc">
+                    <input class="input-tabacc" id="tabacc-two" type="checkbox" name="tabs">
+                    <label class="label-tabacc" for="tabacc-two">
+                        Nouvelles demandes d'accès
+                        <a class="ui green circular label">{{newMembers.length}}</a>
+                        <div class="ui button" style="margin-left: 20px" *ngIf="newMembers.length != 0" (click)="acceptAll()">Tout accepter</div>
+                    </label>
+                    <div class="tabacc-content">
+                        <div *ngIf="newMembers.length == 0" class="ui basic message">Aucune nouvelle demande d'accès</div>
+                        <div class="ui middle aligned animated list" style="margin-top:15px!important">
+                            <div *ngFor="let member of newMembers; let i = index" class="item">
+                                <div class="right floated content">
+                                    <div class="ui button positive" (click)="addMember(i, false)">Accepter</div>
+                                    <div class="ui button negative" (click)="refuseMember(i)">Refuser</div>
+                                </div>
+                                <img class="ui avatar image" src="../assets/images/new-user.png">
+                                <div class="content">
+                                    <div class="header">{{member.mail}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="user.group == 'Editor' || user.group == 'Administrator'" class="tabacc">
+                    <input class="input-tabacc" id="tabacc-three" type="checkbox" name="tabs">
+                    <label class="label-tabacc" for="tabacc-three">
+                        Autres nouvelles demandes
+                        <a class="ui green circular label">{{allRequests.length}}</a>
+                    </label>
+                    <div class="tabacc-content">
+
+                        <div *ngIf="allRequests.length == 0" class="ui basic message">Aucune nouvelle demande</div>
+                        <div class="ui divided items" style="margin-top:15px!important">
+                            <div *ngFor="let request of allRequests; let i = index" class="item">
+                                <div class="content">
+                                    <a class="header">Type de demande :
+                                        <span style="color:#1e70bf">{{request.textType}}</span>
+                                    </a>
+                                    <div class="meta">
+                                        <span class="cinema">{{request.user}} le {{request.timestamp}}</span>
+                                    </div>
+                                    <div class="description" style="font-weight: bold;">
+                                        <p>{{request.text}}</p>
+                                    </div>
+                                    <div class="extra">
+                                        <div *ngIf="request.type == 1 || request.type == 2" class="ui button">Plus de détails</div>
+                                        <div *ngIf="request.result == null" class="ui button positive" (click)="acceptRequest(i, request)">Accepter</div>
+                                        <div *ngIf="request.result == null" class="ui button negative" (click)="refuseRequest(i, request)">Refuser</div>
+                                        <div *ngIf="request.result != null && !request.result" class="ui label negative">Cette demande a été refusé par {{request.validatedBy}}</div>
+                                        <div *ngIf="request.result != null && request.result" class="ui label positive">Cette demande a été accepté par {{request.validatedBy}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </form>
         </div>
-        <div [hidden]="user.group != 'Administrator'" class="ui bottom attached tab segment" data-tab="rules" style="text-align:center">
+        <div [hidden]="user.group != 'Administrator'" class="ui bottom attached tab segment" data-tab="rules" style="text-align:center;background: white!important;">
 
             <form *ngIf="user.group == 'Administrator'" id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white; padding: 25px; text-align: center;">
                 <div class="ui icon message">

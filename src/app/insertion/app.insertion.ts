@@ -16,6 +16,8 @@ import { AppSettings } from '../settings/app.settings';
 /* Models  */
 import { Entry } from '../model/entry'
 import { EntryCowaboo } from '../model/entrycowaboo'
+import { Request } from '../model/request'
+import { RequestType } from '../model/request-type'
 
 /* Tools  */
 import { Formatter } from '../tools/app.formatter';
@@ -234,38 +236,60 @@ export class AppInsertion implements OnInit{
 			let type = $('#select-types').dropdown('get value') == "Aucun" ? "" :  $('#select-types').dropdown('get value')
 			let context = $('#select-context').text() == "Aucun" ? "" : $('#select-context').text()
 			
-			let dataInfo = new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, "", tags, "", this._format.getTodayTimestamp(), [], [], false, "")
+			let dataInfo = new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, "", tags, "", this._format.getTodayTimestamp(), [], [], false, "", this._userservice.currentUser.mail)
 			
-			instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name, instance._userservice.currentUser.secretKey)
-			.subscribe(
-				response => { // The communication with the API has matched
-					console.log(response)
-					instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, response, instance._userservice.currentUser.secretKey) // Put searchClick to 0
-					.subscribe(
-						resp =>  {
-							instance._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, instance._userservice.currentUser.publicKey, Number(instance._userservice.currentUser.settingsReputation.repNew))
-							.subscribe(
-								transferResponse => {
-									console.log(transferResponse)
-									if (transferResponse) {
-										instance.loading = false;
-										instance._alert.create('success', AppSettings.MSGSUCCESS)
-										this._userservice.currentUser.reputation += instance._userservice.currentUser.settingsReputation.repNew
-										data => instance.data = data
-										instance.reinit();
+			if (this._userservice.currentUser.group == AppSettings.RULEADMINISTRATOR) {
+				instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name, instance._userservice.currentUser.secretKey)
+				.subscribe(
+					response => { // The communication with the API has matched
+						console.log(response)
+						instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, response, instance._userservice.currentUser.secretKey) // Put searchClick to 0
+						.subscribe(
+							resp =>  {
+								instance._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, instance._userservice.currentUser.publicKey, Number(instance._userservice.currentUser.settingsReputation.repNew))
+								.subscribe(
+									transferResponse => {
+										console.log(transferResponse)
+										if (transferResponse) {
+											instance.loading = false;
+											instance._alert.create('success', AppSettings.MSGSUCCESS)
+											this._userservice.currentUser.reputation += instance._userservice.currentUser.settingsReputation.repNew
+											data => instance.data = data
+											instance.reinit();
+										}
 									}
-								}
-							)
-							
-						}	
-					)
-				},
-				// The communication with the API has not matched
-				error => {instance.loading = false; instance._alert.create('error', AppSettings.MSGERROR); },
-			);
+								)
+								
+							}	
+						)
+					},
+					// The communication with the API has not matched
+					error => {instance.loading = false; instance._alert.create('error', AppSettings.MSGERROR); },
+				)
+			} else {
+				this.sendRequest(dataInfo)
+			}
 		} else {
 			 this._alert.create('warning', AppSettings.MSGINCOMPLETED);
 		}
+	}
+
+	sendRequest(dataInfo : EntryCowaboo) {
+		let request : Request = new Request(AppSettings.TYPEREQUESTNEW)
+		request.user = this._userservice.currentUser.mail
+		request.timestamp = this._format.getTodayTimestamp()
+		request.textType = AppSettings.TEXTREQUESTNEW
+		request.content = dataInfo
+		request.publicKeySender = this._userservice.currentUser.publicKey
+		this._httpService.postEntryJSON(request, AppSettings.API_REQUESTS, AppSettings.TYPEREQUESTNEW + "-" + dataInfo.name, this._userservice.currentUser.secretKey)
+		.subscribe(
+			res => {
+				this.loading = false;
+				this.reinit();
+				this._alert.create('success', "La communauté vous remercie pour votre proposition d'insertion de l'entrée : " + dataInfo.name + ", sur GraphTolearn. Votre demande sera accepter ou refuser par des membres éditeurs ou administrateurs et vous serez notifier dès qu'elle sera traitée", {duration:30000})
+				
+			}
+		)
 	}
 
 	switchExistsOrAddModule(val, choice) {

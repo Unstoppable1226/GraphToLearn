@@ -1,5 +1,6 @@
 export class SettingsReputation {
     repIntegrationEditor : number // Default value
+    repIntegrationAdministrator : number // Default value
     repContribution : number // Default value
     repNew : number // Default value
     repModify : number// Default value
@@ -7,6 +8,7 @@ export class SettingsReputation {
 
     constructor() {
         this.repIntegrationEditor = 3;
+        this.repIntegrationAdministrator = 3;
         this.repContribution = 1;
         this.repNew = 1;
         this.repModify = 1;

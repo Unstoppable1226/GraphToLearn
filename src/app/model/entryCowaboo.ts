@@ -18,8 +18,9 @@ export class EntryCowaboo {
     comments : Array<Comment> = []
     inactive : boolean = false
     commentary : string = ""
+    author : string = ""
 
-    constructor(name : string, type: string, source : string, modules: string, definition: string, meaning : string, context: string, review : string, keywords: string,  parent: string, timestampCreation : string, updates : Array<Update>, comments : Array<Comment>, inactive : boolean, commentary : string) {
+    constructor(name : string, type: string, source : string, modules: string, definition: string, meaning : string, context: string, review : string, keywords: string,  parent: string, timestampCreation : string, updates : Array<Update>, comments : Array<Comment>, inactive : boolean, commentary : string, author : string) {
         this.name = name;
         this.type = type;
         this.source = source;
@@ -35,5 +36,6 @@ export class EntryCowaboo {
         this.comments = comments;
         this.inactive = inactive;
         this.commentary = commentary;
+        this.author = author;
     }
 }

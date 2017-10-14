@@ -1,22 +1,31 @@
 <div class="ui inverted segment" style="padding: 0.3em!important;margin-bottom:0px!important">
 	<div class="ui inverted secondary menu right">
 		<a class="item" [ngClass]="{'active': active[0]}" (click)="changeActiveMenuItem(0, 'home')">
-			Accueil <i class="right home icon" style="margin-left:5px"></i>
+			Accueil
+			<i class="right home icon" style="margin-left:5px"></i>
 		</a>
-		<a class="item" [ngClass]="{'active': active[1]}" data-tooltip="Consulter votre profil" data-inverted=""
-		data-position="bottom center" (click)="changeActiveMenuItem(1, 'profile')">
-			{{user.mail}} <span style="margin-left:5px" [ngClass]="{'group-Administrator': user.group == 'Administrator', 'group-Editor' : user.group == 'Editor', 'group-Lambda' : user.group == 'Lambda'}">[{{user.group}}]</span> <i class="right user icon" style="margin-left:5px"></i>
+		<a class="item" [ngClass]="{'active': active[1]}" data-tooltip="Consulter votre profil" data-inverted="" data-position="bottom center"
+		 (click)="changeActiveMenuItem(1, 'profile')">
+			{{user.mail}}
+			<span style="margin-left:5px" [ngClass]="{'group-Administrator': user.group == 'Administrator', 'group-Editor' : user.group == 'Editor', 'group-Lambda' : user.group == 'Lambda'}">[{{user.group}}]</span>
+			<i class="right user icon" style="margin-left:5px"></i>
 		</a>
-		<a class="item" [ngClass]="{'active': active[2]}" (click)="toggleSideBar()" data-tooltip="Consulter l'historique de vos dernières recherches" data-inverted=""
-		data-position="bottom center">
-			Récentes recherches <i class="right history icon" style="margin-left:5px"></i>
+		<a class="item" [ngClass]="{'active': active[2]}" (click)="toggleSideBar()" data-tooltip="Consulter l'historique de vos dernières recherches"
+		 data-inverted="" data-position="bottom center">
+			Récentes recherches
+			<i class="right history icon" style="margin-left:5px"></i>
 		</a>
 
-		<a *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')" class="item" [ngClass]="{'active': active[3]}" (click)="changeActiveMenuItem(3, 'manage-members')">
-			Gestion membres<a class="ui green circular label">{{nbNewMembers}}</a><i class="right users icon" style="margin-left:5px"></i>
+		<a class="item" [ngClass]="{'active': active[3]}" (click)="changeActiveMenuItem(3, 'manage-members')">
+			<span *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')">Gestion membres et demandes</span>
+			<span *ngIf="(user.group == 'Lambda')">Vos demandes<i  class="right idea icon" style="margin-left:5px"></i></span>
+			
+			<a *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')" class="ui green circular label">{{nbNewMembers}}</a>
+			<i *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')" class="right users icon" style="margin-left:5px"></i>
 		</a>
 		<a class="item right" data-tooltip="Cette réputation correspond à votre Réputation P" data-position="bottom center" data-inverted="">
-			Ma réputation <a class="ui red left pointing label" [ngClass]="{'blue': user.reputation > -1 }">{{user.reputation}}</a>
+			Ma réputation
+			<a class="ui red left pointing label" [ngClass]="{'blue': user.reputation > -1 }">{{user.reputation}}</a>
 		</a>
 		<a class="item" style="margin-left: auto;" (click)="showInfo()" data-tooltip="Infos GraphToLearn et son fonctionnement" data-inverted=""
 		 data-position="bottom center">
@@ -29,7 +38,8 @@
 			<i class="settings icon" style="margin-left:5px"></i>
 		</a>
 		<a class="item right" (click)="logout()">
-			Se déconnecter <i class="right sign out icon" style="margin-left:5px"></i>
+			Se déconnecter
+			<i class="right sign out icon" style="margin-left:5px"></i>
 		</a>
 	</div>
 </div>
@@ -40,8 +50,9 @@
 		Feedback sur GraphToLearn
 	</div>
 	<div class="scrolling content">
-		<p>Donner votre avis sur <strong>GraphToLearn</strong> et donner des propositions d'amélioration afin de renforcer l'expérience
-			de l'utilisateur à travers l'outil. </p>
+		<p>Donner votre avis sur
+			<strong>GraphToLearn</strong> et donner des propositions d'amélioration afin de renforcer l'expérience de l'utilisateur à travers
+			l'outil. </p>
 		<h3>Votre avis
 			<div class="ui rating" data-max-rating="5" style="margin-left:5px"></div>
 		</h3>
@@ -51,7 +62,7 @@
 			<div *ngFor="let feed of allFeedbacks; let i = index" class="comment">
 				<a class="avatar">
 					<img src="../assets/images/user.jpg">
-				  </a>
+				</a>
 				<div class="content">
 					<a class="author">{{feed.author}}</a>
 					<div class="metadata">
@@ -85,17 +96,23 @@
 		<h3>Objectifs</h3>
 		<p>
 			L'outil sert à pouvoir rechercher des mots qui ont été créé par les gens de la communauté GraphToLearn. Ces mots là apparaîtront
-			à l'utilisateur de manière graphique (3D) grâce à la librairie <strong>BabylonJS</strong>. Plusieurs possibilités s'offrent
-			alors pour l'utilisateur:<br><br> 1 - Donner son avis sur un contenu, cela améliorera alors la réputation du mot lorsqu'il
-			sera recherché une nouvelle fois <br> 2 - Commenter le mot; <br>3 - Modifier le mot donnera <strong>1</strong> de réputation
-			en plus à l'utilisateur qui a apporté la modifications;
+			à l'utilisateur de manière graphique (3D) grâce à la librairie
+			<strong>BabylonJS</strong>. Plusieurs possibilités s'offrent alors pour l'utilisateur:
+			<br>
+			<br> 1 - Donner son avis sur un contenu, cela améliorera alors la réputation du mot lorsqu'il sera recherché une nouvelle
+			fois
+			<br> 2 - Commenter le mot;
+			<br>3 - Modifier le mot donnera
+			<strong>1</strong> de réputation en plus à l'utilisateur qui a apporté la modifications;
 		</p>
 		<hr>
 		<h3>Réputation</h3>
 		<p>La réputation est l’importance quantifiée qui sert à distinguer, évaluer et différencier toutes les entrées et les membres
-			de la communauté selon la recherche effectuée. <br> Règles définis <br> • Toutes les entrées et personnes doivent avoir
-			une réputation. <br> • Si une entrée est associée à x module(s), alors elle possède x réputation(s), chacune correspondant
-			à un module. <br>
+			de la communauté selon la recherche effectuée.
+			<br> Règles définis
+			<br> • Toutes les entrées et personnes doivent avoir une réputation.
+			<br> • Si une entrée est associée à x module(s), alors elle possède x réputation(s), chacune correspondant à un module.
+			<br>
 		</p>
 		<hr>
 		<h3>Algorithme de classification collaborative</h3>
@@ -154,8 +171,8 @@
 					<div class="description">
 						<p>Une entrée a la priorité lorsqu’elle a été créée par une personne avec une meilleure Réputation P.</p>
 						<p>Dans cette règle, la réputation en question est celle d’une personne et non d’une entrée. En effet, le solde du compte
-							Stellar de la personne qui a créé l’entrée est consulté et transformé en réputation. <br>Exemple : une personne possède
-							x dans la monnaie Stellar, elle possède alors x de réputation.</p>
+							Stellar de la personne qui a créé l’entrée est consulté et transformé en réputation.
+							<br>Exemple : une personne possède x dans la monnaie Stellar, elle possède alors x de réputation.</p>
 					</div>
 				</div>
 			</div>
@@ -163,8 +180,8 @@
 				<div class="content">
 					<a class="header">Avis sur le contenu</a>
 					<div class="description">
-						<p>Une entrée a la priorité lorsqu’un meilleur score est obtenu pour la formule qui suit : <br> • (Nombre de votes positifs
-							- Nombre de votes négatifs) = score
+						<p>Une entrée a la priorité lorsqu’un meilleur score est obtenu pour la formule qui suit :
+							<br> • (Nombre de votes positifs - Nombre de votes négatifs) = score
 						</p>
 						<p>La soustraction de ces deux résultats fera ainsi variée le score. Si le score obtenu est négatif cela voudra dire que
 							l’entrée possède plus d’avis négatifs que positifs. En conséquence, elle fera « théoriquement » baisser la réputation
@@ -208,8 +225,9 @@
 		</div>
 		<hr>
 		<h3>API</h3>
-		<a>http://groups.cowaboo.net/group-graphToLearn/public/api</a><br>
-		<h5>L’outil utilise 8 observatoires qui vous sont présentés ci-dessous, sous forme de tableau.</h5>
+		<a href="http://groups.cowaboo.net/group-graphToLearn/public/api"></a>
+		<br>
+		<h5>L’outil utilise 9 observatoires qui vous sont présentés ci-dessous, sous forme de tableau.</h5>
 		<table class="ui single line table">
 			<thead>
 				<tr>
@@ -252,6 +270,10 @@
 					<td>Settings</td>
 					<td>Contient tous les paramètres de l’outil.</td>
 				</tr>
+				<tr>
+					<td>Requests</td>
+					<td>Contient toutes les demandes en cours de traitement de tous les membres.</td>
+				</tr>
 			</tbody>
 		</table>
 	</div>
@@ -264,7 +286,9 @@
 		Paramètres de l'outil
 	</div>
 	<div class="scrolling content">
-		<p>Ici, vous pouvez ajuster certains réglages afin d'améliorer votre expérience sur l'outil <strong>GraphToLearn</strong></p>
+		<p>Ici, vous pouvez ajuster certains réglages afin d'améliorer votre expérience sur l'outil
+			<strong>GraphToLearn</strong>
+		</p>
 		<hr>
 		<div class="ui top attached tabular menu">
 			<div class="item active" data-tab="search" style="cursor:pointer!important">Recherche</div>
@@ -276,22 +300,26 @@
 				<div class="field">
 					<label>Terme recherché : </label>
 					<input type="text" [(ngModel)]="settingsGeneral.colSearchTerm" [ngModelOptions]="{standalone: true}" name="search-term" placeholder="Couleur ..."
-					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colSearchTerm}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
+					 style="width: 150px">
+					<a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colSearchTerm}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
 				</div>
 				<div class="field">
 					<label>Mots clés: </label>
 					<input type="text" [(ngModel)]="settingsGeneral.colKeyWords" [ngModelOptions]="{standalone: true}" name="key-word" placeholder="Couleur ..."
-					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colKeyWords}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
+					 style="width: 150px">
+					<a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colKeyWords}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
 				</div>
 				<div class="field">
 					<label>Module : </label>
 					<input type="text" [(ngModel)]="settingsGeneral.colModule" [ngModelOptions]="{standalone: true}" name="module" placeholder="Couleur ..."
-					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colModule}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
+					 style="width: 150px">
+					<a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colModule}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
 				</div>
 				<div class="field">
 					<label>Autres termes : </label>
 					<input type="text" [(ngModel)]="settingsGeneral.colOtherTerms" [ngModelOptions]="{standalone: true}" name="other-terms" placeholder="Couleur ..."
-					 style="width: 150px"><a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colOtherTerms}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
+					 style="width: 150px">
+					<a class="ui empty circular label" [ngStyle]="{'background-color': settingsGeneral.colOtherTerms}" style="margin-left: 5px;width: 15px;height: 15px;margin-top: 10px;"></a>
 				</div>
 
 			</form>
@@ -309,39 +337,94 @@
 				<div class="header">
 					Modification de la distribution de la réputation
 				</div>
-				<p>Vous êtes administrateur vous pouvez donc changer les niveaux de distribution de la réputation configurés
-					dans l'outil en changeant les valeurs ci-dessous. <br><strong> <span style="color:#C01515">Attention</span>, les changements effectués auront des repércussions sur l'ensemble des autres membres. En effet, les modifications seront apportées aussi sur tous les autres membres de la communauté, à ne pas négliger! </strong></p>
+				<p>Vous êtes administrateur vous pouvez donc changer les niveaux de distribution de la réputation configurés dans l'outil
+					en changeant les valeurs ci-dessous.
+					<br>
+					<strong>
+						<span style="color:#C01515">Attention</span>, les changements effectués auront des repércussions sur l'ensemble des autres membres. En effet, les
+						modifications seront apportées aussi sur tous les autres membres de la communauté, à ne pas négliger! </strong>
+				</p>
 			</div>
 			<form *ngIf="(user.group == 'Administrator')" [ngClass]="{'loading': loadingSaveOptions}" class="ui form">
 				<div class="field">
-					<label>Réputation nécessaire pour faire partie d'un groupe d'éditeurs :</label>
-					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 1)"  [(ngModel)]="settingsReputation.repIntegrationEditor" [ngModelOptions]="{standalone: true}" name="search-term"
-					 style="width: 70px">
+					<label>Réputation nécessaire pour pouvoir faire une demande afin intégrer le groupe d'éditeurs :</label>
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 1)" [(ngModel)]="settingsReputation.repIntegrationEditor"
+					 [ngModelOptions]="{standalone: true}" name="search-term" style="width: 70px">
 				</div>
 				<div class="field">
-					<label>Réputation donné lorsqu'un utilisateur <span style="color:#C01515">apprécie le contenu d'un terme</span></label>
-					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 2)" [(ngModel)]="settingsReputation.repContribution" [ngModelOptions]="{standalone: true}" name="key-word"
-					 style="width: 70px">
+					<label>Réputation nécessaire pour pouvoir faire une demande afin intégrer le groupe d'administrateur :</label>
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 2)" [(ngModel)]="settingsReputation.repIntegrationAdministrator"
+					 [ngModelOptions]="{standalone: true}" name="search-term" style="width: 70px">
 				</div>
 				<div class="field">
-					<label>Réputation donné lorsqu'un utilisateur <span style="color:#C01515">modifie le contenu d'un terme</span></label>
-					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 3)" [(ngModel)]="settingsReputation.repModify" [ngModelOptions]="{standalone: true}" name="module" style="width: 70px">
+					<label>Réputation donné lorsqu'un utilisateur
+						<span style="color:#C01515">apprécie le contenu d'un terme</span>
+					</label>
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 3)" [(ngModel)]="settingsReputation.repContribution"
+					 [ngModelOptions]="{standalone: true}" name="key-word" style="width: 70px">
 				</div>
 				<div class="field">
-					<label>Réputation donné lorsqu'un utilisateur <span style="color:#C01515">insére un nouveau terme</span></label>
-					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 4)" [(ngModel)]="settingsReputation.repNew" [ngModelOptions]="{standalone: true}" name="other-terms" style="width: 70px">
+					<label>Réputation donné lorsqu'un utilisateur
+						<span style="color:#C01515">modifie le contenu d'un terme</span>
+					</label>
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 4)" [(ngModel)]="settingsReputation.repModify" [ngModelOptions]="{standalone: true}"
+					 name="module" style="width: 70px">
 				</div>
 				<div class="field">
-					<label>Réputation donné lorsqu'un utilisateur <span style="color:#C01515">fait une révision (commentaire) sur un terme</span></label>
-					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 5)" [(ngModel)]="settingsReputation.repRevision" [ngModelOptions]="{standalone: true}" name="other-terms"
-					 style="width: 70px">
+					<label>Réputation donné lorsqu'un utilisateur
+						<span style="color:#C01515">insére un nouveau terme</span>
+					</label>
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 5)" [(ngModel)]="settingsReputation.repNew" [ngModelOptions]="{standalone: true}"
+					 name="other-terms" style="width: 70px">
+				</div>
+				<div class="field">
+					<label>Réputation donné lorsqu'un utilisateur
+						<span style="color:#C01515">fait une révision (commentaire) sur un terme</span>
+					</label>
+					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 6)" [(ngModel)]="settingsReputation.repRevision"
+					 [ngModelOptions]="{standalone: true}" name="other-terms" style="width: 70px">
 				</div>
 
 			</form>
 		</div>
-		<div class="ui fluid large approve button button-blur" style="margin-left:0px"  [ngClass]="{'loading': loadingSaveOptions}"  (click)="saveOptions()">Enregistrer modifications<i class="right checkmark icon"></i></div>
+		<div class="ui fluid large approve button button-blur" style="margin-left:0px" [ngClass]="{'loading': loadingSaveOptions}"
+		 (click)="saveOptions()">Enregistrer modifications
+			<i class="right checkmark icon"></i>
+		</div>
 	</div>
 
+</div>
+
+<div id="requests" class="ui modal">
+	<div class="header">
+		Vos Demandes Traitées <i  class="right idea icon" style="margin-left:5px"></i>
+	</div>
+	<div class="scrolling content" style="text-align:center!important">
+		<h3>Voici vos demandes qui ont été traitées par la communauté</h3>
+		<div class="ui divided items">
+			<div *ngFor="let request of requestsAnswered; let i = index" class="item">
+				<div class="content">
+					<a class="header">Type de demande :
+						<span style="color:#1e70bf">{{request.textType}}</span>
+					</a>
+					<div class="meta">
+						<span class="cinema">{{request.user}} le {{request.timestamp}}</span>
+					</div>
+					<div class="description" style="font-weight: bold;">
+						<p>{{request.text}}</p>
+					</div>
+					<div class="extra">
+						<div *ngIf="!request.result" class="ui label red">Votre demande a été refusé par {{request.validatedBy}}</div>
+						<div *ngIf="request.result" class="ui label green">Votre demande a été accepté par {{request.validatedBy}}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="ui fluid large approve button button-blur" style="margin-left:0px" [ngClass]="{'loading': loadingMyRequests}"
+		(click)="hideModalMyRequests()">Merci, j'en ai bien pris connaissance
+		   <i class="right checkmark icon"></i>
+	   </div>
+	</div>
 </div>
 
 <div class="ui mini modal">
@@ -364,7 +447,8 @@
 
 <!--The content below is only a placeholder and can be replaced.-->
 <div class="ui left vertical menu sidebar inverted">
-	<a class="item" style="font-size:1.1em;text-align:center;"> <span style="margin-bottom:10px">Historique de vos 15 dernières recherches</span>
+	<a class="item" style="font-size:1.1em;text-align:center;">
+		<span style="margin-bottom:10px">Historique de vos 15 dernières recherches</span>
 		<div class="ui animated fluid button" tabindex="0" style="margin-top:10px!important" (click)="delete()">
 			<div class="visible content">Tout effacer</div>
 			<div class="hidden content">
@@ -374,6 +458,7 @@
 	</a>
 	<!-- href="http://localhost:4200/search/{{his}}" -->
 	<a *ngFor="let his of historySearch.reverse(); let i = index" class="item" (click)="searchSelectedWord(his)">
-		{{his}} <i class="search icon"></i>
-    </a>
+		{{his}}
+		<i class="search icon"></i>
+	</a>
 </div>

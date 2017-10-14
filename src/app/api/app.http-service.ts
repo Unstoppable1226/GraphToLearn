@@ -98,4 +98,10 @@ export class HttpAPIService {
 		return this._http.post(AppSettings.API_ENTRYMETADATA + "metadata%20name=" + name + "&metadata%20value=" + value, "secretKey=" + secretKey + "&observatoryId=Words&hash=" + hashEntry, options)
 			.map((res: Response) => res);
 	}
+
+	deleteEntryJSON(secretKey, observatoryId, hash) {
+		let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let options = new RequestOptions({ headers: headers, body : "secretKey=" + secretKey + "&observatoryId=" + observatoryId + "&hash=" + hash});
+		return this._http.delete(AppSettings.API_ENTRY, options)
+	}
 }

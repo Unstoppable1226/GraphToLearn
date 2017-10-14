@@ -86,6 +86,7 @@ export class AppProfile implements OnInit {
 		request.user = this.user.mail
 		request.timestamp = this._format.getTodayTimestamp()
 		request.content = rule
+		request.textType = AppSettings.TEXTREQUESTRULE
 		this._httpService.postEntryJSON(request, AppSettings.API_REQUESTS, AppSettings.TYPEREQUESTRULE + "-" + this.user.mail, this.user.secretKey)
 		.subscribe(
 			res => {
