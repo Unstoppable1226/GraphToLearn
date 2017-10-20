@@ -15,7 +15,7 @@ import { Proposition } from '../model/proposition'
 import { UserService } from '../model/user-service'
 import { HistorySearchService } from '../model/history-search'
 import { WordsService } from '../model/words-service'
-import { Observable } from 'rxjs/Rx';
+import { Observable, Observer } from 'rxjs/Rx';
 
 declare var $: any;
 
@@ -29,6 +29,7 @@ export class MenuComponent implements OnInit {
 
 	public isConnected
 	public nbNewMembers = 0
+	public nbReputationGained = 0
 	public requestsAnswered = []
 	public active
 	public user
@@ -43,15 +44,15 @@ export class MenuComponent implements OnInit {
 	public allFeedbacks: Array<Proposition>
 	public modifyFeedback: number
 	public loadingSaveOptions: boolean
-	public loadingRequests : boolean
+	public loadingRequests: boolean
 	public loadingAdd: boolean
 	public error: boolean
-	public settingsReputation : SettingsReputation
-	public settingsGeneral : SettingsGeneral
+	public settingsReputation: SettingsReputation
+	public settingsGeneral: SettingsGeneral
 
-	
 
-	constructor(private _httpService: HttpAPIService, private _alert : AlertsService, private _wordsservice : WordsService, private _format: Formatter, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch: HistorySearchService) {
+
+	constructor(private _httpService: HttpAPIService, private _alert: AlertsService, private _wordsservice: WordsService, private _format: Formatter, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch: HistorySearchService) {
 		$('.ui.left.vertical.menu.sidebar.inverted').remove()
 	}
 
@@ -59,14 +60,14 @@ export class MenuComponent implements OnInit {
 		let instance = this;
 		this.initVariables()
 		this._userservice.getCurrentUser()
-		.then(
-			data => { 
-				this.user = this._userservice.currentUser ;
+			.then(
+			data => {
+				this.user = this._userservice.currentUser;
 				this.settingsGeneral = this._userservice.currentUser.settingsGeneral;
 				this.init()
 				this._httpService.getEntryJSON(AppSettings.API_MEMBERS)
-				.subscribe(
-					data=> {
+					.subscribe(
+					data => {
 						let members = [];
 						if (this.user.group == 'Administrator' || this.user.group == 'Editor') {
 							let entries = JSON.parse(data.dictionary.entries[Object.keys(data.dictionary.entries)[0]].value)
@@ -77,33 +78,41 @@ export class MenuComponent implements OnInit {
 								}
 							}
 						}
-						
+
 						this._httpService.getEntryJSON(AppSettings.API_REQUESTS)
-						.subscribe(
+							.subscribe(
 
 							requests => {
+								let nbReputGained = 0
 								this.nbNewMembers = (Object.keys(requests.dictionary.entries).length + members.length)
 								for (let prop in requests.dictionary.entries) {
 									var element = JSON.parse(requests.dictionary.entries[prop].value);
 									if (element.user == this._userservice.currentUser.mail && element.result != null && element.isVisited == undefined) {
 										element.hash = prop
+										nbReputGained += Number(element.reputationGained)
 										this.requestsAnswered.push(element)
 									}
 								}
 								if (this.requestsAnswered.length > 0) {
-									$('#requests').modal({closable: false}).modal('show')
+									this.nbReputationGained += nbReputGained
+									this._userservice.getReputation(this._userservice.currentUser.publicKey).subscribe(
+										reput => {
+											this._userservice.currentUser.reputation = reput;
+											$('#requests').modal({ closable: false }).modal('refresh').modal('show')
+										}
+									)
 								}
 							}
-						)
-						
+							)
+
 					}
-				)
+					)
 			}, error => {
-				setTimeout(function(){
-					instance.ngOnInit()	
+				setTimeout(function () {
+					instance.ngOnInit()
 				}, 300);
 			}
-		)
+			)
 	}
 
 	init() {
@@ -140,6 +149,7 @@ export class MenuComponent implements OnInit {
 
 	initVariables() {
 		this.user = new User();
+		this.nbReputationGained = 0;
 		this.isConnected = false
 		this.active = [true, false, false, false]
 		this.colSearchTerm = AppSettings.COL_SEARCH_TERM
@@ -161,43 +171,97 @@ export class MenuComponent implements OnInit {
 		this.error = false;
 	}
 
+	getHashWord(element){
+		return new Promise((resolve, reject) => {
+			this._httpService.getEntryJSON(AppSettings.API_REQUESTS)
+			.subscribe(
+				requests => {
+					let entries = requests.dictionary.entries;
+					let tag = ""
+					if (element.type == 1) {
+						tag = AppSettings.TYPEREQUESTRULE + "-" + element.user
+					} else if (element.type == 2) {
+						tag = AppSettings.TYPEREQUESTNEW + "-" + element.content.name
+					} else if (element.type == 3) {
+						tag = AppSettings.TYPEREQUESTMODIFY + "-" + element.content.name
+					} else {
+						tag = AppSettings.TYPEREQUESTREVISION + "-" + element.content.name + "-" + element.timestamp
+					}
+					let hash = ""
+					for (let prop in entries) {
+						var tags = entries[prop].tags;
+						if (tags == ("||" + tag + "||")) {element.hash = prop}
+					}
+					resolve(hash)
+				})
+			})
+	}
+
+
 	hideModalMyRequests() {
-		let length = this.requestsAnswered.length -1
+		let length = this.requestsAnswered.length - 1
+		this.loadingAdd = true
 		let promisesAll = []
-		for (let index = 0; index < this.requestsAnswered.length;index++) {
-			let element = this.requestsAnswered[index];
-			promisesAll.push(this._httpService.deleteEntryJSON(this._userservice.currentUser.secretKey, AppSettings.API_REQUESTS, element.hash))
+		let isRuleChanged = ""
+		let instance = this;
+
+		for (let index = 0; index < this.requestsAnswered.length; index++) {
+			let element = instance.requestsAnswered[index];
+			if (element.type == 1) { isRuleChanged = element.rule; }
+			
+			this._httpService.deleteEntryJSON(this._userservice.currentUser.secretKey, AppSettings.API_REQUESTS, element.hash ).subscribe(
+				res => {
+					if (index == length) {
+						this.requestsAnswered.splice(0, this.requestsAnswered.length)
+						if (isRuleChanged != "") { this.user.group == isRuleChanged; this._userservice.currentUser.group == isRuleChanged }
+						this.loadingAdd = false
+						$('#requests').modal('hide')
+					} else {
+						console.log(index)
+					}
+				}
+			)
+			
 		}
-		Observable.forkJoin(promisesAll)
-		.subscribe((response) => {
-		   this.requestsAnswered.splice(0, this.requestsAnswered.length)
-		   $('#requests').modal('hide')
-		});
+		/*
+		Observable.forkJoin(promisesAll, 
+			resAll => {
+				console.log(resAll)
+				
+			}
+		)*/
 	}
 
 	isValidNumber(value, id) {
 		let instance = this;
-		setTimeout(function(){
+		setTimeout(function () {
 			switch (id) {
 				case 1:
-					if(value.repIntegrationEditor>20){value.repIntegrationEditor=20;}else if(value.repIntegrationEditor<1){value.repIntegrationEditor=1;}
+					if (value.repIntegrationEditor > 20) { value.repIntegrationEditor = 20; } else if (value.repIntegrationEditor < 1) { value.repIntegrationEditor = 1; }
 					break;
 				case 2:
-					if(value.repIntegrationAdministrator>100){value.repIntegrationAdministrator=100;}else if(value.repIntegrationAdministrator<1){value.repIntegrationAdministrator=1;}
+					if (value.repIntegrationAdministrator > 100) { value.repIntegrationAdministrator = 100; } else if (value.repIntegrationAdministrator < 1) { value.repIntegrationAdministrator = 1; }
 					break;
 				case 3:
-					if(value.repContribution>20){value.repContribution=20;}else if(value.repContribution<1){value.repContribution=1;}
+					if (value.repContribution > 20) { value.repContribution = 20; } else if (value.repContribution < 1) { value.repContribution = 1; }
 					break;
 				case 4:
-					if(value.repModify>20){value.repModify=20;}else if(value.repModify<1){value.repModify=1;}
+					if (value.repModify > 20) { value.repModify = 20; } else if (value.repModify < 1) { value.repModify = 1; }
 					break;
 				case 5:
-					if(value.repNew>20){value.repNew=20;}else if(value.repNew<1){value.repNew=1;}	
+					if (value.repNew > 20) { value.repNew = 20; } else if (value.repNew < 1) { value.repNew = 1; }
 					break;
 				case 6:
-					if(value.repRevision>20){value.repRevision=20;}else if(value.repRevision<1){value.repRevision=1;}
+					if (value.repRevision > 20) { value.repRevision = 20; } else if (value.repRevision < 1) { value.repRevision = 1; }
 					break;
 			}
+		}, 1)
+	}
+
+	isValidNumberRules(value, id) {
+		let instance = this;
+		setTimeout(function () {
+			if (value['rule'+ id].coefficient > 20) { value['rule'+ id].coefficient = 20} else if (value['rule'+ id].coefficient  < 1) { value['rule'+ id].coefficient = 1; }
 		}, 1)
 	}
 
@@ -231,31 +295,34 @@ export class MenuComponent implements OnInit {
 
 		this._httpService.postObservatoryMetadata(AppSettings.API_METAFEEDBACKPROP, JSON.stringify(this.feedbacks), AppSettings.API_FEEDBACK, this._userservice.currentUser.secretKey)
 			.subscribe(
-				data => { console.log(data); this.newProposition = "", this.allFeedbacks.splice(0, this.allFeedbacks.length); this.init(); this.loadingAdd = false },
-				err => { console.log(err) }
+			data => { console.log(data); this.newProposition = "", this.allFeedbacks.splice(0, this.allFeedbacks.length); this.init(); this.loadingAdd = false },
+			err => { console.log(err) }
 			)
 	}
 
 	showHistorySearch() {
-		$('.ui.sidebar').sidebar({transition : 'overlay', useLegacy : true}).sidebar('toggle').sidebar('setting', {onHide : function() {
-			$('.pusher').removeClass('pusher dimmed')
-		}})
+		$('.ui.sidebar').sidebar({ transition: 'overlay', useLegacy: true }).sidebar('toggle').sidebar('setting', {
+			onHide: function () {
+				$('.pusher').removeClass('pusher dimmed')
+			}
+		})
 	}
 
 	toggleSideBar() {
 		if (this.historySearch.length == 0) {
 			this._httpService.getEntryJSON(AppSettings.API_HISTORY)
-			.subscribe(
+				.subscribe(
 				data => {
 					try {
 						this._historysearch.lastSearches = JSON.parse(data.dictionary.conf[this._userservice.currentUser.mail])
 					} catch (error) {
 						this._historysearch.lastSearches = data.dictionary.conf[this._userservice.currentUser.mail]
 					}
+					if (this._historysearch.lastSearches == undefined) { this._historysearch.lastSearches = [] }
 					this.historySearch = this._historysearch.getLastSearches()
 					this.showHistorySearch()
 				}
-			)
+				)
 		} else {
 			this.historySearch = this._historysearch.getLastSearches()
 			this.showHistorySearch()
@@ -269,7 +336,7 @@ export class MenuComponent implements OnInit {
 				maxRating: 5
 			});
 		$('.menu .item').tab();
-		
+
 	}
 
 	delete() {
@@ -282,36 +349,36 @@ export class MenuComponent implements OnInit {
 		this.loadingSaveOptions = true
 		this._userservice.currentUser.settingsGeneral = this.settingsGeneral
 		this._httpService.getEntryJSON(AppSettings.API_MEMBERS)
-		.subscribe(
+			.subscribe(
 			users => {
 				let props = Object.keys(users.dictionary.entries)
 				let allUsers = JSON.parse(users.dictionary.entries[props[0]].value)
 				allUsers[this._userservice.currentUser.mail].settingsGeneral = this.settingsGeneral
 				this._httpService.postEntryJSON(allUsers, AppSettings.API_MEMBERS, AppSettings.TAGMEMBERS, this._userservice.currentUser.secretKey)
-				.subscribe(
-					data=> {
-						console.log(data)
-						if (this._userservice.currentUser.group == AppSettings.RULEADMINISTRATOR) {
-							this.settingsReputation.repIntegrationEditor = Number(this.settingsReputation.repIntegrationEditor)
-							this.settingsReputation.repIntegrationAdministrator = Number(this.settingsReputation.repIntegrationAdministrator)
-							this.settingsReputation.repContribution = Number(this.settingsReputation.repContribution)
-							this.settingsReputation.repNew = Number(this.settingsReputation.repNew)
-							this.settingsReputation.repModify = Number(this.settingsReputation.repModify)
-							this.settingsReputation.repRevision = Number(this.settingsReputation.repRevision)
-							
-							this._httpService.postEntryJSON(this.settingsReputation, AppSettings.API_SETTINGS, AppSettings.TAGSETTINGS, this.user.secretKey)
-							.subscribe(
-								res => {console.log(res); this._userservice.currentUser.settingsReputation = this.settingsReputation; this.loadingSaveOptions = false; this._alert.create('success', AppSettings.MSG_SUCCESS_MODIFICATION); $('.ui.modal').modal('hide all')}
-							)
-						} else {
-							this.loadingSaveOptions = false
+					.subscribe(
+						data => {
+							console.log(data)
+							if (this._userservice.currentUser.group == AppSettings.RULEADMINISTRATOR) {
+								this.settingsReputation.repIntegrationEditor = Number(this.settingsReputation.repIntegrationEditor)
+								this.settingsReputation.repIntegrationAdministrator = Number(this.settingsReputation.repIntegrationAdministrator)
+								this.settingsReputation.repContribution = Number(this.settingsReputation.repContribution)
+								this.settingsReputation.repNew = Number(this.settingsReputation.repNew)
+								this.settingsReputation.repModify = Number(this.settingsReputation.repModify)
+								this.settingsReputation.repRevision = Number(this.settingsReputation.repRevision)
+
+								this._httpService.postEntryJSON(this.settingsReputation, AppSettings.API_SETTINGS, AppSettings.TAGSETTINGS, this.user.secretKey)
+									.subscribe(
+									res => { console.log(res); this._userservice.currentUser.settingsReputation = this.settingsReputation; this.loadingSaveOptions = false; this._alert.create('success', AppSettings.MSG_SUCCESS_MODIFICATION); $('.ui.modal').modal('hide all') }
+									)
+							} else {
+								this.loadingSaveOptions = false
+							}
+						},
+						error => {
+							this.loadingSaveOptions = false; this._alert.create('error', AppSettings.MSG_ERROR_MODIFICATION)
 						}
-					},
-					error=> {
-						this.loadingSaveOptions = false; this._alert.create('error', AppSettings.MSG_ERROR_MODIFICATION)
-					}
-				)
-			}, 
+					)
+			},
 			error => {
 				this.loadingSaveOptions = false; this._alert.create('error', AppSettings.MSG_ERROR_MODIFICATION);
 			}
@@ -324,7 +391,7 @@ export class MenuComponent implements OnInit {
 	}
 
 	showOptions() {
-		this.settingsReputation = Object.assign({},this.user.settingsReputation);
+		this.settingsReputation = Object.assign({}, this.user.settingsReputation);
 		$('.ui.options.modal').modal('show')
 	}
 

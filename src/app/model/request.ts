@@ -9,6 +9,7 @@ export class Request {
     public result : boolean
     public validatedBy : string
     public publicKeySender : string
+    public reputationGained : number
 
     constructor(type: string) {
         this.type = RequestType[type]
@@ -20,5 +21,6 @@ export class Request {
         this.result = null
         this.validatedBy = ""
         this.publicKeySender = ""
+        this.reputationGained = 0
     }
 }

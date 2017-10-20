@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { UserService } from '../model/user-service'
+import { WordsService } from '../model/words-service'
 import { Formatter } from '../tools/app.formatter'
 import { AppSettings } from '../settings/app.settings'
 
@@ -26,7 +28,7 @@ export class Manager3D {
 	private header
 	private info
 
-	constructor(private _format: Formatter) { }
+	constructor(private _format: Formatter, private _wordsservice:  WordsService, private _userservice : UserService) { }
 
 	startEngine(nameElement) {
 		this.canvas = document.getElementById(nameElement);
@@ -104,6 +106,13 @@ export class Manager3D {
 	}
 
 	updateInfos(mesh, data) {
+		console.log(data);
+		this.wordSel.author = data.author
+		this.wordSel.author.reputation = 0
+		this._userservice.getReputation(this._wordsservice.users.user_list.list[data.author.name])
+		.subscribe(
+			rep => {this.wordSel.author.reputation = rep}
+		)
 		this.wordSel.name = mesh.name
 		this.wordSel.type = data.type
 		this.wordSel.context = data.context
@@ -120,7 +129,7 @@ export class Manager3D {
 		this.wordSel.likes = data.likes
 		this.wordSel.dislikes = data.dislikes
 		this.wordSel.keywords = data.keywords
-		this.wordSel.author = data.author
+		
 		this.wordSel.lastUpdatedNbDays = data.lastUpdatedNbDays;
 		this.wordSel.timestampCreation = data.timestampCreation;
 		this.wordSel.modulesReputation = data.modulesReputation;

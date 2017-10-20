@@ -287,7 +287,6 @@ export class AppInsertion implements OnInit{
 				this.loading = false;
 				this.reinit();
 				this._alert.create('success', "La communauté vous remercie pour votre proposition d'insertion de l'entrée : " + dataInfo.name + ", sur GraphTolearn. Votre demande sera accepter ou refuser par des membres éditeurs ou administrateurs et vous serez notifier dès qu'elle sera traitée", {duration:30000})
-				
 			}
 		)
 	}

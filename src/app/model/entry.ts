@@ -14,7 +14,7 @@ export class Entry {
     hierarchy: string = "";
     meaning: string = "";
     context: string = "";
-    author: {name: string, search : string} = { name: "", search: "" };
+    author: {name: string, reputation : number} = { name: "", reputation: 0 };
     searchClick: number = 0;
     count: number = 0;
     position: number = 0;
@@ -82,7 +82,7 @@ export class Entry {
             this.lastUpdatedAuthor = ""
         }
 
-        this.author = { name: ((obj.author == undefined || obj.author == "") ? entry.author : obj.author), search: "" }
+        this.author = { name: ((obj.author == undefined || obj.author == "") ? entry.author : obj.author), reputation: 0 }
         
         this.parent = obj.parent == undefined ? "": obj.parent;
         this.inactive = obj.inactive == undefined ? "": obj.inactive;

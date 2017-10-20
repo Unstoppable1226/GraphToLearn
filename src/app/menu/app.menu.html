@@ -18,8 +18,10 @@
 
 		<a class="item" [ngClass]="{'active': active[3]}" (click)="changeActiveMenuItem(3, 'manage-members')">
 			<span *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')">Gestion membres et demandes</span>
-			<span *ngIf="(user.group == 'Lambda')">Vos demandes<i  class="right idea icon" style="margin-left:5px"></i></span>
-			
+			<span *ngIf="(user.group == 'Lambda')">Vos demandes
+				<i class="right idea icon" style="margin-left:5px"></i>
+			</span>
+
 			<a *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')" class="ui green circular label">{{nbNewMembers}}</a>
 			<i *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')" class="right users icon" style="margin-left:5px"></i>
 		</a>
@@ -87,35 +89,44 @@
 </div>
 
 
-<div class="ui info modal">
+<div class="ui info large modal">
 	<i class="close icon" (click)="hideModalOptions()"></i>
 	<div class="header">
 		Informations sur GraphToLearn
 	</div>
 	<div class="scrolling content">
-		<h3>Objectifs</h3>
+		<h3 class="text-center">Objectifs</h3>
 		<p>
 			L'outil sert à pouvoir rechercher des mots qui ont été créé par les gens de la communauté GraphToLearn. Ces mots là apparaîtront
 			à l'utilisateur de manière graphique (3D) grâce à la librairie
 			<strong>BabylonJS</strong>. Plusieurs possibilités s'offrent alors pour l'utilisateur:
 			<br>
-			<br> 1 - Donner son avis sur un contenu, cela améliorera alors la réputation du mot lorsqu'il sera recherché une nouvelle
-			fois
-			<br> 2 - Commenter le mot;
-			<br>3 - Modifier le mot donnera
-			<strong>1</strong> de réputation en plus à l'utilisateur qui a apporté la modifications;
 		</p>
+		<ol class="ui list">
+			<li>Donner son avis sur un contenu</li>
+			<li>Commenter le mot</li>
+			<li>Modifier le mot</li>
+			<li>Toutes les actions qu'il effectuera sur l'outil influenceront sur sa réputation
+				<strong style="color:#1e70bf">(Réputation P)</strong> ainsi que sur la réputation des entrées
+				<strong style="color:#333">(Réputation E)</strong> modifiées</li>
+		</ol>
 		<hr>
-		<h3>Réputation</h3>
+		<h3 class="text-center">Réputation</h3>
 		<p>La réputation est l’importance quantifiée qui sert à distinguer, évaluer et différencier toutes les entrées et les membres
 			de la communauté selon la recherche effectuée.
-			<br> Règles définis
-			<br> • Toutes les entrées et personnes doivent avoir une réputation.
-			<br> • Si une entrée est associée à x module(s), alors elle possède x réputation(s), chacune correspondant à un module.
 			<br>
+			<br>
+			<strong>Règles définis :</strong>
 		</p>
+		<ul class="ui list">
+			<li>Toutes les entrées et personnes doivent avoir une réputation.</li>
+			<li>Si une entrée est associée à
+				<strong>x</strong> module(s), alors elle possède
+				<strong>x</strong> réputation(s), chacune correspondant à un module.</li>
+		</ul>
+		<p> Sur Stellar la réputation représente les lumens, c'est une crypto-monnaie que l'on peut associer au bitcoin.</p>
 		<hr>
-		<h3>Algorithme de classification collaborative</h3>
+		<h3 class="text-center">Algorithme de classification collaborative</h3>
 		<p>L'algorithme est construit grâce à 6 règles métiers.</p>
 		<table class="ui single line table">
 			<thead>
@@ -126,39 +137,53 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td>Interne</td>
-					<td>3</td>
+					<td class="olive text-strong">Interne</td>
+					<td>
+						<strong>3</strong>
+					</td>
 				</tr>
 				<tr>
-					<td>Réputation P</td>
-					<td>2.5</td>
+					<td class="blue text-strong">Réputation P</td>
+					<td>
+						<strong>2.5</strong>
+					</td>
 				</tr>
 				<tr>
-					<td>Avis sur le contenu</td>
-					<td>2</td>
+					<td class="orange text-strong">Avis sur le contenu</td>
+					<td>
+						<strong>2</strong>
+					</td>
 				</tr>
 				<tr>
-					<td>Vue / clic</td>
-					<td>1.5</td>
+					<td class="green text-strong">Vue / clic</td>
+					<td>
+						<strong>1.5</strong>
+					</td>
 				</tr>
 
 				<tr>
-					<td>Mise à jour</td>
-					<td>1</td>
+					<td class="violet text-strong">Mise à jour</td>
+					<td>
+						<strong>1</strong>
+					</td>
 				</tr>
 				<tr>
-					<td>Timestamp création</td>
-					<td>0.5</td>
+					<td class="red text-strong">Timestamp création</td>
+					<td>
+						<strong>0.5</strong>
+					</td>
 				</tr>
 			</tbody>
 		</table>
-		<p>Explications des règles métiers</p>
+		<h4 class="text-center">Explications des règles métiers</h4>
 		<div class="ui items">
 			<div class="item">
 				<div class="content">
-					<a class="header">Interne</a>
+					<a class="header olive text-strong" style="font-size:1em">Interne</a>
 					<div class="description">
-						<p>Une entrée a la priorité lorsqu’elle apparaît plus souvent dans les objectifs d’un module.</p>
+						<p>
+							<strong>Une entrée a la priorité lorsqu’elle apparaît plus souvent dans les objectifs d’un module.</strong>
+						</p>
 						<p>C’est-à-dire que chaque entrée répertorie le nombre de fois où elle est citée dans les objectifs des modules auxquels
 							elle est liée. Les entrées seront alors triées. Celles qui ont de meilleurs résultats apparaissent au début, les autres
 							vers la fin.</p>
@@ -167,9 +192,11 @@
 			</div>
 			<div class="item">
 				<div class="content">
-					<a class="header">Réputation P (Désactivée)</a>
+					<a class="header blue text-strong" style="font-size:1em">Réputation P</a>
 					<div class="description">
-						<p>Une entrée a la priorité lorsqu’elle a été créée par une personne avec une meilleure Réputation P.</p>
+						<p>
+							<strong>Une entrée a la priorité lorsqu’elle a été créée par une personne avec une meilleure Réputation P.</strong>
+						</p>
 						<p>Dans cette règle, la réputation en question est celle d’une personne et non d’une entrée. En effet, le solde du compte
 							Stellar de la personne qui a créé l’entrée est consulté et transformé en réputation.
 							<br>Exemple : une personne possède x dans la monnaie Stellar, elle possède alors x de réputation.</p>
@@ -178,11 +205,14 @@
 			</div>
 			<div class="item">
 				<div class="content">
-					<a class="header">Avis sur le contenu</a>
+					<a class="header orange text-strong" style="font-size:1em">Avis sur le contenu</a>
 					<div class="description">
-						<p>Une entrée a la priorité lorsqu’un meilleur score est obtenu pour la formule qui suit :
-							<br> • (Nombre de votes positifs - Nombre de votes négatifs) = score
+						<p>
+							<strong>Une entrée a la priorité lorsqu’un meilleur score est obtenu pour la formule qui suit :</strong>
 						</p>
+						<ul class="ui list">
+							<li>(Nombre de votes positifs - Nombre de votes négatifs) = score</li>
+						</ul>
 						<p>La soustraction de ces deux résultats fera ainsi variée le score. Si le score obtenu est négatif cela voudra dire que
 							l’entrée possède plus d’avis négatifs que positifs. En conséquence, elle fera « théoriquement » baisser la réputation
 							(importance du terme) dès l’application de cette règle.</p>
@@ -191,9 +221,11 @@
 			</div>
 			<div class="item">
 				<div class="content">
-					<a class="header">Vue / Clic</a>
+					<a class="header green text-strong" style="font-size:1em">Vue / Clic</a>
 					<div class="description">
-						<p>Une entrée a la priorité lorsqu’elle a été recherchée plus souvent et récemment.</p>
+						<p>
+							<strong>Une entrée a la priorité lorsqu’elle a été recherchée plus souvent.</strong>
+						</p>
 						<p>Toutes les informations concernant une entrée sont stockées sur IPFS via l’API Cowaboo. GraphToLearn lance une fonction
 							qui récupère le nombre de vues ou clics qu’une entrée possède. Ces données peuvent être consultées par les utilisateurs.
 							C’est un choix que j’ai fait sur l’outil. De ce fait, je ne voulais pas privatiser les données concernant les actions
@@ -203,20 +235,21 @@
 			</div>
 			<div class="item">
 				<div class="content">
-					<a class="header">Mise à jour (Non implémentée)</a>
+					<a class="header violet text-strong" style="font-size:1em">Mise à jour</a>
 					<div class="description">
-						<p>Une entrée a la priorité lorsqu’elle a subi une mise à jour ou modification récente et fréquente.</p>
-						<p>Cette règle n’a pas encore été implémentée. En effet, il était question de pouvoir modifier une entrée. Malheureusement,
-							cette fonctionnalité à l’heure où j’écris n’a pas encore été intégrée dans l’outil GraphToLearn. En conséquence, cette
-							règle n’est pas utilisée par l’algorithme.</p>
+						<p>
+							<strong>Une entrée a la priorité lorsqu’elle a subi une mise à jour ou modification récente et fréquente.</strong>
+						</p>
 					</div>
 				</div>
 			</div>
 			<div class="item">
 				<div class="content">
-					<a class="header">Timestamp création</a>
+					<a class="header red text-strong" style="font-size:1em">Timestamp création</a>
 					<div class="description">
-						<p>Une entrée insérée plus récemment, a la priorité sur les plus anciennes.</p>
+						<p>
+							<strong>Une entrée insérée plus récemment, a la priorité sur les plus anciennes.</strong>
+						</p>
 						<p>La date de création est stockée lorsqu’une entrée est insérée dans l’outil automatiquement grâce à l’API Cowaboo. L’outil
 							compare ainsi les entrées entre elles et détermine lesquelles sont prioritaires.</p>
 					</div>
@@ -224,9 +257,8 @@
 			</div>
 		</div>
 		<hr>
-		<h3>API</h3>
+		<h3 class="text-center">API Cowaboo</h3>
 		<a href="http://groups.cowaboo.net/group-graphToLearn/public/api"></a>
-		<br>
 		<h5>L’outil utilise 9 observatoires qui vous sont présentés ci-dessous, sous forme de tableau.</h5>
 		<table class="ui single line table">
 			<thead>
@@ -237,50 +269,85 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td>Types</td>
+					<td class="text-strong">Types</td>
 					<td>Contient tous les types disponibles à attribuer à une entrée.</td>
 				</tr>
 				<tr>
-					<td>Context</td>
+					<td class="text-strong">Context</td>
 					<td>Contient tous les contextes (thèmes) disponibles à attribuer à une entrée.</td>
 				</tr>
 				<tr>
-					<td>Modules</td>
+					<td class="text-strong">Modules</td>
 					<td>Contient tous les modules existants et disponibles qui peuvent être attribués à une entrée.</td>
 				</tr>
 				<tr>
-					<td>Words</td>
+					<td class="text-strong">Words</td>
 					<td>Contient toutes les entrées présentes sur GraphToLearn.</td>
 				</tr>
 
 				<tr>
-					<td>History</td>
+					<td class="text-strong">History</td>
 					<td>Contient les informations de l’historique de recherche de chaque membre.</td>
 				</tr>
 				<tr>
-					<td>Members</td>
+					<td class="text-strong">Members</td>
 					<td>Contient les informations concernant tous les membres.</td>
 				</tr>
 				<tr>
-					<td>Feedback</td>
+					<td class="text-strong">Feedback</td>
 					<td>Contient toutes les informations d’un membre lorsqu’il a donné un feedback dans l’outil. Son avis et ses propositions
 						sont enregistrés ici.</td>
 				</tr>
 				<tr>
-					<td>Settings</td>
+					<td class="text-strong">Settings</td>
 					<td>Contient tous les paramètres de l’outil.</td>
 				</tr>
 				<tr>
-					<td>Requests</td>
+					<td class="text-strong">Requests</td>
 					<td>Contient toutes les demandes en cours de traitement de tous les membres.</td>
 				</tr>
 			</tbody>
 		</table>
+		<hr>
+		<h3 class="text-center">Observations sur le fonctionnement de l'API Cowaboo et GraphToLearn</h3>
+		<h4>Stellar - FriendBot</h4>
+		<h5>
+			<div class="ui label green">Post</div> - New User</h5>
+		<p>
+			Tout le monde peut utiliser GraphToLearn, il suffit de créer un compte qui sera généré par l'API Cowaboo sur Stellar et ensuite
+			la demande de ce nouveau membre doit être accepté par les autres membres existants de la communauté.
+			<br>
+			<br> Or l'API crée simplement le compte sur Stellar. Après la création du compte par l'API Cowaboo, il a été nécessaire pour
+			GraphToLearn de générer un friendbot afin de pouvoir faire des transactions (de réputation) dans l'outil. Comme il est
+			expliqué à cette url :
+			<a href="https://www.stellar.org/developers/guides/get-started/create-account.html">https://www.stellar.org/developers/guides/get-started/create-account.html</a>.
+			<br>
+		</p>
+		Selon Stellar :
+			<blockquote style="font-weight: bold"> "Afin d'empêcher les gens de faire un grand nombre de comptes inutiles, chaque compte doit avoir un solde
+					minimum de 20 lumens (les lumens sont la monnaie intégrée du réseau Stellar). Comme vous n'avez pas encore de lumens,
+					vous ne pouvez pas payer de compte. Dans le monde réel, vous payez habituellement un échange qui vend des lumens afin
+					de créer un nouveau compte. Sur le réseau de test de Stellar, cependant, vous pouvez demander à Friendbot, un robot qui
+					s'occupera de créer un compte."</blockquote> 
+		<p>	<br>
+			<br> La requête qui permet cela est la suivante :
+			<a>https://horizon-testnet.stellar.org/friendbot?addr=
+				<strong>[Public Key]</strong>
+			</a>.
+			<br>
+			<br>
+			<strong>[Public Key]</strong> = C'est la public Key qui été généré par Stellar lorsque le compte a été créé et elle est visible
+			par tout le monde. Tous les utilisateurs possède une Secret Key et une Public Key.
+			<br>
+			<br>En appelant l'url, Stellar s'occupera alors de trouver un compte à associé en utilisant la public Key mentionné comme
+			ID de compte, afin que ce dernier puisse faire des transactions.
+		</p>
+
 	</div>
 </div>
 
 
-<div class="ui options modal">
+<div class="ui options large modal">
 	<i class="close icon" (click)="hideModalOptions()"></i>
 	<div class="header">
 		Paramètres de l'outil
@@ -291,7 +358,8 @@
 		</p>
 		<hr>
 		<div class="ui top attached tabular menu">
-			<div class="item active" data-tab="search" style="cursor:pointer!important">Recherche</div>
+			<div class="item active" data-tab="search" style="cursor:pointer!important">Couleurs du système de recherche</div>
+			<div class="item" data-tab="rules" style="cursor:pointer!important">Règles métiers</div>
 			<div class="item" data-tab="reputation" style="cursor:pointer!important">Réputation</div>
 		</div>
 		<div class="ui bottom attached tab segment active" data-tab="search" style="text-align:center">
@@ -324,6 +392,136 @@
 
 			</form>
 		</div>
+
+		<div class="ui bottom attached tab segment" data-tab="rules" style="text-align:center">
+			<h3>Impact des règles métiers sur le système de recherche</h3>
+			<div class="ui message">
+				<div class="content">Plus un coefficient est <strong>grand</strong>, plus la règle devient <strong>importante</strong> dans l'algorithme de classification dans la recherche. Ces règles permettent d'indiquer à l'utilisateur si un mot est important ou non dans le contexte de la recherche dans laquelle il se trouve.</div>
+			</div>
+			<h5>Vous pouvez
+				<span class="green">activer</span>/
+				<span class="red">désactiver</span> une règle ou modifier son
+				<span class="teal">coefficient</span> pour le moteur de recherche
+			</h5>
+			
+			<table class="ui celled striped table">
+				<thead>
+					<tr>
+						<th colspan="4">
+							Liste des règles
+						</th>
+					</tr>
+					<tr>
+						<th>
+							Active / Inactive
+						</th>
+						<th>
+							Nom de la règle
+						</th>
+						<th>
+							Description
+						</th>
+						<th>
+							Coefficient
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="collapsing">
+							<div class="ui toggle checkbox">
+								<input [checked]="settingsGeneral.rule1.isActive" (change)="settingsGeneral.rule1.isActive = !settingsGeneral.rule1.isActive" type="checkbox" name="public">
+								<label></label>
+							</div>
+						</td>
+						<td class="olive">Interne</td>
+						<td class="left aligned collapsing">Une entrée a la priorité lorsqu’elle apparaît plus souvent dans les objectifs d’un module.</td>
+						<td class="collapsing">
+							<div class="field">
+								<input class="teal text-strong" style="width: 70px;text-align:center" type="number" (ngModelChange)="isValidNumberRules(settingsGeneral, 1)" [(ngModel)]="settingsGeneral.rule1.coefficient">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="collapsing">
+							<div class="ui toggle checkbox">
+								<input [checked]="settingsGeneral.rule2.isActive" (change)="settingsGeneral.rule2.isActive = !settingsGeneral.rule2.isActive"type="checkbox" name="public">
+								<label></label>
+							</div>
+						</td>
+						<td class="blue">Réputation P</td>
+						<td class="left aligned collapsing">Une entrée a la priorité lorsqu’elle a été créée par une personne avec une meilleure Réputation P.</td>
+						<td class="collapsing">
+							<div class="field">
+								<input class="teal text-strong" style="width: 70px;text-align:center" type="number" (ngModelChange)="isValidNumberRules(settingsGeneral, 2)" [(ngModel)]="settingsGeneral.rule2.coefficient">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="collapsing">
+							<div class="ui toggle checkbox">
+								<input [checked]="settingsGeneral.rule3.isActive" (change)="settingsGeneral.rule3.isActive = !settingsGeneral.rule3.isActive" type="checkbox" name="public">
+								<label></label>
+							</div>
+						</td>
+						<td class="orange">Avis sur le contenu</td>
+						<td class="left aligned collapsing">Une entrée a la priorité lorsqu’elle a le plus d'avis positifs.</td>
+						<td class="collapsing">
+							<div class="field">
+								<input class="teal text-strong" style="width: 70px;text-align:center" type="number" (ngModelChange)="isValidNumberRules(settingsGeneral, 3)" [(ngModel)]="settingsGeneral.rule3.coefficient">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="collapsing">
+							<div class="ui toggle checkbox">
+								<input [checked]="settingsGeneral.rule4.isActive" (change)="settingsGeneral.rule4.isActive = !settingsGeneral.rule4.isActive" type="checkbox" name="public">
+								<label></label>
+							</div>
+						</td>
+						<td class="green">Vue / Clic</td>
+						<td class="left aligned collapsing">Une entrée a la priorité lorsqu’elle a été recherchée plus souvent.</td>
+						<td class="collapsing">
+							<div class="field">
+								<input class="teal text-strong" style="width: 70px;text-align:center" type="number" (ngModelChange)="isValidNumberRules(settingsGeneral, 4)" [(ngModel)]="settingsGeneral.rule4.coefficient">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="collapsing">
+							<div class="ui toggle checkbox">
+								<input [checked]="settingsGeneral.rule5.isActive" (change)="settingsGeneral.rule5.isActive = !settingsGeneral.rule5.isActive" type="checkbox" name="public">
+								<label></label>
+							</div>
+						</td>
+						<td>Mise à jour</td>
+						<td class="left aligned collapsing">Une entrée a la priorité lorsqu’elle a subi une mise à jour ou modification récente et fréquente.</td>
+						<td class="collapsing">
+							<div class="field">
+								<input class="teal text-strong" style="width: 70px;text-align:center" type="number" (ngModelChange)="isValidNumberRules(settingsGeneral, 5)" [(ngModel)]="settingsGeneral.rule5.coefficient">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="collapsing">
+							<div class="ui toggle checkbox">
+								<input [checked]="settingsGeneral.rule6.isActive" (change)="settingsGeneral.rule6.isActive = !settingsGeneral.rule6.isActive" type="checkbox" name="public">
+								<label></label>
+							</div>
+						</td>
+						<td class="red">Timestamp création</td>
+						<td class="left aligned collapsing">Une entrée insérée plus récemment, a la priorité sur les plus anciennes.</td>
+						<td class="collapsing">
+							<div class="field">
+								<input class="teal text-strong" style="width: 70px;text-align:center" type="number" (ngModelChange)="isValidNumberRules(settingsGeneral, 6)" [(ngModel)]="settingsGeneral.rule6.coefficient">
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+
 		<div class="ui bottom attached tab segment" data-tab="reputation" style="text-align:center">
 			<div *ngIf="(user.group != 'Administrator')">
 				<div class="ui message" style="text-align:left">
@@ -347,39 +545,41 @@
 			</div>
 			<form *ngIf="(user.group == 'Administrator')" [ngClass]="{'loading': loadingSaveOptions}" class="ui form">
 				<div class="field">
-					<label>Réputation nécessaire pour pouvoir faire une demande afin intégrer le groupe d'éditeurs :</label>
+					<label>Réputation nécessaire pour pouvoir faire une demande afin intégrer le groupe d'
+						<span class="group-Editor">[Editor]</span> :</label>
 					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 1)" [(ngModel)]="settingsReputation.repIntegrationEditor"
 					 [ngModelOptions]="{standalone: true}" name="search-term" style="width: 70px">
 				</div>
 				<div class="field">
-					<label>Réputation nécessaire pour pouvoir faire une demande afin intégrer le groupe d'administrateur :</label>
+					<label>Réputation nécessaire pour pouvoir faire une demande afin intégrer le groupe d'
+						<span class="group-Administrator">[Administrator]</span> :</label>
 					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 2)" [(ngModel)]="settingsReputation.repIntegrationAdministrator"
 					 [ngModelOptions]="{standalone: true}" name="search-term" style="width: 70px">
 				</div>
 				<div class="field">
 					<label>Réputation donné lorsqu'un utilisateur
-						<span style="color:#C01515">apprécie le contenu d'un terme</span>
+						<span style="color:#1e70bf">apprécie le contenu d'un terme</span>
 					</label>
 					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 3)" [(ngModel)]="settingsReputation.repContribution"
 					 [ngModelOptions]="{standalone: true}" name="key-word" style="width: 70px">
 				</div>
 				<div class="field">
 					<label>Réputation donné lorsqu'un utilisateur
-						<span style="color:#C01515">modifie le contenu d'un terme</span>
+						<span style="color:#1e70bf">modifie le contenu d'un terme</span>
 					</label>
 					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 4)" [(ngModel)]="settingsReputation.repModify" [ngModelOptions]="{standalone: true}"
 					 name="module" style="width: 70px">
 				</div>
 				<div class="field">
 					<label>Réputation donné lorsqu'un utilisateur
-						<span style="color:#C01515">insére un nouveau terme</span>
+						<span style="color:#1e70bf">insére un nouveau terme</span>
 					</label>
 					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 5)" [(ngModel)]="settingsReputation.repNew" [ngModelOptions]="{standalone: true}"
 					 name="other-terms" style="width: 70px">
 				</div>
 				<div class="field">
 					<label>Réputation donné lorsqu'un utilisateur
-						<span style="color:#C01515">fait une révision (commentaire) sur un terme</span>
+						<span style="color:#1e70bf">fait une révision (commentaire) sur un terme</span>
 					</label>
 					<input type="number" (ngModelChange)="isValidNumber(settingsReputation, 6)" [(ngModel)]="settingsReputation.repRevision"
 					 [ngModelOptions]="{standalone: true}" name="other-terms" style="width: 70px">
@@ -395,35 +595,50 @@
 
 </div>
 
-<div id="requests" class="ui modal">
+<div id="requests" class="ui requests modal">
 	<div class="header">
-		Vos Demandes Traitées <i  class="right idea icon" style="margin-left:5px"></i>
+		Vos Demandes Traitées
+		<i class="right idea icon" style="margin-left:5px"></i>
+		<h1 *ngIf="nbReputationGained == 0">Aucun changement sur votre Réputation P</h1>
+		<h1 *ngIf="nbReputationGained != 0" style="color:#333">Grâce à votre implication sur GraphToLearn, vous gagner en réputation (
+			<span style="color:#1e70bf">+{{nbReputationGained}}</span>) !</h1>
+		<h2 *ngIf="nbReputationGained != 0" style="text-align:center">
+			<a class="ui blue label" [ngClass]="{red : ((user.reputation - nbReputationGained) < 0)}" data-tooltip="Votre ancienne Réputation P"
+			 data-inverted="" data-position="top center">{{user.reputation - nbReputationGained}}</a>
+			<i class="caret right icon"></i>
+			<a style="margin-left:5px;font-size: 1em;" class="ui blue label" [ngClass]="{red : ((user.reputation - nbReputationGained) < 0)}"
+			 data-tooltip="Votre actuelle Réputation P" data-inverted="" data-position="top center">{{user.reputation}}</a>
+		</h2>
 	</div>
 	<div class="scrolling content" style="text-align:center!important">
-		<h3>Voici vos demandes qui ont été traitées par la communauté</h3>
+		<h2>Voici vos demandes qui ont été traitées par la communauté</h2>
 		<div class="ui divided items">
 			<div *ngFor="let request of requestsAnswered; let i = index" class="item">
 				<div class="content">
-					<a class="header">Type de demande :
+					<a class="header" style="user-select:none">Type de demande :
 						<span style="color:#1e70bf">{{request.textType}}</span>
 					</a>
 					<div class="meta">
-						<span class="cinema">{{request.user}} le {{request.timestamp}}</span>
+						<span class="cinema">
+							<strong>{{request.user}}</strong> le {{request.timestamp}}</span>
 					</div>
 					<div class="description" style="font-weight: bold;">
 						<p>{{request.text}}</p>
 					</div>
 					<div class="extra">
-						<div *ngIf="!request.result" class="ui label red">Votre demande a été refusé par {{request.validatedBy}}</div>
-						<div *ngIf="request.result" class="ui label green">Votre demande a été accepté par {{request.validatedBy}}</div>
+						<div *ngIf="!request.result" class="ui label red">Votre demande a été refusé par
+							<strong>{{request.validatedBy}}</strong>
+						</div>
+						<div *ngIf="request.result" class="ui label green">Votre demande a été accepté par
+							<strong>{{request.validatedBy}}</strong>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="ui fluid large approve button button-blur" style="margin-left:0px" [ngClass]="{'loading': loadingMyRequests}"
-		(click)="hideModalMyRequests()">Merci, j'en ai bien pris connaissance
-		   <i class="right checkmark icon"></i>
-	   </div>
+		<div class="ui fluid large approve button button-blur" style="margin-left:0px" [ngClass]="{'loading': loadingAdd}" (click)="hideModalMyRequests()">Merci, j'en ai pris connaissance
+			<i class="right checkmark icon"></i>
+		</div>
 	</div>
 </div>
 

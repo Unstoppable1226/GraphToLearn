@@ -83,8 +83,8 @@
                     style="margin-top:20px">
                     <div class="column">
                         <h4 class="ui header group-Lambda">Lambda</h4>
-                        <p>Il peut rechercher des termes, donner son avis sur un terme, donner un commentaire et proposer de
-                            nouveaux termes.</p>
+                        <p>Il peut rechercher des entrées, donner son avis sur une entrée, proposer un commentaire et
+                            l'insertion de nouvelles entrées.</p>
                         <div *ngIf="user.group == 'Lambda'" class="ui message">
                             <p>Votre rôle</p>
                         </div>
@@ -95,7 +95,7 @@
                     </div>
                     <div class="column">
                         <h4 class="ui header group-Editor">Editor</h4>
-                        <p>Il peut en plus d'un utilisateur Lambda : modifier un terme ou le désactiver et accepter les demandes
+                        <p>Il peut en plus d'un utilisateur Lambda : proposer la modification d'une entrée ou <strong>[la désactiver - fonctionnalité désactivée]</strong>, mais aussi traiter les demandes
                             d'autres membres</p>
                         <div *ngIf="user.group == 'Editor'" class="ui message">
                             <p>Votre rôle</p>

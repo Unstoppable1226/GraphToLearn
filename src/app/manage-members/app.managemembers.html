@@ -41,7 +41,8 @@
                                         <span style="color:#1e70bf">{{yrequest.textType}}</span>
                                     </a>
                                     <div class="meta">
-                                        <span class="cinema">{{yrequest.user}} le {{yrequest.timestamp}}</span>
+                                        <span class="cinema">
+                                            <strong>{{yrequest.user}}</strong> le {{yrequest.timestamp}}</span>
                                     </div>
                                     <div class="description" style="font-weight: bold;">
                                         <p>{{yrequest.text}}</p>
@@ -50,7 +51,7 @@
                                         <div *ngIf="yrequest.result == null" class="ui label orange">En cours de traitement</div>
                                         <div *ngIf="yrequest.result && yrequest != null" class="ui label green">Votre demande a été accepté par {{yrequest.validatedBy}}</div>
                                         <div *ngIf="yrequest != null && yrequest.result == false" class="ui label red">Votre demande a été refusé par {{yrequest.validatedBy}}</div>
-                                        <div *ngIf="yrequest.type == 1 || yrequest.type == 2" class="ui button">Plus de détails</div>
+                                        <div *ngIf="yrequest.type == 2 || yrequest.type == 3" class="ui button" (click)="showMoreInfoAboutRequest(index, yrequest)">Plus de détails</div>
                                     </div>
                                 </div>
                             </div>
@@ -70,8 +71,8 @@
                         <div class="ui middle aligned animated list" style="margin-top:15px!important">
                             <div *ngFor="let member of newMembers; let i = index" class="item">
                                 <div class="right floated content">
-                                    <div class="ui button positive" (click)="addMember(i, false)">Accepter</div>
-                                    <div class="ui button negative" (click)="refuseMember(i)">Refuser</div>
+                                    <div class="ui button positive" (click)="addMember($event, i, false)">Accepter</div>
+                                    <div class="ui button negative" (click)="refuseMember($event, i)">Refuser</div>
                                 </div>
                                 <img class="ui avatar image" src="../assets/images/new-user.png">
                                 <div class="content">
@@ -98,17 +99,18 @@
                                         <span style="color:#1e70bf">{{request.textType}}</span>
                                     </a>
                                     <div class="meta">
-                                        <span class="cinema">{{request.user}} le {{request.timestamp}}</span>
+                                        <span class="cinema">
+                                            <strong>{{request.user}}</strong> le {{request.timestamp}}</span>
                                     </div>
                                     <div class="description" style="font-weight: bold;">
                                         <p>{{request.text}}</p>
                                     </div>
                                     <div class="extra">
-                                        <div *ngIf="request.type == 1 || request.type == 2" class="ui button">Plus de détails</div>
-                                        <div *ngIf="request.result == null" class="ui button positive" (click)="acceptRequest(i, request)">Accepter</div>
-                                        <div *ngIf="request.result == null" class="ui button negative" (click)="refuseRequest(i, request)">Refuser</div>
-                                        <div *ngIf="request.result != null && !request.result" class="ui label negative">Cette demande a été refusé par {{request.validatedBy}}</div>
-                                        <div *ngIf="request.result != null && request.result" class="ui label positive">Cette demande a été accepté par {{request.validatedBy}}</div>
+                                        <div *ngIf="request.type == 2 || request.type == 3" class="ui button" (click)="showMoreInfoAboutRequest(index, request)">Plus de détails</div>
+                                        <div *ngIf="request.result == null" class="ui button positive" (click)="acceptRequest($event, i, request)">Accepter</div>
+                                        <div *ngIf="request.result == null" class="ui button negative" (click)="refuseRequest($event, i, request)">Refuser</div>
+                                        <div *ngIf="request.result != null && !request.result" class="ui label red">Cette demande a été refusé par {{request.validatedBy}}</div>
+                                        <div *ngIf="request.result != null && request.result" class="ui label green">Cette demande a été accepté par {{request.validatedBy}}</div>
                                     </div>
                                 </div>
                             </div>
@@ -119,6 +121,7 @@
 
             </form>
         </div>
+
         <div [hidden]="user.group != 'Administrator'" class="ui bottom attached tab segment" data-tab="rules" style="text-align:center;background: white!important;">
 
             <form *ngIf="user.group == 'Administrator'" id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white; padding: 25px; text-align: center;">
@@ -226,5 +229,98 @@
 
 
 
+    </div>
+</div>
+
+<div id="infoRequests2" class="ui inforequests modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Informations sur la demande
+        <i class="right idea icon" style="margin-left:5px"></i>
+    </div>
+    <div class="scrolling content" style="text-align:center!important">
+        <h3>Membre : {{requestSel.user}}, demandée le : {{requestSel.timestamp}}</h3>
+        <h3>Concerne : {{requestSel.textType}}</h3>
+        <div class="ui grid">
+            <div class="sixteen wide column">
+                <h4>Informations sur l'entrée à insérer : <span class="group-Lambda">{{requestSel.content.name}}</span></h4>
+                <h5>Nom</h5>
+                <p>{{requestSel.content.name}}
+                </p>
+                <h5>Type</h5>
+                <p>{{requestSel.content.type}}
+                </p>
+                <h5>Explications</h5>
+                <p>{{requestSel.content.meaning}}
+                </p>
+                <h5>Définition</h5>
+                <p>{{requestSel.content.definition}}
+                </p>
+                <h5>Source</h5>
+                <p>{{requestSel.content.source}}
+                </p>
+                <h5>Contexte/Domaine</h5>
+                <p>{{requestSel.content.context}}
+                </p>
+                <h5>Mots clés</h5>
+                <p>{{requestSel.content.keywords}}
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="infoRequests3" class="ui inforequests modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Informations sur la demande
+        <i class="right idea icon" style="margin-left:5px"></i>
+    </div>
+    <div class="scrolling content" style="text-align:center!important">
+        <h3>Membre : {{requestSel.user}}, demandée le : {{requestSel.timestamp}}</h3>
+        <h3>Concerne : {{requestSel.textType}}</h3>
+        <div class="ui grid">
+            <div class="sixteen wide column">
+                <h4>Informations sur l'entrée |
+                    <span class="group-Lambda">Modifications apportées</span>
+                </h4>
+                <h5>Nom</h5>
+                <p>{{lastModifEntry.name}}
+                    <i class="caret right icon"></i>
+                    <span [ngClass]="{'group-Lambda': lastModifEntry.name != requestSel.content.name}">{{requestSel.content.name}}</span>
+                </p>
+                <h5>Type</h5>
+                <p>{{lastModifEntry.type}}
+                    <i class="caret right icon"></i>
+                    <span [ngClass]="{'group-Lambda': lastModifEntry.type != requestSel.content.type}">{{requestSel.content.type}}</span>
+                </p>
+                <h5>Explications</h5>
+                <p>{{lastModifEntry.meaning}}
+                    <i class="caret right icon"></i>
+                    <span [ngClass]="{'group-Lambda': lastModifEntry.meaning != requestSel.content.meaning}">{{requestSel.content.meaning}}</span>
+                </p>
+                <h5>Définition</h5>
+                <p>{{lastModifEntry.definition}}
+                    <i class="caret right icon"></i>
+                    <span [ngClass]="{'group-Lambda': lastModifEntry.definition != requestSel.content.definition}">{{requestSel.content.definition}}</span>
+                </p>
+                <h5>Source</h5>
+                <p>{{lastModifEntry.source}}
+                    <i class="caret right icon"></i>
+                    <span [ngClass]="{'group-Lambda': lastModifEntry.source != requestSel.content.source}">{{requestSel.content.source}}</span>
+                </p>
+                <h5>Contexte/Domaine</h5>
+                <p>{{lastModifEntry.context}}
+                    <i class="caret right icon"></i>
+                    <span [ngClass]="{'group-Lambda': lastModifEntry.context != requestSel.content.context}">{{requestSel.content.context}}</span>
+                </p>
+                <h5>Mots clés</h5>
+                <p>{{lastModifEntry.keywords}}
+                    <i class="caret right icon"></i>
+                    <span [ngClass]="{'group-Lambda': lastModifEntry.keywords != requestSel.content.keywords}">{{requestSel.content.keywords}}</span>
+                </p>
+            </div>
+        </div>
     </div>
 </div>

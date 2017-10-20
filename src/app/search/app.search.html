@@ -12,11 +12,14 @@
 	<div></div>
 	
 	<div style="width: 100%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">
-		<div *ngIf="loading" class="ui active dimmer">
+		<!--<div *ngIf="loading" class="ui active dimmer">
 			<div class="ui large text loader">Initialisation de l'interface ...</div>
+		</div>-->
+		<div *ngIf="loadingLike" class="ui active dimmer">
+			<div class="ui large text loader">Transaction en cours ...</div>
 		</div>
 		<div *ngIf="loadingModif" class="ui active dimmer">
-			<div class="ui large text loader">Mise à jour des infomations ...</div>
+			<div class="ui large text loader"><span *ngIf="user.group == 'Administrator'">Mise à jour des infomations ... </span><span *ngIf="user.group == 'Editor'">Envoie de la demande de modification ...</span></div>
 		</div>
 		<h2 class="ui icon header" style="margin-top:25px; text-align:center!important;margin-bottom: -200px">
 			<div class="content" style="color:#F8F9FB; font-weight:200">
@@ -78,40 +81,33 @@
 				<li class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Type : </span>
-						<div class="c" style="font-weight: bold; color:white; font-size:1em; text-align:right;padding-right: 15px"><span *ngIf="(wordSel.type.length < 2)">Aucun</span>{{wordSel.type}}</div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em; text-align:right;padding-right: 15px;overflow: overlay"><span *ngIf="(wordSel.type.length < 2)">Aucun</span>{{wordSel.type}}</div>
 					</div>
 				</li>
 				<li *ngIf="(wordSel.definition != '')" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Définition : </span>
-						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px">{{wordSel.definition}}</div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay">{{wordSel.definition}}</div>
 					</div>
 				</li>
 				<li class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Source : </span>
-						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px">{{wordSel.source}} <i *ngIf="wordSel.source == 'Google'" class="google icon"></i><i *ngIf="wordSel.source == 'Wikipédia'" class="wikipedia icon"></i></div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay">{{wordSel.source}} <i *ngIf="wordSel.source == 'Google'" class="google icon"></i><i *ngIf="wordSel.source == 'Wikipédia'" class="wikipedia icon"></i></div>
 					</div>
 				</li>
-				<!--<li *ngIf="wordSel.name != wordSearch.name" class="cr number has-slider" style="height: 35px;line-height: 35px">
-					<div>
-						<span class="property-name">Réputation :</span>
-						<div id="popupReputation" data-html="<div class='header'>User Rating</div><div class='content'><div class='ui star rating'><i class='active icon'></i><i class='active icon'></i><i class='active icon'></i><i class='icon'></i><i class='icon'></i></div></div>"
-						 class="ui blue small left pointing label"><strong>{{wordSel.totalReput}}</strong></div>
-					</div>
-				</li>-->
 				<li class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Contexte : </span>
-						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px"><span *ngIf="(wordSel.context == '')">Aucun</span>{{wordSel.context}}</div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay"><span *ngIf="(wordSel.context == '')">Aucun</span>{{wordSel.context}}</div>
 					</div>
 				</li>
 				<li *ngIf="wordSel.lastUpdated != ''" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Dernière modification:</span>
-						<div class="c">
+						<div id="style-1" class="c">
 							<div id="lastModif" class="circular ui violet icon button" data-tooltip="Voir la dernière modification" data-inverted=""
-							 data-position="top center" style="width: 20px;height: 20px;border-radius: 20px;float: left;margin: 7px;padding: 3px;"
+							 data-position="top center" style="width: 20px;height: 20px;border-radius: 20px;float: left;margin: 7px;padding: 3px;overflow: overlay"
 							 (click)="showLastModification()">
 								<i class="icon info"></i>
 							</div>
@@ -123,15 +119,15 @@
 				<li *ngIf="wordSel.timestampCreation != ''" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Date de création :</span>
-						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px">{{wordSel.timestampCreation}}</div>
+						<div class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: auto">{{wordSel.timestampCreation}}</div>
 					</div>
 				</li>
-				<li class="cr number" style="height: 60px">
+				<li class="cr number" style="height: 60px;overflow: auto;">
 					<div class='header'>Créé par</div>
 					<div class='content' style="font-weight: bold; color:white; font-size:1em">
 						{{wordSel.author.name}}
 						<div class="ui blue small left pointing label">
-							<strong>{{wordSel.totalReput}}</strong>
+							<strong>{{wordSel.author.reputation}}</strong>
 						</div>
 					</div>
 				</li>
@@ -158,7 +154,7 @@
 
 			</ul>
 			<div class="ui labeled button" [ngClass]='{disabled: !wordSel.canLike}' (click)="like()">
-				<div class="ui blue button" [ngClass]="{'loading' : loading}" style="width: 270px;">
+				<div class="ui blue button" [ngClass]="{'loading' : loadingLike}" style="width: 270px;">
 					<i class="smile icon"></i> Contenu très utile
 				</div>
 				<a tabindex="0" class="ui basic blue left pointing label" style="width: 80px; text-align: center">{{wordSel.like.number}}</a>
@@ -181,16 +177,25 @@
 		<div *ngIf="!wordFind" style="color:black; margin-top:10%;font-size:2.5em"><i style="font-size: 2.5em" class="search icon"></i><i style="font-size: 1em;margin-left:-5px;margin-top:-10px" class="remove circle icon"></i><br>Aucun mot n'a été trouvé qui correspond à votre recherche</div>
 		<canvas *ngIf="wordFind" id="renderCanvas" style="outline: none;user-select: none !important;"></canvas>
 	</div>
-	<div *ngIf="wordFind && user.group != 'Lambda'" class="" style="position:fixed;top:180px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
-		<button (click)="showModifications()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
+	<div *ngIf="wordFind" class="" style="position:fixed;top:180px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
+		<button *ngIf="user.group == 'Administrator'" (click)="showModifications()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
 		 data-tooltip="Modifier le terme sélectionné" data-inverted="" data-position="right center">
 			<i class="icon pencil"></i>
 		</button>
-		<button (click)="focusAddComment()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 95px;margin-left: 52px;"
+		<button [disabled]="user.group == 'Lambda'" *ngIf="user.group != 'Administrator'" (click)="showModifications()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
+		data-tooltip="Proposer une modification pour le terme sélectionné" data-inverted="" data-position="right center">
+		   <i class="icon pencil"></i>
+	   </button>
+
+		<button *ngIf="user.group != 'Lambda'" (click)="focusAddComment()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 95px;margin-left: 52px;"
 		 data-tooltip="Donner son avis sur le terme sélectionné" data-inverted="" data-position="right center">
 			<i class="icon comments"></i>
 		</button>
-		<button class="circular ui icon button" style="display: block;position: absolute;margin-top:160px;margin-left: 52px;"
+		<button *ngIf="user.group == 'Lambda'"  (click)="focusAddComment()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 95px;margin-left: 52px;"
+		data-tooltip="Proposer un commentaire concernant le terme sélectionné" data-inverted="" data-position="right center">
+		   <i class="icon comments"></i>
+	   </button>
+		<button [disabled]="true" class="circular ui icon button" style="display: block;position: absolute;margin-top:160px;margin-left: 52px;"
 		 data-tooltip="Mettre ce terme en inactif" data-inverted="" data-position="right center">
 			<i class="icon delete"></i>
 		</button>
@@ -237,7 +242,7 @@
 							<div class="actions">
 								<a class="like" style="user-select:none" style="color:#eee!important" (click)="addLikeToComment(i)"><i class="thumbs up icon"></i> {{comment.likes.length}}</a>
 								<!--<a class="reply" style="color:#63924D!important">Répondre</a>-->
-								<a class="delete" style="color:rgb(100, 55, 55)!important" (click)="deleteComment(i)">Supprimer</a>
+								<a *ngIf="user.group != 'Lambda'" class="delete" style="color:rgb(100, 55, 55)!important" (click)="deleteComment(i)">Supprimer</a>
 							</div>
 						</div>
 					</div>
@@ -249,7 +254,8 @@
 						<textarea id="newComment" rows="2" [(ngModel)]="newComment" [ngModelOptions]="{standalone: true}" placeholder="Écriver un commentaire"></textarea>
 					</div>
 					<div class="ui blue fluid labeled submit icon button" [ngClass]="{'loading': loadingAddComment}" (click)="addComment()">
-						<i class="icon comment"></i> Ajouter commentaire
+						<span *ngIf="user.group != 'Lambda'"><i class="icon comment"></i> Ajouter commentaire</span>
+						<span *ngIf="user.group == 'Lambda'"><i class="icon comment"></i> Proposer ce commentaire à la communauté</span>
 					</div>
 				</div>
 
@@ -305,17 +311,18 @@
 		<div class="ui modification fullscreen modal">
 			<i class="close icon" (click)="hideModals()"></i>
 			<div class="header" style="text-align:center">
-				Modification du terme : {{wordSel.name}}
+				<span *ngIf="user.group == 'Administrator'" >Modification du terme : {{wordSel.name}}</span>
+				<span *ngIf="user.group == 'Editor'" >Proposition de modification du terme : {{wordSel.name}}</span>
 			</div>
 
 			<div class="scrolling content">
 				<form id="insert-form" class="ui form" [ngClass]="{'loading' : loadingModif}" style="background-color: white; padding: 25px; text-align: center">
 
-					<div class="field icon required">
+					<div  class="field icon required">
 						<label>Mot</label>
 						<div class="ui icon input">
 							<i id="wordInfo" class="left info icon"></i>
-							<input style="text-align: center" class="input-insert" type="text" [(ngModel)]="word" [ngModelOptions]="{standalone: true}"
+							<input [disabled]="disabled" style="text-align: center" class="input-insert" type="text" [(ngModel)]="word" [ngModelOptions]="{standalone: true}"
 							 (ngModelChange)="isUnique(0, '#wordInfo', 'name')" placeholder="AAA, Module, ..." />
 						</div>
 						<div [hidden]="!nameChosen" class="ui top pointing basic label" [ngClass]="{'green': !nameTaken, 'red': nameTaken}">
@@ -447,7 +454,7 @@
 				</form>
 			</div>
 			<div class="actions">
-				<div class="ui fluid large approve button button-blur" style="margin-top:15px;margin-left:0px" (click)="saveModifications()">Enregistrer modifications<i class="right checkmark icon"></i></div>
+				<div class="ui fluid large approve button button-blur" style="margin-top:15px;margin-left:0px" (click)="saveModifications()"><span *ngIf="user.group == 'Administrator'">Enregistrer modifications<i class="right checkmark icon"></i></span><span *ngIf="user.group == 'Editor'">Envoyer demande de modification<i class="right send icon"></i></span></div>
 			</div>
 
 		</div>

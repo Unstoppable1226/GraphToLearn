@@ -144,7 +144,9 @@ export class AppLogin implements OnInit {
 				err => {
 					this.loadingButton = false;
 					this.error = true;
-					if (err.status == 401) { // User already exists
+					if (err.status == 0) {
+						this.errorTextSecretKey = AppSettings.MSG_ERROR_ERR_CONNECTION_TIMEDOUT
+					} else if(err.status == 401) { // User already exists
 						this.errorTextSecretKey = AppSettings.MSG_ERROR_LOG_IN
 					}
 				}

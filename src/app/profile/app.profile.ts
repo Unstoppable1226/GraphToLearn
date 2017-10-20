@@ -64,9 +64,14 @@ export class AppProfile implements OnInit {
 	}
 
 	countWordsInserted(words) {
-		let entries = words.dictionary.entries, count : number = 0;
+		let entries = words.dictionary.entries, el, count : number = 0;
 		for (let prop in entries) {
-			if (entries[prop].author == this.user.mail) { count += 1 }
+			el = JSON.parse(entries[prop].value)
+			if (el.author != undefined) {
+				if (el.author == this.user.mail) { count += 1 }
+			} else {
+				if (entries[prop].author == this.user.mail) { count += 1 }
+			}
 		}
 		this.nbWordsInserted = count
 	}

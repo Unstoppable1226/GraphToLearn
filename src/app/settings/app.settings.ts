@@ -39,7 +39,7 @@ export class AppSettings {
 
 	public static TYPEREQUESTRULE = "rule"
 	public static TYPEREQUESTNEW = "new"
-	public static TYPEREQUESTMODIFY = "modify"
+	public static TYPEREQUESTMODIFY = "modification"
 	public static TYPEREQUESTREVISION = "revision"
 
 	public static TEXTREQUESTRULE = "Changement de rôle"
@@ -74,6 +74,7 @@ export class AppSettings {
 	public static WHITE = "#FFF";
 
 	public static CURRENTUSER = "currentUser"
+	public static NAME = 'name'
 
 	public static COL_SEARCH_TERM = "#0D47A1";
 	public static COL_KEY_WORDS = "#95A5A6";
@@ -96,6 +97,7 @@ export class AppSettings {
 	public static MSG_ERROR_MAIL_TAKEN = "Attention, un utilisateur avec cet email existe déjà !";
 	public static MSG_ERROR_CREATE_USER = "Attention, un problème est survenu lors de la création du compte, veuillez réessayer !";
 	public static MSG_ERROR_LOG_IN = "La secret key saisie est incorrecte !";
+	public static MSG_ERROR_ERR_CONNECTION_TIMEDOUT = "L'API Cowaboo est actuellement en cours de maintenance, tous les services sont indisponibles, veuillez réessayer ultérieurement !";
 	public static MSG_SUCCESS_MODIFICATION = "Les modifications ont été enregistrées avec succès !";
 	public static MSG_ERROR_MODIFICATION = "Les modifications n'ont pas pu être enregistrées veuillez réassayer !"
 
@@ -112,7 +114,7 @@ export class AppSettings {
 	public static COLORSSPHERES : Array<string> = [AppSettings.COL_OTHER_TERMS, AppSettings.COL_OTHER_TERMS, AppSettings.COL_OTHER_TERMS, AppSettings.COL_OTHER_TERMS, AppSettings.COL_OTHER_TERMS];
 	public static COLORSKEYWORDS : Array<string> = [AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS, AppSettings.COL_KEY_WORDS];
 	/* Reputation Rules */
-	public static COEFRULES : Array<number> = [3, 2.5, 1.5, 1, 0.5, 2]
+	public static COEFRULES : Array<number> = [3, 2.5, 2, 1.5, 1, 0.5]
 	public static TIMESTAMPRULE : Array<number[]> = [[0,10],[3,8],[7,6],[30,4],[90,2],[360,0]]
 
 	/* Table that contains words that must be deleted by the algorithm when he will create the world for the response*/

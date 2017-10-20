@@ -51,6 +51,10 @@ export class HttpAPIService {
 			.retryWhen(error => error.delay(1000));
 	}
 
+	getUserReputationPromise(pubKey) {
+		return this._http.get(AppSettings.API_USERS + "/balance?public=" + pubKey)
+	}
+
 	getEntryJSON(observatory) {
 		return this._http.get(AppSettings.API_OBSERVATORY + "?observatoryId=" + observatory)
 			.map((res: Response) => res.json())
@@ -103,5 +107,12 @@ export class HttpAPIService {
 		let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
 		let options = new RequestOptions({ headers: headers, body : "secretKey=" + secretKey + "&observatoryId=" + observatoryId + "&hash=" + hash});
 		return this._http.delete(AppSettings.API_ENTRY, options)
+	}
+
+	deleteEntryJSONSub(secretKey, observatoryId, hash) {
+		let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' }); // ... Set content type to JSON
+		let options = new RequestOptions({ headers: headers, body : "secretKey=" + secretKey + "&observatoryId=" + observatoryId + "&hash=" + hash});
+		return this._http.delete(AppSettings.API_ENTRY, options)
+			.map((res:Response) => res);
 	}
 }

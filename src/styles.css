@@ -33,13 +33,13 @@
 	width: 100%;
 	color: #fff;
 	overflow: hidden;
-  }
-  .input-tabacc {
+}
+.input-tabacc {
 	position: absolute;
 	opacity: 0;
 	z-index: -1;
-  }
-  .label-tabacc {
+}
+.label-tabacc {
 	position: relative!important;
 	display: block!important;
 	padding: 0 0 0 1em!important;
@@ -48,26 +48,26 @@
 	line-height: 3!important;
 	cursor: pointer!important;
 	user-select: none!important;
-    font-size: 1.2em!important;
-  }
+	font-size: 1.2em!important;
+}
 
-  .tabacc-content {
+.tabacc-content {
 	max-height: 0;
-	overflow: hidden;
+	overflow: auto;
 	background: white;
 	-webkit-transition: max-height .35s;
 	-o-transition: max-height .35s;
 	transition: max-height .35s;
-  }
-  .blue .tabacc-content {
+}
+.blue .tabacc-content {
 	background: #3498db;
-  }
+}
   .tabacc-content p {
 	margin: 1em;
   }
   /* :checked */
   .input-tabacc:checked ~ .tabacc-content {
-	max-height: 10em;
+		max-height: 20em;
   }
   /* Icon */
   .label-tabacc::after {
@@ -94,5 +94,75 @@
   }
   .input-tabacc[type=radio]:checked + .label-tabacc::after {
 	transform: rotateX(180deg);
-  }
+	}
+	
+	
+	#style-1::-webkit-scrollbar-track
+	{
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+		border-radius: 10px;
+		background-color:none;
+	}
+	
+	#style-1::-webkit-scrollbar
+	{
+		width: 5px;
+		height: 3px;
+		background-color: none;
+	}
+	
+	#style-1::-webkit-scrollbar-thumb
+	{
+		border-radius: 10px;
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+		background-color: #e67e22;
+	}
+
+	.text-strong{
+		font-weight: bold!important;
+	}
+
+	.text-center{
+		text-align: center!important;
+	}
+
+	.red {
+		color: #d01919!important;
+	}           
+	.orange {
+		color: #f2711c!important;
+	}        
+	.yellow {
+		color: #FFD700!important;
+	}        
+	.olive {
+		color : #32CD32!important;
+	}        
+	.green {
+		color: #016936!important;
+	}         
+	.teal   {
+		color: #008080!important;
+	}        
+	.blue {
+		color: #0E6EB8!important;
+	}          
+	.violet {
+		color: #9627ba!important;
+	}        
+	.purple {
+		color: #B413EC!important;
+	}        
+	.pink   {
+		color: #FF1493!important;
+	}        
+	.brown  {
+		color: #A52A2A!important;
+	}        
+	.grey  {
+		color: #A0A0A0!important;
+	}         
+	.black {
+		color: #000000!important;
+	}       
   
