@@ -44,6 +44,7 @@
 
 .button-connect-modal{
 	background-image: url(/assets/images/blur.jpg)!important;
+	color:white!important
 }
 
 .button-connect-modal:hover{

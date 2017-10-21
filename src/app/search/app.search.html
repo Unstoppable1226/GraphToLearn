@@ -253,7 +253,7 @@
 					<div class="field">
 						<textarea id="newComment" rows="2" [(ngModel)]="newComment" [ngModelOptions]="{standalone: true}" placeholder="Écriver un commentaire"></textarea>
 					</div>
-					<div class="ui blue fluid labeled submit icon button" [ngClass]="{'loading': loadingAddComment}" (click)="addComment()">
+					<div class="ui blue white fluid labeled submit icon button" [ngClass]="{'loading': loadingAddComment}" (click)="addComment()">
 						<span *ngIf="user.group != 'Lambda'"><i class="icon comment"></i> Ajouter commentaire</span>
 						<span *ngIf="user.group == 'Lambda'"><i class="icon comment"></i> Proposer ce commentaire à la communauté</span>
 					</div>
