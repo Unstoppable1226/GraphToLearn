@@ -20,6 +20,7 @@ import { Formatter } from '../tools/app.formatter';
 import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
 
 declare var $: any;
+declare var firebase: any;
 
 @Component({
 	selector: 'app-login',

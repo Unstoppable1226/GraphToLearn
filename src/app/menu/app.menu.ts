@@ -1,21 +1,30 @@
+/* Core */
 import { Component, AfterViewInit, OnInit } from '@angular/core';
-import { AppComponent } from '../app.component';
-import { ActivatedRoute } from '@angular/router';
+import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, ActivatedRoute } from '@angular/router';
+import { Observable, Observer } from 'rxjs/Rx';
+
+/* Services */
 import { HttpAPIService } from '../api/app.http-service';
+
+/* Constantes */
 import { AppSettings } from '../settings/app.settings';
-import { Formatter } from '../tools/app.formatter';
 import { AuthService } from '../login/app.authservice';
+import { UserService } from '../model/user-service';
+import { WordsService } from '../model/words-service';
+import { HistorySearchService } from '../model/history-search';
+
+/* Tools */
+import { Formatter } from '../tools/app.formatter';
+
+/* Alerts */
 import { AlertsService, AlertType } from '@jaspero/ng2-alerts';
-import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+
+/* Model */
 import { User } from '../model/user'
 import { Feedback } from '../model/feedback'
 import { SettingsReputation } from '../model/settings-reputation'
 import { SettingsGeneral } from '../model/settings-general'
 import { Proposition } from '../model/proposition'
-import { UserService } from '../model/user-service'
-import { HistorySearchService } from '../model/history-search'
-import { WordsService } from '../model/words-service'
-import { Observable, Observer } from 'rxjs/Rx';
 
 declare var $: any;
 
@@ -223,13 +232,6 @@ export class MenuComponent implements OnInit {
 			)
 			
 		}
-		/*
-		Observable.forkJoin(promisesAll, 
-			resAll => {
-				console.log(resAll)
-				
-			}
-		)*/
 	}
 
 	isValidNumber(value, id) {
