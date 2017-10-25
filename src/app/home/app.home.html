@@ -77,27 +77,46 @@
 		<div class="image-back"></div>
 	</div>
 </div>
-<div id="modalInsertion" class="ui modal">
+<div id="modalInsertionFile" class="ui large modal">
 	<i class="close icon"></i>
 	<div class="header text-center">
 		Insertion depuis un fichier
 	</div>
-	<div style="padding:50px" class="text-center">
-		<div class="js input-file-container">
-			<input class="js input-file" id="my-file" type="file" (change)="fileChanged()">
-			<label for="my-file" class="js input-file-trigger" tabindex="0">Choisir un fichier...</label>
-		</div>
-		<p class="js file-return">Aucun fichier choisi</p>
-		<hr>
-
-		<div class="ui message" style="font-size:0.9em!important">
-			<div class="header">
-				Temps estimé : {{timeEstimated}}
-			</div>
-		</div>
-		<br>
-		<button class="ui button button-blur" (click)="saveInsertFile()">Lancer l'insertion <i class="plus icon" style="margin-left: 10px"></i></button>
-		<br>
+	<div class="ui fluid button" (click)="showImage()"> <i class="ui info icon"></i><span *ngIf="!showImageStructure">Afficher</span><span *ngIf="showImageStructure">Cacher</span> information sur la structure du fichier</div>
+	<div class="scrolling content">
 		
+		<div class="image content">
+			<img *ngIf="showImageStructure" class="ui fluid image" src="../assets/images/structure-json.PNG">
+		</div>
+		<div style="padding:30px" class="text-center">
+			<div class="js input-file-container">
+				<input class="js input-file" id="my-file" type="file" (change)="fileChanged()">
+				<label for="my-file" class="js input-file-trigger" tabindex="0">Choisir un fichier...</label>
+			</div>
+			<p class="js file-return" style="text-align: center;">Aucun fichier choisi</p>
+			<hr>
+			<div *ngIf="canInsert && errorStructureFile" class="ui red message" style="font-size:0.9em!important">
+				<div class="header">
+					{{textErrorStructureFile}} <i class="ui minus circle icon"></i> <br>
+					Il vous manque l'attribut : {{attributeErrorEmpty}}
+				</div>
+			</div>
+			<div *ngIf="canInsert && !errorStructureFile" class="ui green message" style="font-size:0.9em!important">
+				<div class="header">
+					{{textErrorStructureFile}} <i class="ui checkmark icon"></i>
+				</div>
+			</div>
+
+			<div class="ui message" [ngClass]="{'red': timeEstimated == 'Fichier invalide'}" style="font-size:0.9em!important">
+				<div class="header">
+					Temps estimé : {{timeEstimated}}<br>
+					Nombre d'entrées : {{nbEntries}}
+				</div>
+			</div>
+			<br>
+			<br>
+			
+		</div>
 	</div>
+	<button [disabled]="!canInsert || errorStructureFile" class="ui blue white large fluid button" [ngClass]="{'loading': isInserting}"(click)="saveInsertFile()">Lancer l'insertion <i class="plus icon" style="margin-left: 10px"></i></button>
 </div>

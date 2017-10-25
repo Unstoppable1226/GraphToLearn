@@ -14,7 +14,7 @@ declare var $:any;
 })
 
 export class AppComponent {
-	title = AppSettings.TITLE;
+	public title = AppSettings.TITLE;
 
 	constructor(protected _authguard : AuthGuard, public _userservice: UserService, public _historysearch : HistorySearchService, public _wordsservice : WordsService) {}
 }

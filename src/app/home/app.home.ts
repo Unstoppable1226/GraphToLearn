@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Rx';
 /* API Service */
 import { HttpAPIService } from '../api/app.http-service';
 
-/* Constants */ 
+/* Constants */
 import { AppSettings } from '../settings/app.settings';
 
 /* Alerts */
@@ -36,22 +36,57 @@ declare var $: any; // This enables to use Jquery inside angular 2 app
 
 export class AppHome implements OnInit {
 
-	public title : string // Title of the App
+	public title: string // Title of the App
 	public searchWord: string // Word that i want to search
-	public content : string[] // That stores all the content in function of the word that i want to search
-	public timeEstimated : string // Estimates the time necessary for the insertion with a file
+	public content: string[] // That stores all the content in function of the word that i want to search
+	public timeEstimated: string // Estimates the time necessary for the insertion with a file
+	public nbEntries : string
+	public showImageStructure : boolean
+	public canInsert : boolean
+	public errorStructureFile : boolean
+	public textErrorStructureFile : string
+	public isInserting : boolean
+	public attributeErrorEmpty : string
 
-	constructor(private _httpService: HttpAPIService, private _wordsservice : WordsService, private _historyservice : HistorySearchService, private _alert : AlertsService, private _format : Formatter, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
+	constructor(private _httpService: HttpAPIService, private _wordsservice: WordsService, private _historyservice: HistorySearchService, private _alert: AlertsService, private _format: Formatter, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
 		this._format.deleteAllModals() // This is necessary for the modal system. That cleans every modal to avoid bugs
 	}
 
 	ngOnInit() {
 		this.initVariables()
 		this._historyservice.getLastSearches() // Get the last searches did by the current user
-		this._userservice.getCurrentUser() // Promise that permits to initialize the current user
 		this._wordsservice.getWords() // Stores all the words to upgrade the search performances
 		this._wordsservice.getModules() // Stores all the modules to upgrade the search performances
 		this._wordsservice.getUsers() // Stores all the users to upgrade the search performances
+
+		this._httpService.getEntryJSON(AppSettings.API_WORDS)
+		.subscribe(
+			res => {
+				let array = []
+				for (let prop in res.dictionary.entries) {
+					var element = JSON.parse(res.dictionary.entries[prop].value);
+					if (res.dictionary.entries[prop].conf.searchClick != undefined) {
+						element.searchClick = res.dictionary.entries[prop].conf.searchClick
+					}
+					if (res.dictionary.entries[prop].conf.like != undefined) {
+						element.like = res.dictionary.entries[prop].conf.like
+					}
+
+					if (res.dictionary.entries[prop].conf.dislike != undefined) {
+						element.dislike = res.dictionary.entries[prop].conf.dislike
+					}
+					array.push(element)
+				}
+				console.log(JSON.stringify(array))
+			}
+		)
+	}
+
+	showImage() {
+		this.showImageStructure = !this.showImageStructure
+		setTimeout(function() {
+			$('#modalInsertionFile').modal('refresh');
+		}, 1);
 	}
 
 	initVariables() {
@@ -59,26 +94,74 @@ export class AppHome implements OnInit {
 		this.searchWord = ""
 		this.content = []
 		this.timeEstimated = ""
+		this.showImageStructure = true
+		this.canInsert = false
+		this.nbEntries = ""
+		this.errorStructureFile = false
+		this.textErrorStructureFile = ""
+		this.isInserting = false
+		this.attributeErrorEmpty = ""
 	}
 
-	insertWithFile() { $('#modalInsertion').modal('show'); }
+	insertWithFile() { 
+		let instance = this;
+		$('#modalInsertionFile').modal('show'); 
+		setTimeout(function() {
+			$('#modalInsertionFile').modal('refresh');
+		}, 1);
+	}
+
+	updateInfosFile(canInsert, timeEstimated, nbEntries?: number) {
+		this.canInsert = true
+		this.timeEstimated = timeEstimated
+		if (nbEntries)
+			this.nbEntries = nbEntries + " entrée" + (nbEntries > 1 ? "s": "") + "."
+		else
+			this.nbEntries = timeEstimated
+	}
+
+	updateErrorsFile(errorStructureFile, textErrorStructureFile) {
+		this.errorStructureFile = errorStructureFile
+		this.textErrorStructureFile = textErrorStructureFile
+	}
+
+	isObjectValid(object){
+		let keys = Object.keys(object)
+		for (let index = 0; index < AppSettings.ATTRIBUTES_REQUIRED_FOR_OBJECT.length; index++) {
+			let element = AppSettings.ATTRIBUTES_REQUIRED_FOR_OBJECT[index];
+			if (!keys.includes(element)) { this.attributeErrorEmpty = element; return false }
+		}
+		return true
+	}
 
 	fileChanged() {
-		let instance = this;
-		let file = (<HTMLInputElement>document.getElementById("my-file")).files[0];		
+		let instance = this, fileReader = new FileReader(), file = (<HTMLInputElement>document.getElementById("my-file")).files[0];
 		$('p.file-return').text(file.name)
-		let fileReader = new FileReader();
 		fileReader.readAsText(file); //try to read file, this part does not work at all, need a solution
-		
-		fileReader.onload = function(e) {
-			let obj = JSON.parse(this.result)
-			console.log(obj)
-			instance.timeEstimated = "~ " + Math.floor(obj.data.length / 12) + " minutes"
+		fileReader.onload = function (e) {
+			try {
+				let obj = JSON.parse(this.result)
+				instance.updateInfosFile(true, "~ 5 secondes", Object.keys(obj).length)
+				instance.updateErrorsFile(false, "La structure de votre fichier est correcte !")
+				let keys = Object.keys
+				let arrayWords = {}
+				for (let prop in obj) {
+					let element: any = obj[prop];
+					if (!instance.isObjectValid(element)) {
+						instance.updateErrorsFile(true, "La structure de votre fichier n'est pas correcte, il manque des champs obligatoire pour l'entrée : " + element.name)
+						break;
+					}
+				}
+			} catch (error) {
+				instance.updateInfosFile(false, "Fichier invalide")
+				instance.updateErrorsFile(true, "Fichier invalide")
+				alert('Votre fichier n\' est pas un fichier JSON valide !')
+			}
 		}
-	} 
+	}
 
 	exists(name1, a2) {
-		for(let x = 0; x < a2.length; x++) {
+		for (let x = 0; x < a2.length; x++) {
 			if (name1.toLowerCase() == a2[x].name.toLowerCase().trim()) {
 				return true;
 			}
@@ -86,27 +169,56 @@ export class AppHome implements OnInit {
 		return false;
 	}
 
-	saveInsertFile() {		
-		let instance = this;
-		var file = (<HTMLInputElement>document.getElementById("my-file")).files[0];
-		var fileReader = new FileReader();
-		fileReader.readAsText(file);
-		//try to read file, this part does not work at all, need a solution
-		fileReader.onload = function(e) {
-			var obj = JSON.parse(this.result)
-			var data = obj.data
-			if (data == undefined) {
-				alert('Attention data doit être le premier objet présent')
-			} else {
-				$('#modalInsertion').modal('hide');
-				instance._alert.create('error', "Cette fonctionnalitée a été désactivée, car elle est encore dans l'état expérimentale");
-				console.log('expérimental')
-			}
+	prepareObjects(data, allWords) {
+		for (var index = 0; index < data.length; index++) {
+			var element = data[index];
+			element.meaning = element.meaning.replace(/&/g, "And")
+			element.name = element.name.trim()
+			element.author = (element.author == undefined ? this._userservice.currentUser.mail : element.author)
+			element.review = (element.review == undefined ? "x" : element.review)
+			element.timestampCreation = (element.timestampCreation == undefined ? this._format.getTodayTimestamp() : element.timestampCreation)
+			element.cpte = (element.cpte == undefined ? "1" : element.cpte)
+			element.ict = (element.ict == undefined ? "" : element.ict)
+			element.parent = (element.parent == undefined ? "" : element.parent)
+			element.commentary = (element.commentary == undefined ? "" : element.commentary)
+			element.keywords = (element.keywords == undefined ? "" : element.keywords)
+			element.searchClick = (element.searchClick == undefined ? 0 : element.searchClick)
+			element.updates = (element.updates == undefined ? [] : element.updates)
+			element.comments = (element.comments == undefined ? [] : element.comments)
+			element.like = (element.like == undefined ? [] : element.like)
+			element.dislike = (element.dislike == undefined ? [] : element.dislike)
+			element.inactive = (element.inactive == undefined ? false : element.inactive)
+			allWords[element.name] = element
+		}
+		return allWords
+	}
+
+	saveInsertFile() {
+		let instance = this, file = (<HTMLInputElement>document.getElementById("my-file")).files[0], fileReader = new FileReader();
+		instance.isInserting = true
+		fileReader.readAsText(file); //try to read file, this part does not work at all, need a solution
+		fileReader.onload = function (e) {
+			let data = JSON.parse(this.result), allWords = {}
+		
+			instance._httpService.getEntryJSON(AppSettings.API_WORDSNEW)
+			.subscribe( words => {
+				allWords = JSON.parse(words.dictionary.entries[Object.keys(words.dictionary.entries)[0]].value)
+				allWords = instance.prepareObjects(data, allWords)
+				instance._httpService.postEntryJSON(allWords, AppSettings.API_WORDSNEW, AppSettings.TAGALLWORDS, instance._userservice.currentUser.secretKey)
+				.subscribe(
+					res=> {
+						console.log(res)
+						instance.isInserting = false;
+						$('#modalInsertionFile').modal('hide');
+						instance._alert.create('success', "L'insertion des entrées est un succès !")
+					}
+				)
+			})
 		}
 	}
 
 	eventHandler(keyCode) {
-		if (keyCode != 13) {return;}
+		if (keyCode != 13) { return; }
 		if (this.searchWord != "") { this.moveToSearch(this.searchWord) }
 	}
 
@@ -119,137 +231,44 @@ export class AppHome implements OnInit {
 	ngAfterViewInit() {
 		let instance = this;
 		$('.ui.search.searchWord')
-		.search({
-			apiSettings: {
-				url: AppSettings.API_OBSERVATORY + "?observatoryId=" + AppSettings.API_WORDS, // Communication avec l'API Cowaboo
-				onResponse: function (response) {
-					instance.content.splice(0, instance.content.length) // Vider le tableau
-					let responseSearch = {
-						results: [] // Tableau qui contient les résultats
-					}
-					let obj = response.dictionary.entries;
-					for (let prop in obj) {
-						let tag = obj[prop].tags; // Récupère le tag lié à l'entrée
-						if (tag.toLowerCase().trim().startsWith('||' + instance.searchWord.toLowerCase().trim())) { // Algorithme de recherche
-							instance.content.push(obj[prop].value);
+			.search({
+				apiSettings: {
+					url: AppSettings.API_OBSERVATORY + "?observatoryId=" + AppSettings.API_WORDS, // Communication avec l'API Cowaboo
+					onResponse: function (response) {
+						instance.content.splice(0, instance.content.length) // Vider le tableau
+						let responseSearch = {
+							results: [] // Tableau qui contient les résultats
 						}
-					}
-					instance.content.forEach(function (item) {
-						let itemObj = JSON.parse(item);
-						itemObj.modules = itemObj.modules.replace(/\.0/g,"")
-						let modules = itemObj.modules.length > 1 ? " [" + (isNaN(parseInt(itemObj.modules)) ? itemObj.modules : itemObj.modules) + "]" : ""
-						responseSearch.results.push({
-							title: itemObj.name + modules,
-							description: itemObj.meaning,
-							name: itemObj.name
-							/*url: AppSettings.URL_SEARCH + name*/
+						let obj = response.dictionary.entries;
+						for (let prop in obj) {
+							let tag = obj[prop].tags; // Récupère le tag lié à l'entrée
+							if (tag.toLowerCase().trim().startsWith('||' + instance.searchWord.toLowerCase().trim())) { // Algorithme de recherche
+								instance.content.push(obj[prop].value);
+							}
+						}
+						instance.content.forEach(function (item) {
+							let itemObj = JSON.parse(item);
+							itemObj.modules = itemObj.modules.replace(/\.0/g, "")
+							let modules = itemObj.modules.length > 1 ? " [" + (isNaN(parseInt(itemObj.modules)) ? itemObj.modules : itemObj.modules) + "]" : ""
+							responseSearch.results.push({
+								title: itemObj.name + modules,
+								description: itemObj.meaning,
+								name: itemObj.name
+								/*url: AppSettings.URL_SEARCH + name*/
+							});
 						});
-					});
-					return responseSearch;
+						return responseSearch;
+					}
+				},
+				minCharacters: 1, // 1 caractère minimum pour déclencher l'algorithme de recherche
+				maxResults: 15, // Affiche 10 résultats maximum
+				searchDelay: 300,
+				searchFields: [
+					'title',
+				],
+				onSelect(result, response) {
+					instance.moveToSearch(result.name)
 				}
-			},
-			minCharacters: 1, // 1 caractère minimum pour déclencher l'algorithme de recherche
-			maxResults : 15, // Affiche 10 résultats maximum
-			searchDelay: 300,
-			searchFields: [
-				'title',
-			],
-			onSelect(result, response) {
-				instance.moveToSearch(result.name)
-			}
-		});
+			});
 	}
 }
-
-/*instance._httpService.getEntryJSON(AppSettings.API_WORDS)
-	.subscribe(function(res){
-		let words = res.dictionary.entries
-		let cpt = 0;
-		/*
-		for (let prop in words) {
-			let el = JSON.parse(words[prop].value)
-			if (cpt < 6 && (el.keywords == undefined)) {
-
-				let modules = el.modules.replace(/\.0/g,"")
-				let tags = (el.keywords == undefined ? "" : el.keywords)
-				let comments = []
-				if (el.commentary.trim() != "") {
-					comments.push(new Comment(el.commentary, "IDEC", el.timestampCreation, []))
-				}
-				let newValue = new EntryCowaboo(el.name, el.type.trim(), el.source.trim(), modules, el.definition.trim(), el.meaning, el.context.trim(), el.review.trim(), tags, el.parent.trim(), el.timestampCreation, [], comments, false, el.commentary)
-				instance._httpService.putEntryJSON(newValue, AppSettings.API_WORDS, prop, instance._userservice.currentUser.secretKey)
-				.subscribe(
-					hashGenerated => {
-						console.log(hashGenerated);
-					},
-					e => {console.log(e)}
-				)	
-				
-			}
-			cpt++;
-		}
-		*/
-		/*let obj = res.dictionary.entries
-		let i = 0;
-		
-		let a2 = []
-		for (let prop in obj) {
-			a2.push(JSON.parse(obj[prop].value))
-		}
-		//console.log(a2)
-		let tab = []
-		for (let i = 0; i < data.length; i++) {
-			if (!instance.exists(data[i].name.trim(), a2)) {								
-				tab.push(data[i])
-			}
-		}*/
-		//console.log(tab)
-		/*for (var cpt = 0; cpt < tab.length; cpt++) {
-			(function(index) {
-				var element = tab[index];
-				setTimeout(function() { 
-					instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name, instance._userservice.getCurrentUser().secretKey)
-					.subscribe(function(res) {
-						console.log(res)
-					})
-				},cpt * 5000);
-			})(cpt);
-		} 
-		
-		for (let prop in obj) {
-			(function(index) {
-				i++
-				var element = data[index];
-				setTimeout(function() { 
-					let tag = obj[prop].tags;
-					instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, prop, instance._userservice.getCurrentUser().secretKey)
-						.subscribe(function(res) {console.log(res)})
-				}, i * 5000);
-			})(i);
-		} */
-/*
-		let tab = []
-		
-		for (var i = 0; i < data.length; i++) {
-			(function(index) {
-				var element = data[index];
-				setTimeout(function() { 
-					instance._httpService.postEntryJSON(element, AppSettings.API_WORDS, element.name, instance._userservice.currentUser.secretKey)
-					.subscribe(function(res) {
-						console.log(res)
-					})
-				}, i * 5000);
-			})(i);
-		}
-		/*Observable.forkJoin(tab).subscribe(t=> {
-			console.log(t)
-			for (var i = 0; i < t.length; i++) {
-				console.log("valeur" + t[i])
-				instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, t[i], instance._userservice.getCurrentUser().secretKey)
-					.subscribe(function(res){
-						console.log(res)
-					}) 
-			}
-		});*/
-	/*})	*/
-//})

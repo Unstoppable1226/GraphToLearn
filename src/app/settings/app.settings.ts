@@ -16,6 +16,7 @@ export class AppSettings {
 	public static API_TAGS = AppSettings.API_ENDPOINT + "tags";
 	
 	public static API_WORDS = "Words";
+	public static API_WORDSNEW = "Words2";
 	public static API_MODULES = "Modules";
 	public static API_HISTORY = "History";
 	public static API_TYPES = "Types";
@@ -50,12 +51,15 @@ export class AppSettings {
 
 	public static TAGMEMBERS = "members"
 	public static TAGSETTINGS = "settings"
+	public static TAGALLWORDS = "allwords"
 
 	/* URL */
 	public static URL_SEARCH = 'http://localhost:4200/search/'
 	public static FORWARD_SLACH = "ForwardSlash"
 	public static OPEN_PARENTHESIS = "OpenParenthesis"
 	public static CLOSE_PARENTHESIS = "CloseParenthesis"
+
+	public static ATTRIBUTES_REQUIRED_FOR_OBJECT = ['name', 'meaning', 'type', 'modules', 'source', 'definition', 'context']
 
 	/* API Wikipedia */
 	//https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=Albert%20Einstein&utf8

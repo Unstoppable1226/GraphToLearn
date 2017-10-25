@@ -30,20 +30,20 @@ declare var firebase: any;
 
 export class AppLogin implements OnInit {
 
-	public secretKey : string // Secret Key gaved by the user
-	public mail : string // Mail gived for the user
+	public secretKey: string // Secret Key gaved by the user
+	public mail: string // Mail gived for the user
 
-	public error : boolean // Error occured in the modal connection
-	public errorTextSecretKey : string // Error that the user commited on modal connection
+	public error: boolean // Error occured in the modal connection
+	public errorTextSecretKey: string // Error that the user commited on modal connection
 
-	public errorMail : boolean // Error occured in the modal join
-	public errorTextMail : string // Error taht the user commited on modal join
+	public errorMail: boolean // Error occured in the modal join
+	public errorTextMail: string // Error taht the user commited on modal join
 
-	public loading : boolean // Loading to indicate when the user must be patient
-	public loadingButton : boolean // Loading for the button to indicate when the user must be patient
-	public title : string // Title of the application
+	public loading: boolean // Loading to indicate when the user must be patient
+	public loadingButton: boolean // Loading for the button to indicate when the user must be patient
+	public title: string // Title of the application
 
-	constructor(private _authservice: AuthService, private _router: Router, private _alert: AlertsService, private _userservice: UserService, private _httpservice: HttpAPIService,  private _format: Formatter) {
+	constructor(private _authservice: AuthService, private _router: Router, private _alert: AlertsService, private _userservice: UserService, private _httpservice: HttpAPIService, private _format: Formatter) {
 		this._format.deleteAllModals()
 	}
 
@@ -54,9 +54,9 @@ export class AppLogin implements OnInit {
 	initVariables() {
 		this.secretKey = ""
 		this.mail = ""
-		this.error = false;
+		this.error = false
 		this.errorTextSecretKey = AppSettings.MSG_ERROR_SECRETKEY_EMPTY
-		this.errorMail = false;
+		this.errorMail = false
 		this.errorTextMail = AppSettings.MSG_ERROR_MAIL_EMPTY
 		this.loading = false
 		this.loadingButton = false
@@ -71,9 +71,9 @@ export class AppLogin implements OnInit {
 		user.secretKey = instance.secretKey;
 		user.group = infoMembers.group;
 		user.validated = infoMembers.validated
-		if (infoMembers.settingsGeneral != undefined) {user.settingsGeneral = infoMembers.settingsGeneral}
+		if (infoMembers.settingsGeneral != undefined) { user.settingsGeneral = infoMembers.settingsGeneral }
 		instance._httpservice.getEntryJSON(AppSettings.API_SETTINGS)
-		.subscribe(
+			.subscribe(
 			dataSettings => {
 				user.settingsReputation = JSON.parse(dataSettings.dictionary.entries[Object.keys(dataSettings.dictionary.entries)[0]].value)
 				instance._userservice.setCurrentUser(user);
@@ -82,19 +82,19 @@ export class AppLogin implements OnInit {
 				instance._router.navigate(['home']);
 				instance._alert.create('success', AppSettings.MSGWELCOME + " " + resp.email + " !")
 			}
-		)
+			)
 	}
 
 	getReputation(publicKey: string, resp, infoMembers) { // Get the stellar coins of the user => his reputation
 		let instance = this;
 		this._httpservice.getUserReputation(publicKey)
-		.subscribe(
-			reputation=> {
+			.subscribe(
+			reputation => {
 				if (isNaN(reputation)) {
 					this._httpservice.findFriendBot(publicKey)
-					.subscribe(
+						.subscribe(
 						find => { this.constructReputation(publicKey, 0, resp, infoMembers) }
-					)
+						)
 				} else { this.constructReputation(publicKey, reputation, resp, infoMembers) }
 			},
 		)
@@ -104,10 +104,10 @@ export class AppLogin implements OnInit {
 		this.loadingButton = false
 		if (data.publicAddress != undefined) {
 			this._httpservice.getEntryJSON(AppSettings.API_MEMBERS)
-			.subscribe(
+				.subscribe(
 				allMembers => {
 					let dataInfo = JSON.parse(allMembers.dictionary.entries[Object.keys(allMembers.dictionary.entries)[0]].value)
-					let mail : string = data.email
+					let mail: string = data.email
 
 					if (dataInfo[mail] == undefined) {
 						dataInfo[mail] = {
@@ -116,7 +116,7 @@ export class AppLogin implements OnInit {
 							validated: false
 						}
 						this._httpservice.postEntryJSON(dataInfo, AppSettings.API_MEMBERS, AppSettings.TAGMEMBERS, this.secretKey)
-						.subscribe(resultPostMembers => { console.log(resultPostMembers) })
+							.subscribe(resultPostMembers => { console.log(resultPostMembers) })
 					} else {
 						$('.ui.modal').modal('hide');
 						if (dataInfo[mail].validated == false && dataInfo[mail].refusedBy == undefined) {
@@ -126,10 +126,10 @@ export class AppLogin implements OnInit {
 						} else {
 							this.loading = true
 							this.getReputation(data.publicAddress, data, dataInfo[mail])
-						}	
+						}
 					}
 				}
-			)
+				)
 		}
 	}
 
@@ -137,7 +137,7 @@ export class AppLogin implements OnInit {
 		if (this.secretKey.length > 0) { // Not empty
 			this.loadingButton = true
 			this._authservice.connect(this.secretKey)
-			.subscribe(
+				.subscribe(
 				data => {
 					console.log(data)
 					this.checkResultConnection(data)
@@ -147,11 +147,11 @@ export class AppLogin implements OnInit {
 					this.error = true;
 					if (err.status == 0) {
 						this.errorTextSecretKey = AppSettings.MSG_ERROR_ERR_CONNECTION_TIMEDOUT
-					} else if(err.status == 401) { // User already exists
+					} else if (err.status == 401) { // User already exists
 						this.errorTextSecretKey = AppSettings.MSG_ERROR_LOG_IN
 					}
 				}
-			)
+				)
 			return false;
 		} else { // The information is empty
 			this.loadingButton = false
@@ -173,17 +173,17 @@ export class AppLogin implements OnInit {
 
 	prepareUser() {
 		this._httpservice.getUsers()
-		.subscribe(
+			.subscribe(
 			users => {
 				this._httpservice.findFriendBot(users.user_list.list[this.mail])
-				.subscribe(
+					.subscribe(
 					data => {
 						this._httpservice.getEntryJSON(AppSettings.API_MEMBERS)
-						.subscribe(
+							.subscribe(
 							dataMembers => {
 								let dataInfo = JSON.parse(dataMembers.dictionary.entries[Object.keys(dataMembers.dictionary.entries)[0]].value)
-								let mail : string = this.mail
-		
+								let mail: string = this.mail
+
 								if (dataInfo[mail] == undefined) {
 									dataInfo[mail] = {
 										publicKey: users.user_list.list[this.mail],
@@ -191,7 +191,7 @@ export class AppLogin implements OnInit {
 										validated: false
 									}
 									this._httpservice.postEntryJSON(dataInfo, AppSettings.API_MEMBERS, AppSettings.TAGMEMBERS, AppSettings.API_KEY)
-									.subscribe(
+										.subscribe(
 										datas => {
 											this.redirectToHome()
 										},
@@ -200,11 +200,11 @@ export class AppLogin implements OnInit {
 									this.redirectToHome()
 								}
 							}
-						)
+							)
 					}
-				)
+					)
 			}
-		)
+			)
 	}
 
 	launchRegistration() {
@@ -212,14 +212,14 @@ export class AppLogin implements OnInit {
 		if (isMailNotNull && isMailValid) {
 			this.loadingButton = true
 			this._authservice.join(this.mail)
-			.subscribe(
+				.subscribe(
 				data => { this.prepareUser() },
 				err => {
 					this.loadingButton = false;
 					this.errorMail = true;
 					this.errorTextMail = err.status == 409 ? AppSettings.MSG_ERROR_MAIL_TAKEN : AppSettings.MSG_ERROR_CREATE_USER
 				}
-			)
+				)
 		} else {
 			this.errorMail = true;
 			this.errorTextMail = isMailNotNull ? AppSettings.MSG_ERROR_MAIL_INVALID : AppSettings.MSG_ERROR_MAIL_EMPTY;
@@ -232,11 +232,11 @@ export class AppLogin implements OnInit {
 		this.errorMail = false;
 	}
 
-	connect() { 
+	connect() {
 		$('#modalConnection').modal('refresh').modal('show');
 	}
 
-	join() { 
+	join() {
 		$('#modalJoinCommunity').modal('refresh').modal('show');
 	}
 }

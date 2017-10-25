@@ -114,7 +114,8 @@ export class AppSearch implements OnInit {
 		this.disabled = true;
 		this.user = new User()
 		this.lastModifItem = new EntryCowaboo("", "", "", "", "", "", "", "", "", "", "", [], [], false, "", "")
-		delete (this._manager3d)
+		console.log('ici')
+		delete(this._manager3d)
 		this._manager3d = new Manager3D(this._format, this._wordsservice, this._userservice)
 	}
 
@@ -212,6 +213,7 @@ export class AppSearch implements OnInit {
 
 	backToHome() {
 		this.refresh()
+		delete(this._manager3d)
 		this._router.navigate(['/home'])
 	}
 
@@ -490,8 +492,8 @@ export class AppSearch implements OnInit {
 
 	hideModals() { $('.ui.modal').modal('hide all') } // hideModals
 
-	showModifications() {
-		if (this.wordFind) {
+	showModifications(isModule : boolean) {
+		if (this.wordFind && !isModule) {
 			this.word = this.wordSel.name
 			//this.newModules = '168';
 			this.source = this.wordSel.source; // Separate with the comma
@@ -537,6 +539,17 @@ export class AppSearch implements OnInit {
 
 			$('.ui.dropdown.multiple').dropdown({ values: this.valuesModules })
 		}
+	}
+
+	navigateTo(module) {
+		this.onSubmit(module)
+	}
+
+	onSubmit(data) {
+		this.loading = true
+		this._manager3d.refresh()
+		this.wordSel.modulesReputation.splice(0, this.wordSel.modulesReputation.length)
+		this._router.navigate(['/search/' + data.name])
 	}
 
 	ngAfterViewInit() {
@@ -1030,6 +1043,13 @@ export class AppSearch implements OnInit {
 		instance.allEntries = allEntries
 
 		if (instance._manager3d.engine != null) {
+			let count = 0;
+			for (var index = 0; index < allEntries.length; index++) {
+				console.log(allEntries[index])
+				if (allEntries[index].name == wordSearch.name) {count += 1; break}
+			}
+			if (count == 1) {allEntries = this.deleteWordSearchFromEntries(allEntries, wordSearch)}
+
 			instance._manager3d.createScene(wordSearch, allEntries, instance.wordSel, instance.modulesOfWord, this.user);
 			instance._manager3d.runRender();
 		}
@@ -1278,6 +1298,7 @@ export class AppSearch implements OnInit {
 	} // getData
 
 	ngOnInit() {
+		console.log('ici')
 		this.loading = true;
 		this.col1 = this.user.settingsGeneral.colSearchTerm
 		this.col2 = this.user.settingsGeneral.colKeyWords

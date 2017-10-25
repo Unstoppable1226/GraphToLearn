@@ -12,9 +12,9 @@
 	<div></div>
 	
 	<div style="width: 100%;display: inline-block;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">
-		<!--<div *ngIf="loading" class="ui active dimmer">
+		<div *ngIf="loading" class="ui active dimmer">
 			<div class="ui large text loader">Initialisation de l'interface ...</div>
-		</div>-->
+		</div>
 		<div *ngIf="loadingLike" class="ui active dimmer">
 			<div class="ui large text loader">Transaction en cours ...</div>
 		</div>
@@ -79,24 +79,34 @@
 			<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
 			<ul style="height: auto;">
 				<li class="cr number" style="height: 35px;line-height: 35px">
-					<div>
+					<div *ngIf="!wordSel.isModule">
 						<span class="property-name" style="text-align:left;padding-left:8px">Type : </span>
 						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em; text-align:right;padding-right: 15px;overflow: overlay"><span *ngIf="(wordSel.type.length < 2)">Aucun</span>{{wordSel.type}}</div>
 					</div>
+					<div *ngIf="wordSel.isModule">
+						<span class="property-name" style="text-align:left;padding-left:8px">Id du module: </span>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em; text-align:right;padding-right: 15px;overflow: overlay">{{wordSel.name}}</div>
+					</div>
 				</li>
-				<li *ngIf="(wordSel.definition != '')" class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="(wordSel.definition != '') && !wordSel.isModule" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Définition : </span>
 						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay">{{wordSel.definition}}</div>
 					</div>
 				</li>
-				<li class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="!wordSel.isModule"class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Source : </span>
 						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay">{{wordSel.source}} <i *ngIf="wordSel.source == 'Google'" class="google icon"></i><i *ngIf="wordSel.source == 'Wikipédia'" class="wikipedia icon"></i></div>
 					</div>
 				</li>
-				<li class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="wordSel.isModule" class="cr number" style="height: 60px;overflow: auto;">
+					<div >
+						<span class="property-name" style="text-align:left;padding-left:8px">Nom du module : </span>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;">{{wordSel.type}}</div>
+					</div>
+				</li>
+				<li *ngIf="!wordSel.isModule" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Contexte : </span>
 						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay"><span *ngIf="(wordSel.context == '')">Aucun</span>{{wordSel.context}}</div>
@@ -106,13 +116,11 @@
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Dernière modification:</span>
 						<div id="style-1" class="c">
-							<div id="lastModif" class="circular ui violet icon button" data-tooltip="Voir la dernière modification" data-inverted=""
-							 data-position="top center" style="width: 20px;height: 20px;border-radius: 20px;float: left;margin: 7px;padding: 3px;overflow: overlay"
-							 (click)="showLastModification()">
-								<i class="icon info"></i>
-							</div>
+							<button id="lastModif" (click)="showLastModification()" class="circular ui violet icon button" 
+							data-tooltip="Afficher modification" data-position="left center" style="width: 20px;height: 20px;border-radius: 20px;margin-top: 6px;line-height: 0px;padding-right: 25px;">
+								<i class="icon info" style="color:white!important"></i>
+							</button>
 							<span style="font-weight: bold; color:white; font-size:1em;text-align:right;float:right;padding-right: 15px">{{wordSel.lastUpdated}}</span>
-
 						</div>
 					</div>
 				</li>
@@ -131,7 +139,7 @@
 						</div>
 					</div>
 				</li>
-				<li class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
+				<li *ngIf="!wordSel.isModule" class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
 					<div>
 						<div class='header'>Appartient aux modules suivants : </div>
 						<div class='content'>
@@ -142,9 +150,19 @@
 						</div>
 					</div>
 				</li>
+				<li *ngIf="wordSel.isModule" class="cr number" style="height: auto;max-height: 350px!important; overflow: auto">
+					<div>
+						<div class='header'>Liste des entrées du module : {{wordSel.name}} </div>
+						<div class='content'>
+							<div>
+								<a *ngFor="let module of wordSel.modules" class="ui green-dark label" style="margin-left:15px;  margin-top:5px;margin-bottom:10px" (click)="navigateTo(module)">{{module.name}}</a>
+							</div>
+						</div>
+					</div>
+				</li>
 
 
-				<li class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
+				<li *ngIf="!wordSel.isModule" class="cr number" style="height: auto;max-height: 90px!important; overflow: auto">
 					<div class='header'>Mots clés</div>
 					<div class='content'>
 						<span *ngIf="wordSel.keywords.length == 0" style="font-weight: bold; color:white; font-size:1em">Aucun mot clé n'est associé</span>
@@ -153,14 +171,14 @@
 				</li>
 
 			</ul>
-			<div class="ui labeled button" [ngClass]='{disabled: !wordSel.canLike}' (click)="like()">
-				<div class="ui blue button" [ngClass]="{'loading' : loadingLike}" style="width: 270px;">
+			<div *ngIf="!wordSel.isModule" class="ui labeled button" [ngClass]='{disabled: !wordSel.canLike}' (click)="like()">
+				<div class="ui blue white button" [ngClass]="{'loading' : loadingLike}" style="width: 270px;">
 					<i class="smile icon"></i> Contenu très utile
 				</div>
 				<a tabindex="0" class="ui basic blue left pointing label" style="width: 80px; text-align: center">{{wordSel.like.number}}</a>
 			</div>
-			<div class="ui labeled button" tabindex="1" [ngClass]='{disabled: !wordSel.canDislike}' (click)="dislike()">
-				<div class="ui red button" [ngClass]="{'loading' : loading2}" style="width: 270px;">
+			<div *ngIf="!wordSel.isModule" class="ui labeled button" tabindex="1" [ngClass]='{disabled: !wordSel.canDislike}' (click)="dislike()">
+				<div class="ui red white button" [ngClass]="{'loading' : loading2}" style="width: 270px;">
 					<i class="frown icon"></i> Contenu sans intérêt
 				</div>
 				<a tabindex="0" class="ui basic red left pointing label" style="width: 80px; text-align: center">{{wordSel.dislike.number}}</a>
@@ -178,10 +196,14 @@
 		<canvas *ngIf="wordFind" id="renderCanvas" style="outline: none;user-select: none !important;"></canvas>
 	</div>
 	<div *ngIf="wordFind" class="" style="position:fixed;top:180px;background-color:#1B1C1D!important; left:0; width: 100px;height:225px">
-		<button *ngIf="user.group == 'Administrator'" (click)="showModifications()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
-		 data-tooltip="Modifier le terme sélectionné" data-inverted="" data-position="right center">
+		<button *ngIf="((user.group == 'Administrator') && wordSel.isModule)" (click)="showModifications(true)" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
+		 data-tooltip="Modifier le module sélectionné" data-inverted="" data-position="right center">
 			<i class="icon pencil"></i>
 		</button>
+		<button *ngIf="((user.group == 'Administrator') && !wordSel.isModule)" (click)="showModifications(false)" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
+		data-tooltip="Modifier le terme sélectionné" data-inverted="" data-position="right center">
+		   <i class="icon pencil"></i>
+	   </button>
 		<button [disabled]="user.group == 'Lambda'" *ngIf="user.group != 'Administrator'" (click)="showModifications()" class="circular ui icon button" style="display: block;position: absolute;margin-top: 30px;margin-left: 52px;"
 		data-tooltip="Proposer une modification pour le terme sélectionné" data-inverted="" data-position="right center">
 		   <i class="icon pencil"></i>
@@ -204,16 +226,20 @@
 	</div>
 
 	<div *ngIf="wordFind" class="dg main a" style="width: 59%;left:0;position: fixed;right: 0; margin-right:0px!important;bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
-		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
+		<div *ngIf="!wordSel.isModule" class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
 		 (click)="hideOrShow($event, 2)">Explications de <strong class="not-active" style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
 			<div class="not-active" style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedMeaning, 'plus': collapsedMeaning}"></i></div>
 		</div>
+		<div *ngIf="wordSel.isModule" class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
+		(click)="hideOrShow($event, 2)">Objectifs du module <strong class="not-active" style="color:#2185d0!important;font-size:1.2em">{{wordSel.name}}</strong>
+		   <div class="not-active" style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedMeaning, 'plus': collapsedMeaning}"></i></div>
+	   </div>
 		<div style="width: 6px; margin-left: -3px; height: 81px; cursor: ew-resize; position: absolute;"></div>
-		<ul style="height: auto;">
-			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;"><span style="font-size: 1.1em!important;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">{{wordSel.meaning}} [Source : {{wordSel.source}}]</span></li>
+		<ul style="height: auto;max-height: 200px;overflow:auto">
+			<li class="cr" style="height: auto;text-align: left; padding: 5px!important; word-wrap: break-word;text-align: justify;"><span style="font-size: 1.1em!important;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;">{{wordSel.meaning}} <span *ngIf="!wordSel.isModule" style="color:#76ca9c!important;font-weight: bold"> [Source : {{wordSel.source}}]</span></span></li>
 		</ul>
 	</div>
-	<div *ngIf="wordFind"  class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
+	<div *ngIf="wordFind && !wordSel.isModule"  class="dg main a" style="width: 39%;right:0;position: fixed;margin-right:0px!important;right: 0; bottom:0;font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif!important;font-size: 0.9em;text-shadow: none!important;">
 		<div class="close-button" style="width: 100%;height:40px;padding-top: 5px;font-size: 1.3em;line-height:25px!important;user-select: none;"
 		 (click)="hideOrShow($event, 3)">Espace commentaires et révisions
 			<div class="not-active" style="float: right; font-size: 0.7em"><i class="icon" [ngClass]="{'minus': !collapsedComments, 'plus': collapsedComments}"></i></div>

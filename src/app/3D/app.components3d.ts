@@ -28,7 +28,7 @@ export class Manager3D {
 	private header
 	private info
 
-	constructor(private _format: Formatter, private _wordsservice:  WordsService, private _userservice : UserService) { }
+	constructor(private _format: Formatter, private _wordsservice:  WordsService, private _userservice : UserService) { this.camera = null}
 
 	startEngine(nameElement) {
 		this.canvas = document.getElementById(nameElement);
@@ -48,7 +48,7 @@ export class Manager3D {
 		label.background = "transp"
 		label.height = "30px";
 		label.alpha = 0.5;
-		label.width = mesh.name.length >= 11 ? "200px" : "100px";
+		label.width = (mesh.name.length >= 11 ? (mesh.name.length >= 21 ? (mesh.name.length >= 32 ? "400px" : "300px") : "200px") : "100px");
 		label.cornerRadius = 20;
 		label.thickness = 1;
 		label.linkOffsetY = 30;
@@ -61,6 +61,10 @@ export class Manager3D {
 		text1.color = "black";
 		label.addControl(text1);
 		this.lines.push(label)
+	}
+
+	refresh() {
+		this.spheres.splice(0, this.spheres.length)
 	}
 
 	moveCamera(mesh) {
@@ -106,19 +110,19 @@ export class Manager3D {
 	}
 
 	updateInfos(mesh, data) {
-		console.log(data);
+
 		this.wordSel.author = data.author
 		this.wordSel.author.reputation = 0
 		this._userservice.getReputation(this._wordsservice.users.user_list.list[data.author.name])
 		.subscribe(
 			rep => {this.wordSel.author.reputation = rep}
 		)
+		this.wordSel.isModule = false
 		this.wordSel.name = mesh.name
 		this.wordSel.type = data.type
 		this.wordSel.context = data.context
 		this.wordSel.meaning = data.meaning;
 		this.wordSel.source = data.source;
-		this.wordSel.totalReput = data.totalReput;
 		this.wordSel.definition = data.definition;
 		this.wordSel.modules = data.modules
 		this.wordSel.searchClick = data.searchClick
@@ -139,16 +143,30 @@ export class Manager3D {
 		this.wordSel.lastUpdatedAuthor = data.lastUpdatedAuthor;
 	}
 
+	updateInfosModule(data) {
+		console.log(data.name)
+		this.wordSel.isModule = true
+		this.wordSel.name = data.id
+		this.wordSel.meaning = data.goals
+		this.wordSel.type = data.name.trim()
+		this.wordSel.modules = data.allterms
+	}
+
 	registerAction(mesh, tag) {
 		let instance = this;
 		mesh.actionManager = new BABYLON.ActionManager(this.scene);
 		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, (function (mesh) {
+			console.log(tag)
 			instance.moveCameraToMesh(mesh)
 			if (tag == null) {
 				this.updateInfos(mesh, instance.wordSearch)
 				return
+			} else if (tag.isModule) {
+				this.updateInfos(mesh, instance.wordSearch)
+				this.updateInfosModule(tag)
+			} else {
+				this.updateInfos(mesh, tag)
 			}
-			this.updateInfos(mesh, tag)
 		}).bind(this, mesh)));
 	}
 
@@ -218,8 +236,14 @@ export class Manager3D {
 		this.wordSel = wordSel;
 		this.scene = new BABYLON.Scene(this.engine);
 		this.scene.clearColor = new BABYLON.Color4(0, 0, 0, 0.0000000000000001);
+
+		if (this.camera != null) {
+			delete(this.camera)
+		}
+
 		this.camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, 1.0, 125, BABYLON.Vector3.Zero(), this.scene);
 		this.camera.attachControl(this.canvas, true);
+
 		this.scene.collisionsEnabled = false;
 		this.camera.checkCollisions = false;
 		this.advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui1");
@@ -236,12 +260,13 @@ export class Manager3D {
 		this.lines.push(label1)
 		for (let props in modules) {
 			var element = modules[props];
+
 			var sphere = BABYLON.Mesh.CreateSphere(element.id, 80.0, 25 , this.scene);
 			var label = new BABYLON.GUI.Rectangle("label" + sphere.name);
 			this.lines.push(label);
 			this.createMainMesh(sphere, label, (-50 * Object.keys(modules).length + (i * 100)), 50, user.settingsGeneral.colModule);
 			var line = new BABYLON.GUI.Line('line' + element.name);
-			
+
 			line.alpha = 1;
 			line.color = "black";
 			line.lineWidth = 1.5;
@@ -249,6 +274,8 @@ export class Manager3D {
 			line.linkWithMesh(sphere);
 			line.connectedControl = label1;
 			this.lines.push(line)
+			element.isModule = true
+			this.registerAction(sphere, element);
 			i++;
 		}
 		

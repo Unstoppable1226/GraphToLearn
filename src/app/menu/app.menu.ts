@@ -67,10 +67,12 @@ export class MenuComponent implements OnInit {
 
 	ngOnInit() {
 		let instance = this;
+		this.settingsGeneral = new SettingsGeneral()
 		this.initVariables()
 		this._userservice.getCurrentUser()
 			.then(
 			data => {
+				console.log(data)
 				this.user = this._userservice.currentUser;
 				this.settingsGeneral = this._userservice.currentUser.settingsGeneral;
 				this.init()

@@ -4,6 +4,7 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from
 
 /* Services */
 import { HttpAPIService } from '../api/app.http-service'
+import { UserService } from '../model/user-service'
 
 /* Constants */
 import { AppSettings } from '../settings/app.settings';
@@ -14,20 +15,24 @@ export class AuthGuard implements CanActivate  {
 
 	private isConnected = false // Indicates if the user is connected
 
-	constructor (private router: Router, private _httpservice : HttpAPIService) {}
+	constructor (private router: Router, private _userservice : UserService, private _httpservice : HttpAPIService) {}
+
+	goLoginPage() {
+		this.router.navigate(['welcome']);
+		return false
+	}
 
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-		let key = "";
-		return true
-		/*
-	 	if (sessionStorage.getItem(AppSettings.CURRENTUSER)) { // Logged in so return true
-			try {
-				
-				key = window.atob(sessionStorage.getItem(AppSettings.CURRENTUSER))
-				return true
-			} catch(e) {}
+		if (this._userservice.currentUser == undefined) {
+			if (sessionStorage.getItem(AppSettings.CURRENTUSER)) { // Logged in so return true
+				try {
+					let key = window.atob(sessionStorage.getItem(AppSettings.CURRENTUSER))
+					this._httpservice.getUser(key).subscribe(
+						user => { return true; }
+					)
+				} catch(e) { return this.goLoginPage() }
+			} else { return this.goLoginPage() }
 		}
-		this.router.navigate(['welcome']);
-		return false*/
+		return true
 	}
 }
