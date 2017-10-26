@@ -623,7 +623,7 @@
 							<strong>{{request.user}}</strong> le {{request.timestamp}}</span>
 					</div>
 					<div class="description" style="font-weight: bold;">
-						<p>{{request.text}}</p>
+						<p style="text-align:center">{{request.text}}</p>
 					</div>
 					<div class="extra">
 						<div *ngIf="!request.result" class="ui label red">Votre demande a été refusé par
@@ -672,7 +672,7 @@
 		</div>
 	</a>
 	<!-- href="http://localhost:4200/search/{{his}}" -->
-	<a *ngFor="let his of historySearch.reverse(); let i = index" class="item" (click)="searchSelectedWord(his)">
+	<a *ngFor="let his of historySearch let i = index" class="item" (click)="searchSelectedWord(his)">
 		{{his}}
 		<i class="search icon"></i>
 	</a>

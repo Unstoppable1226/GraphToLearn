@@ -313,20 +313,14 @@ export class MenuComponent implements OnInit {
 	}
 
 	toggleSideBar() {
-		if (this.historySearch.length == 0) {
-			this._httpService.getEntryJSON(AppSettings.API_HISTORY)
-				.subscribe(
-				data => {
-					try {
-						this._historysearch.lastSearches = JSON.parse(data.dictionary.conf[this._userservice.currentUser.mail])
-					} catch (error) {
-						this._historysearch.lastSearches = data.dictionary.conf[this._userservice.currentUser.mail]
-					}
-					if (this._historysearch.lastSearches == undefined) { this._historysearch.lastSearches = [] }
+		if (this._historysearch.lastSearches == undefined) {
+			this._historysearch.getLastSearchesFromAPI(this._userservice.currentUser.mail).then(
+				lastSearchesArray => {
+					this._historysearch.lastSearches = lastSearchesArray
 					this.historySearch = this._historysearch.getLastSearches()
 					this.showHistorySearch()
-				}
-				)
+				}, 
+			)
 		} else {
 			this.historySearch = this._historysearch.getLastSearches()
 			this.showHistorySearch()

@@ -11,39 +11,67 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class HistorySearchService  {
 
-    public lastSearches = []
+    public lastSearches : string[]
 
-    constructor (private _http: Http, private _router: Router, private _httpservice : HttpAPIService) {
-        this.lastSearches = []
-    }
+    constructor (private _http: Http, private _router: Router, private _httpservice : HttpAPIService) {}
 
     getLast15() {
-        if (this.lastSearches.length > 15) {
-            this.lastSearches = this.lastSearches.slice(this.lastSearches.length - 15, this.lastSearches.length)
+        let length = this.lastSearches.length
+        if (length > 15) {
+            let array = this.lastSearches.slice(length - 15, length)
+            delete(this.lastSearches)
+            this.lastSearches = array
         }
     }
 
-    getLastSearches() {
+    getLastSearches(): string[] {
         this.getLast15()
     	return this.lastSearches
     }
 
     existantSoUpdate(name) {
         if (name != "" && name != null) {
-            if (this.lastSearches.includes(name)) {
-                this.lastSearches.splice(this.lastSearches.indexOf(name), 1)
+            let index = this.lastSearches.indexOf(name)
+            if (index != -1) { 
+                this.lastSearches.splice(index, 1) ;
             }
-            this.lastSearches.push(name)
+            this.lastSearches.unshift(name)
         }
     }
+
+    getLastSearchesFromAPI(usermail) : Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            this._httpservice.getEntryJSON(AppSettings.API_HISTORY)
+            .subscribe(
+                data => {
+                    resolve((data.dictionary.conf[usermail] == "[]" ? [] : data.dictionary.conf[usermail]))
+                },
+                error => { reject([])}
+            )
+        })
+    }
+
+    saveHistorySearchesOnAPI(usermail, lastSearches, observatory, secretKey) {
+        this._httpservice.postObservatoryMetadata(usermail, lastSearches, observatory, secretKey)
+        .subscribe(function (response) { console.log(response); })
+    }
     
-    addSearch(name) {
+    addSearch(name, usermail, observatory, secretKey) {
         if (this.lastSearches == undefined) {
-            this.lastSearches = []
-        }
-        if (name != "" && name != null) {
-            this.lastSearches.push(name)
-            this.getLast15()
+            this.getLastSearchesFromAPI(usermail).then(
+                lastSearchesArray => { 
+                    this.lastSearches = lastSearchesArray
+                    this.existantSoUpdate(name)
+                    this.getLast15()
+                    this.saveHistorySearchesOnAPI(usermail, JSON.stringify(this.lastSearches), observatory, secretKey)
+                }
+            )
+        } else {
+            if (name != "" && name != null) {
+                this.existantSoUpdate(name)
+                this.getLast15()
+                this.saveHistorySearchesOnAPI(usermail, JSON.stringify(this.lastSearches), observatory, secretKey)
+            }
         }
     }
 

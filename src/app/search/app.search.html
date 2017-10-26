@@ -81,38 +81,38 @@
 				<li class="cr number" style="height: 35px;line-height: 35px">
 					<div *ngIf="!wordSel.isModule">
 						<span class="property-name" style="text-align:left;padding-left:8px">Type : </span>
-						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em; text-align:right;padding-right: 15px;overflow: overlay"><span *ngIf="(wordSel.type.length < 2)">Aucun</span>{{wordSel.type}}</div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em; text-align:right;padding-right: 15px;overflow: overlay; height: 35px!important;"><span *ngIf="(wordSel.type.length < 2)">Aucun</span>{{wordSel.type}}</div>
 					</div>
 					<div *ngIf="wordSel.isModule">
 						<span class="property-name" style="text-align:left;padding-left:8px">Id du module: </span>
-						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em; text-align:right;padding-right: 15px;overflow: overlay">{{wordSel.name}}</div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em; text-align:right;padding-right: 15px;overflow: overlay; height: 35px!important;">{{wordSel.name}}</div>
 					</div>
 				</li>
 				<li *ngIf="(wordSel.definition != '') && !wordSel.isModule" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Définition : </span>
-						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay">{{wordSel.definition}}</div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay; height: 35px!important;">{{wordSel.definition}}</div>
 					</div>
 				</li>
 				<li *ngIf="!wordSel.isModule"class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Source : </span>
-						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay">{{wordSel.source}} <i *ngIf="wordSel.source == 'Google'" class="google icon"></i><i *ngIf="wordSel.source == 'Wikipédia'" class="wikipedia icon"></i></div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay; height: 35px;">{{wordSel.source}} <i *ngIf="wordSel.source == 'Google'" class="google icon"></i><i *ngIf="wordSel.source == 'Wikipédia'" class="wikipedia icon"></i></div>
 					</div>
 				</li>
 				<li *ngIf="wordSel.isModule" class="cr number" style="height: 60px;overflow: auto;">
 					<div >
 						<span class="property-name" style="text-align:left;padding-left:8px">Nom du module : </span>
-						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;">{{wordSel.type}}</div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;height: 56px;overflow: overlay;">{{wordSel.type}}</div>
 					</div>
 				</li>
 				<li *ngIf="!wordSel.isModule" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Contexte : </span>
-						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay"><span *ngIf="(wordSel.context == '')">Aucun</span>{{wordSel.context}}</div>
+						<div id="style-1" class="c" style="font-weight: bold; color:white; font-size:1em;text-align:right;padding-right: 15px;overflow: overlay;height: 35px!important;"><span *ngIf="(wordSel.context == '')">Aucun</span>{{wordSel.context}}</div>
 					</div>
 				</li>
-				<li *ngIf="wordSel.lastUpdated != ''" class="cr number" style="height: 35px;line-height: 35px">
+				<li *ngIf="wordSel.lastUpdated != '' && !wordSel.isModule" class="cr number" style="height: 35px;line-height: 35px">
 					<div>
 						<span class="property-name" style="text-align:left;padding-left:8px">Dernière modification:</span>
 						<div id="style-1" class="c">
@@ -305,6 +305,8 @@
 						<p *ngIf="difDefinition">{{lastModifItem.definition}}</p>
 						<h5 *ngIf="difSource">Source</h5>
 						<p *ngIf="difSource">{{lastModifItem.source}}</p>
+						<h5 *ngIf="difModules">Modules</h5>
+						<p *ngIf="difModules">{{lastModifItem.modules}}</p>
 						<h5 *ngIf="difContext">Contexte/Domaine</h5>
 						<p *ngIf="difContext">{{lastModifItem.context}}</p>
 						<h5 *ngIf="difKeywords">Mots clés</h5>
@@ -323,6 +325,9 @@
 						<h5 *ngIf="difDefinition">Définition</h5>
 						<p id="afterModifDefinition"></p>
 						<h5 *ngIf="difSource">Source</h5>
+						<p id="afterModifSource"></p>
+						<h5 *ngIf="difModules">Modules</h5>
+						<p id="afterModifModules"></p>
 						<p id="afterModifSource"></p>
 						<h5 *ngIf="difContext">Contexte/Domaine</h5>
 						<p id="afterModifContext"></p>

@@ -13,10 +13,10 @@ export class WordsService  {
     constructor (private _httpservice : HttpAPIService) {}
     
     getWords() {
-        this._httpservice.getEntryJSON(AppSettings.API_WORDS)
+        this._httpservice.getEntryJSON(AppSettings.API_WORDSNEW)
         .subscribe(
             response => {
-                this.words = response
+                this.words = JSON.parse(response.dictionary.entries[Object.keys(response.dictionary.entries)[0]].value)
             }
         )
     }

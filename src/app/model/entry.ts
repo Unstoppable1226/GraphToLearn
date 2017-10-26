@@ -65,8 +65,10 @@ export class Entry {
         this.source = obj.source.trim();
         this.type = (obj.type.trim() == "name" ? "Terme" : obj.type.trim());
         this.isModule = false
-        let modules = obj.modules.replace(/\.0/g, "");
-        this.modules = {id: modules.split(/,|-/), name: modules};
+        this.modules = {id: obj.modules.split(/,/g), name: obj.modules};
+        for (let index = 0; index < this.modules.id.length; index++) {
+            this.modules.id[index] = this.modules.id[index].trim()
+        }
 
         this.keywords = ((obj.keywords == undefined || obj.keywords == "") ? new Array() : obj.keywords.split(', '))
         
@@ -86,7 +88,7 @@ export class Entry {
             this.lastUpdatedAuthor = this.updates[this.updates.length-1].author
         }
 
-        this.author = { name: ((obj.author == undefined || obj.author == "") ? entry.author : obj.author), reputation: 0 }
+        this.author = { name: obj.author, reputation: 0 }
 
         this.parent = obj.parent == undefined ? "": obj.parent;
         this.inactive = obj.inactive == undefined ? "": obj.inactive;

@@ -47,7 +47,7 @@ export class AppManagerMembers implements OnInit {
 	}
 
 	ngOnInit() {
-		this.loading = true; this.user = new User(); this.requestSel = new Request(AppSettings.TYPEREQUESTRULE), this.lastModifEntry = new EntryCowaboo("","","","","","","","","","","",[], [], false, "","");
+		this.loading = true; this.user = new User(); this.requestSel = new Request(AppSettings.TYPEREQUESTRULE), this.lastModifEntry = new EntryCowaboo("","","","","","","","","","","",[], [], false, "","", [], [], 0);
 		if (this._userservice.currentUser == undefined) {
 			this.configureCurrentUser()
 		} else {
@@ -210,18 +210,26 @@ export class AppManagerMembers implements OnInit {
 
 	acceptRequestNew(event, index, request) {
 		let content: EntryCowaboo = request.content
-		this._httpService.postEntryJSON(content, AppSettings.API_WORDS, content.name, this._userservice.currentUser.secretKey)
-			.subscribe(
-			res => {
-				this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this.user.settingsReputation.repNew)
+		this._httpService.getEntryJSON(AppSettings.API_WORDSNEW)
+		.subscribe(
+			words=> {
+				let allWords = JSON.parse(words.dictionary.entries[Object.keys(words.dictionary.entries)[0]].value)
+				allWords[content.name.toLowerCase().trim()] = content
+				this._httpService.postEntryJSON(allWords, AppSettings.API_WORDSNEW, AppSettings.TAGALLWORDS, this._userservice.currentUser.secretKey)
 					.subscribe(
-					balance => {
-						if (balance) { request.reputationGained = this.user.settingsReputation.repNew; this.answerRequest(event, index, request, true, AppSettings.TYPEREQUESTNEW + "-" + content.name) }
+					res => {
+						this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this.user.settingsReputation.repNew)
+							.subscribe(
+							balance => {
+								if (balance) { request.reputationGained = this.user.settingsReputation.repNew; this.answerRequest(event, index, request, true, AppSettings.TYPEREQUESTNEW + "-" + content.name) }
+							}
+							)
+		
 					}
 					)
-
 			}
-			)
+		)
+		
 	}
 
 	getHashWord(wordName) {
@@ -244,9 +252,12 @@ export class AppManagerMembers implements OnInit {
 
 	acceptRequestModify(event, index, request) {
 		let tag = AppSettings.TYPEREQUESTMODIFY + "-" + request.content.name
-		this.getHashWord(request.content.name).then(
-			(response: any) => {
-				this._httpService.putEntryJSON(request.content, AppSettings.API_WORDS, response.hash, this._userservice.currentUser.secretKey)
+		this._httpService.getEntryJSON(AppSettings.API_WORDSNEW)
+		.subscribe(
+			words => {
+				let allWords = JSON.parse(words.dictionary.entries[Object.keys(words.dictionary.entries)[0]].value)
+				allWords[request.content.name.toLowerCase().trim()] = request.content
+				this._httpService.postEntryJSON(allWords, AppSettings.API_WORDSNEW, AppSettings.TAGALLWORDS, this._userservice.currentUser.secretKey)
 					.subscribe(
 					hashGenerated => {
 						this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this.user.settingsReputation.repModify)
@@ -263,10 +274,12 @@ export class AppManagerMembers implements OnInit {
 
 	acceptRequestRevision(event, index, request) {
 		let tag = AppSettings.TYPEREQUESTREVISION + "-" + request.content.name + "-" + request.timestamp
-		this.getHashWord(request.content.name).then(
-			(response: any) => {
+		this._httpService.getEntryJSON(AppSettings.API_WORDSNEW)
+		.subscribe(
+			words => {
+				let allWords = JSON.parse(words.dictionary.entries[Object.keys(words.dictionary.entries)[0]].value)
 				let newComment: Comment = new Comment(request.content.info, request.content.author, request.content.timestamp, request.content.likes)
-				let el: EntryCowaboo = response.entry
+				let el: EntryCowaboo = allWords[request.content.name]
 				if (el.comments == undefined) { el.comments = [] }
 				el.comments.push(newComment)
 				let dataInfoString = {
@@ -284,8 +297,14 @@ export class AppManagerMembers implements OnInit {
 					updates: el.updates,
 					comments: el.comments,
 					inactive: el.inactive,
+					like : el.like,
+					dislike : el.dislike,
+					searchClick : el.searchClick
 				}
-				this._httpService.putEntryJSON(el, AppSettings.API_WORDS, response.hash, this._userservice.currentUser.secretKey)
+
+				allWords[request.content.name.toLowerCase().trim()] = dataInfoString
+				
+				this._httpService.postEntryJSON(allWords, AppSettings.API_WORDSNEW, AppSettings.TAGALLWORDS, this._userservice.currentUser.secretKey)
 					.subscribe(
 					hashGenerated => {
 						this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this.user.settingsReputation.repRevision)
@@ -367,7 +386,7 @@ export class AppManagerMembers implements OnInit {
 					} else if (element.type == 2) {
 						element.text = (sameUser ? "Je " : "Ce membre ") + "propose de créer une nouvelle entrée."
 					} else if (element.type == 3) {
-						element.text = (sameUser ? "Je " : "Ce membre ") + "propose de modifier l'entrée suvante : " + element.content.name + "."
+						element.text = (sameUser ? "Je " : "Ce membre ") + "propose de modifier l'entrée suivante : " + element.content.name + "."
 					} else {
 						element.text = (sameUser ? "Je " : "Ce membre ") + "propose d'ajouter le commentaire/révision suivant(e) : \"" + element.content.info + "\" pour l'entrée : " + element.content.name
 					}

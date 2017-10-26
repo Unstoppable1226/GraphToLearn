@@ -110,7 +110,6 @@ export class Manager3D {
 	}
 
 	updateInfos(mesh, data) {
-
 		this.wordSel.author = data.author
 		this.wordSel.author.reputation = 0
 		this._userservice.getReputation(this._wordsservice.users.user_list.list[data.author.name])
@@ -150,19 +149,19 @@ export class Manager3D {
 		this.wordSel.meaning = data.goals
 		this.wordSel.type = data.name.trim()
 		this.wordSel.modules = data.allterms
+		this.wordSel.modulesReputation = [];
 	}
 
 	registerAction(mesh, tag) {
 		let instance = this;
 		mesh.actionManager = new BABYLON.ActionManager(this.scene);
 		mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, (function (mesh) {
-			console.log(tag)
+			
 			instance.moveCameraToMesh(mesh)
 			if (tag == null) {
 				this.updateInfos(mesh, instance.wordSearch)
 				return
 			} else if (tag.isModule) {
-				this.updateInfos(mesh, instance.wordSearch)
 				this.updateInfosModule(tag)
 			} else {
 				this.updateInfos(mesh, tag)
@@ -205,7 +204,9 @@ export class Manager3D {
 			}
 			sphere = this.spheres[i].sphere;
 			sphere.material = this.sphereMaterial;
-			minX = this.getXFromPosition(tag.position, maxGap)
+			if (tag.position == 1) {
+				minX = 30
+			}
 			minX *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
 			space *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
 			maxX = minX + space
@@ -286,7 +287,7 @@ export class Manager3D {
 		for (var cpt = tags.length - 1; cpt >= 0; cpt--) {
 			this.spheres.push(
 				{ 
-					sphere: BABYLON.Mesh.CreateSphere(this._format.capitalize(tags[cpt].name), 50.0, (2 + tags[cpt].repRule1), this.scene), 
+					sphere: BABYLON.Mesh.CreateSphere(this._format.capitalize(tags[cpt].name), 50.0, 4, this.scene), 
 					tag: tags[cpt] 
 				}
 			);

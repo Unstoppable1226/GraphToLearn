@@ -54,32 +54,9 @@ export class AppHome implements OnInit {
 
 	ngOnInit() {
 		this.initVariables()
-		this._historyservice.getLastSearches() // Get the last searches did by the current user
 		this._wordsservice.getWords() // Stores all the words to upgrade the search performances
 		this._wordsservice.getModules() // Stores all the modules to upgrade the search performances
 		this._wordsservice.getUsers() // Stores all the users to upgrade the search performances
-
-		this._httpService.getEntryJSON(AppSettings.API_WORDS)
-		.subscribe(
-			res => {
-				let array = []
-				for (let prop in res.dictionary.entries) {
-					var element = JSON.parse(res.dictionary.entries[prop].value);
-					if (res.dictionary.entries[prop].conf.searchClick != undefined) {
-						element.searchClick = res.dictionary.entries[prop].conf.searchClick
-					}
-					if (res.dictionary.entries[prop].conf.like != undefined) {
-						element.like = res.dictionary.entries[prop].conf.like
-					}
-
-					if (res.dictionary.entries[prop].conf.dislike != undefined) {
-						element.dislike = res.dictionary.entries[prop].conf.dislike
-					}
-					array.push(element)
-				}
-				console.log(JSON.stringify(array))
-			}
-		)
 	}
 
 	showImage() {
@@ -173,7 +150,7 @@ export class AppHome implements OnInit {
 		for (var index = 0; index < data.length; index++) {
 			var element = data[index];
 			element.meaning = element.meaning.replace(/&/g, "And")
-			element.name = element.name.trim()
+			let name = element.name.toLowerCase().trim()			
 			element.author = (element.author == undefined ? this._userservice.currentUser.mail : element.author)
 			element.review = (element.review == undefined ? "x" : element.review)
 			element.timestampCreation = (element.timestampCreation == undefined ? this._format.getTodayTimestamp() : element.timestampCreation)
@@ -188,7 +165,7 @@ export class AppHome implements OnInit {
 			element.like = (element.like == undefined ? [] : element.like)
 			element.dislike = (element.dislike == undefined ? [] : element.dislike)
 			element.inactive = (element.inactive == undefined ? false : element.inactive)
-			allWords[element.name] = element
+			allWords[name] = element
 		}
 		return allWords
 	}
@@ -233,22 +210,28 @@ export class AppHome implements OnInit {
 		$('.ui.search.searchWord')
 			.search({
 				apiSettings: {
-					url: AppSettings.API_OBSERVATORY + "?observatoryId=" + AppSettings.API_WORDS, // Communication avec l'API Cowaboo
+					url: AppSettings.API_OBSERVATORY + "?observatoryId=" + AppSettings.API_WORDSNEW, // Communication avec l'API Cowaboo
 					onResponse: function (response) {
+						
 						instance.content.splice(0, instance.content.length) // Vider le tableau
 						let responseSearch = {
 							results: [] // Tableau qui contient les résultats
 						}
-						let obj = response.dictionary.entries;
+						let obj = JSON.parse(response.dictionary.entries[Object.keys(response.dictionary.entries)[0]].value);
+						
 						for (let prop in obj) {
+							if (prop.toLowerCase().trim().startsWith(instance.searchWord.toLowerCase().trim())) {
+								instance.content.push(obj[prop]);
+							}
+							/*
 							let tag = obj[prop].tags; // Récupère le tag lié à l'entrée
 							if (tag.toLowerCase().trim().startsWith('||' + instance.searchWord.toLowerCase().trim())) { // Algorithme de recherche
 								instance.content.push(obj[prop].value);
-							}
+							}*/
 						}
 						instance.content.forEach(function (item) {
-							let itemObj = JSON.parse(item);
-							itemObj.modules = itemObj.modules.replace(/\.0/g, "")
+							//let itemObj = JSON.parse(item);
+							let itemObj : any = item;
 							let modules = itemObj.modules.length > 1 ? " [" + (isNaN(parseInt(itemObj.modules)) ? itemObj.modules : itemObj.modules) + "]" : ""
 							responseSearch.results.push({
 								title: itemObj.name + modules,

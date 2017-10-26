@@ -86,7 +86,7 @@
                         <p>Il peut rechercher des entrées, donner son avis sur une entrée, proposer un commentaire et
                             l'insertion de nouvelles entrées.</p>
                         <div *ngIf="user.group == 'Lambda'" class="ui message">
-                            <p>Votre rôle</p>
+                            <p style="text-align: center;">Votre rôle</p>
                         </div>
                         <div *ngIf="user.group != 'Lambda' && user.group != 'Administrator'" class="ui button basic blue" [ngClass]="{'loading' : loadingChangeRuleLambda}"
                             (click)="sendChangeRule('Lambda')">Faire la demande</div>
@@ -98,7 +98,7 @@
                         <p>Il peut en plus d'un utilisateur Lambda : proposer la modification d'une entrée ou <strong>[la désactiver - fonctionnalité désactivée]</strong>, mais aussi traiter les demandes
                             d'autres membres</p>
                         <div *ngIf="user.group == 'Editor'" class="ui message">
-                            <p>Votre rôle</p>
+                            <p style="text-align: center;">Votre rôle</p>
                         </div>
                         <div *ngIf="user.group != 'Editor' && user.group != 'Administrator'" class="ui button basic green" [ngClass]="{'loading' : loadingChangeRuleEditor}"
                             (click)="sendChangeRule('Editor')">Faire la demande</div>
@@ -110,7 +110,7 @@
                         <p>Il a accès a toutes les fonctionnalités de l'outil comme l'affectation des rôles des membres ou la modification de
                             la distribution de la réputation au sein de l'outil pour l'ensemble de la communauté.</p>
                         <div *ngIf="user.group == 'Administrator'" class="ui message">
-                            <p>Votre rôle</p>
+                            <p style="text-align: center;">Votre rôle</p>
                         </div>
                         <div *ngIf="user.group != 'Administrator' && user.reputation >= user.settingsReputation.repIntegrationAdministrator" class="ui button basic red" [ngClass]="{'loading' : loadingChangeRuleAdministrator}"
                             (click)="sendChangeRule('Administrator')">Faire la demande</div>

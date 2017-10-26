@@ -19,8 +19,11 @@ export class EntryCowaboo {
     inactive : boolean = false
     commentary : string = ""
     author : string = ""
+    like : string[] = []
+    dislike : string[] = []
+    searchClick : number = 0;
 
-    constructor(name : string, type: string, source : string, modules: string, definition: string, meaning : string, context: string, review : string, keywords: string,  parent: string, timestampCreation : string, updates : Array<Update>, comments : Array<Comment>, inactive : boolean, commentary : string, author : string) {
+    constructor(name : string, type: string, source : string, modules: string, definition: string, meaning : string, context: string, review : string, keywords: string,  parent: string, timestampCreation : string, updates : Array<Update>, comments : Array<Comment>, inactive : boolean, commentary : string, author : string, like: string[], dislike : string[], searchClick : number) {
         this.name = name;
         this.type = type;
         this.source = source;
@@ -37,5 +40,8 @@ export class EntryCowaboo {
         this.inactive = inactive;
         this.commentary = commentary;
         this.author = author;
+        this.like = like;
+        this.dislike = dislike;
+        this.searchClick = searchClick;
     }
 }

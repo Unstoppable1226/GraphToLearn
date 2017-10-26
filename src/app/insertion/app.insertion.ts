@@ -236,34 +236,38 @@ export class AppInsertion implements OnInit {
 			let type = $('#select-types').dropdown('get value') == "Aucun" ? "" : $('#select-types').dropdown('get value')
 			let context = $('#select-context').text() == "Aucun" ? "" : $('#select-context').text()
 
-			let dataInfo = new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, "", tags, "", this._format.getTodayTimestamp(), [], [], false, "", this._userservice.currentUser.mail)
-
+			let dataInfo = new EntryCowaboo(this.word, type, this.source, modulesNotNew, this.definition, this.meaning, context, "", tags, "", this._format.getTodayTimestamp(), [], [], false, "", this._userservice.currentUser.mail, [], [] ,0)
+			let tag = dataInfo.name.toLowerCase().trim()
 			if (this._userservice.currentUser.group == AppSettings.RULEADMINISTRATOR) {
-				instance._httpService.postEntryJSON(dataInfo, AppSettings.API_WORDS, dataInfo.name, instance._userservice.currentUser.secretKey)
+				instance._httpService.getEntryJSON(AppSettings.API_WORDSNEW)
 					.subscribe(
-					response => { // The communication with the API has matched
-						console.log(response)
-						instance._httpService.postEntryMetadata(AppSettings.API_METASEARCHCLICK, 0, response, instance._userservice.currentUser.secretKey) // Put searchClick to 0
+						words => {
+							let entries = words.dictionary.entries
+							let allWords = JSON.parse(entries[Object.keys(entries)[0]].value)
+							allWords[tag] = dataInfo
+							instance._httpService.postEntryJSON(allWords, AppSettings.API_WORDSNEW, AppSettings.TAGALLWORDS, instance._userservice.currentUser.secretKey)
 							.subscribe(
-							resp => {
-								instance._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, instance._userservice.currentUser.publicKey, Number(instance._userservice.currentUser.settingsReputation.repNew))
-									.subscribe(
-									transferResponse => {
-										console.log(transferResponse)
-										if (transferResponse) {
-											instance.loading = false;
-											instance._alert.create('success', AppSettings.MSGSUCCESS)
-											this._userservice.currentUser.reputation += instance._userservice.currentUser.settingsReputation.repNew
-											data => instance.data = data
-											instance.reinit();
+								response => { // The communication with the API has matched
+									console.log(response)
+									instance._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, instance._userservice.currentUser.publicKey, Number(instance._userservice.currentUser.settingsReputation.repNew))
+										.subscribe(
+										transferResponse => {
+											console.log(transferResponse)
+											if (transferResponse) {
+												instance.loading = false;
+												instance._alert.create('success', AppSettings.MSGSUCCESS)
+												this._userservice.currentUser.reputation += instance._userservice.currentUser.settingsReputation.repNew
+												data => instance.data = data
+												instance.reinit();
+											}
 										}
-									})
-
-							})
-					},
-					// The communication with the API has not matched
-					error => { instance.loading = false; instance._alert.create('error', AppSettings.MSGERROR); },
-				)
+										)
+								},
+								error => { instance.loading = false; instance._alert.create('error', AppSettings.MSGERROR); }, // The communication with the API has not matched
+							)	
+						}
+					)
+				
 			} else {
 				this.sendRequest(dataInfo)
 			}
