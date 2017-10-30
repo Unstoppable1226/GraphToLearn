@@ -31,6 +31,7 @@ export class HistorySearchService  {
 
     existantSoUpdate(name) {
         if (name != "" && name != null) {
+            if (this.lastSearches == undefined) { this.lastSearches = []}
             let index = this.lastSearches.indexOf(name)
             if (index != -1) { 
                 this.lastSearches.splice(index, 1) ;

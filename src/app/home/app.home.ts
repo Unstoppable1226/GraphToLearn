@@ -22,6 +22,7 @@ import { HistorySearchService } from '../model/history-search';
 import { Formatter } from '../tools/app.formatter';
 
 /* Models */
+import { User } from '../model/user';
 import { EntryCowaboo } from '../model/entrycowaboo';
 import { Comment } from '../model/comment';
 
@@ -37,6 +38,7 @@ declare var $: any; // This enables to use Jquery inside angular 2 app
 export class AppHome implements OnInit {
 
 	public title: string // Title of the App
+	public user : User
 	public searchWord: string // Word that i want to search
 	public content: string[] // That stores all the content in function of the word that i want to search
 	public timeEstimated: string // Estimates the time necessary for the insertion with a file
@@ -67,6 +69,7 @@ export class AppHome implements OnInit {
 	}
 
 	initVariables() {
+		this.user = new User()
 		this.title = AppSettings.TITLE
 		this.searchWord = ""
 		this.content = []

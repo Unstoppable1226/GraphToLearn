@@ -3,19 +3,28 @@
 	<div style="width: 95%;display: inline-block;">
 		<h2 class="ui icon header" style="text-align:center!important;margin-bottom: -200px">
 			<i class="add square icon" style="color:white"></i>
-			<div class="content" style="color:white">
-				Insertion d'un terme
+			<div *ngIf="_userservice.currentUser.group != Const.RULELAMBDA" class="content" style="color:white">
+				Insertion d'une nouvelle entrée
+			</div>
+			<div *ngIf="_userservice.currentUser.group == Const.RULELAMBDA" class="content" style="color:white">
+				Proposition d'une nouvelle entrée
 			</div>
 		</h2>
 		<button style="display:block; margin-left: 50px;min-width:250px!important; font-size: 1.2em;" class="ui button button-home"
 		 [routerLink]="['/home']"> <i class="reply icon"></i> Retour <span style="margin-left:8px">|</span><i class="home icon" style="margin-left:10px"></i></button>
 		<div class="ui icon message" [hidden]="!loading">
 			<i class="notched circle loading icon"></i>
-			<div class="content">
+			<div *ngIf="_userservice.currentUser.group != Const.RULELAMBDA"class="content">
 				<div class="header">
 					Juste une seconde ...
 				</div>
 				<p>Nous insérons le contenu et vous serez averti dès que la transaction sera terminé.</p>
+			</div>
+			<div *ngIf="_userservice.currentUser.group == Const.RULELAMBDA"class="content">
+				<div class="header">
+					Veuillez patienter svp ...
+				</div>
+				<p>Votre demande est en cours d'envoie aux autres membres de la communauté.</p>
 			</div>
 		</div>
 
@@ -158,7 +167,8 @@
 				<label style="color:#db2828; font-size: 0.8em; float: right;">Champ obligatoire </label>
 			</div>
 		</form> 
-		<div class="ui large approve button button-blur" style="margin-left:0px;margin-top:15px;width: 300px" (click)="saveInsertion()">Enregistrer <i class="right add icon"></i></div>
+		<div *ngIf="_userservice.currentUser.group != Const.RULELAMBDA" class="ui large approve button button-blur" style="margin-left:0px;margin-top:15px;width: 300px" (click)="saveInsertion()">Enregistrer <i class="right save icon"></i></div>
+		<div *ngIf="_userservice.currentUser.group == Const.RULELAMBDA" class="ui large approve button button-blur" style="margin-left:0px;margin-top:15px;width: 300px" (click)="saveInsertion()">Envoyer la proposition <i class="right send icon"></i></div>
 		<br><br><br>
 	</div>
 </div>

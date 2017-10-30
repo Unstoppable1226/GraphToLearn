@@ -215,7 +215,7 @@ export class AppSearch implements OnInit {
 
 	backToHome() {
 		this.refresh()
-		delete (this._manager3d)
+		delete(this._manager3d)
 		this._router.navigate(['/home'])
 	}
 
@@ -405,6 +405,8 @@ export class AppSearch implements OnInit {
 
 			instance.wordSearch.setData(word, null);
 
+			for (let mod in instance.modulesOfWord) delete instance.modulesOfWord[mod];
+
 			for (let i = 0; i < instance.wordSearch.modules.id.length; i++) {
 				instance.getSameModule(instance.wordSearch.modules.id[i].trim())
 			}
@@ -425,7 +427,7 @@ export class AppSearch implements OnInit {
 
 			instance.getAllWordsOfModules(allWords)
 			instance.createContext(instance.wordSearch);
-			
+
 			instance._historysearch.addSearch(instance.wordSearch.name, instance._userservice.currentUser.mail, AppSettings.API_HISTORY, instance._userservice.currentUser.secretKey)
 		} else {
 			this.loading = false;
@@ -505,8 +507,12 @@ export class AppSearch implements OnInit {
 
 	onSubmit(data) {
 		this.loading = true
-		this._manager3d.refresh()
+		this.wordSearch.modules = {id : [], name : ""}
+		this.wordSel.modules = {id : [], name : ""}
+		this.wordSearch.modulesReputation.splice(0, this.wordSearch.modulesReputation.length)
 		this.wordSel.modulesReputation.splice(0, this.wordSel.modulesReputation.length)
+		this.allEntries.splice(0, this.allEntries.length)
+		this._manager3d.refreshNavigationToAnotherEntry()
 		this._router.navigate(['/search/' + data.name])
 	}
 
@@ -963,7 +969,7 @@ export class AppSearch implements OnInit {
 			console.log(data)
 			let allEnt = Object.keys(this.allUsers)
 			for (var index = 0; index < allEnt.length; index++) {
-				this.allUsers[allEnt[index]].reputation = Number(data[index]._body)
+				this.allUsers[allEnt[index]].reputation = (data[index]._body == 'false' ? 0 : Number(data[index]._body))
 			}
 			for (let prop in this.modulesOfWord) {
 				this.createRep2(this.modulesOfWord[prop].id, this._wordsservice.users.user_list.list, allEntries) // Réputation P
@@ -986,7 +992,6 @@ export class AppSearch implements OnInit {
 
 	createContext(wordSearch) {
 		let today = moment(), instance = this, allEntries: Array<Entry> = []
-
 		allEntries = this.concatModules(allEntries)
 		allEntries = this._format.uniqueEntries(allEntries, AppSettings.NAME)
 		
@@ -1017,7 +1022,7 @@ export class AppSearch implements OnInit {
 		instance.allEntries = allEntries
 
 
-		if (!this._userservice.currentUser.settingsGeneral.rule2.isActive && this._manager3d.engine != null) {
+		if (!this._userservice.currentUser.settingsGeneral.rule2.isActive) {
 			allEntries = this.deleteWordSearchFromEntries(allEntries, wordSearch)
 			this._manager3d.refresh()
 			this._manager3d.createScene(wordSearch, allEntries, this.wordSel, this.modulesOfWord, this.user);

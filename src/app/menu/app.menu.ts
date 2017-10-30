@@ -41,7 +41,6 @@ export class MenuComponent implements OnInit {
 	public nbReputationGained = 0
 	public requestsAnswered = []
 	public active
-	public user
 	public colSearchTerm
 	public colKeyWords
 	public colModule
@@ -58,6 +57,7 @@ export class MenuComponent implements OnInit {
 	public error: boolean
 	public settingsReputation: SettingsReputation
 	public settingsGeneral: SettingsGeneral
+	public Const : AppSettings
 
 
 
@@ -66,6 +66,7 @@ export class MenuComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		console.log('ici')
 		let instance = this;
 		this.settingsGeneral = new SettingsGeneral()
 		this.initVariables()
@@ -73,14 +74,14 @@ export class MenuComponent implements OnInit {
 			.then(
 			data => {
 				console.log(data)
-				this.user = this._userservice.currentUser;
+				
 				this.settingsGeneral = this._userservice.currentUser.settingsGeneral;
 				this.init()
 				this._httpService.getEntryJSON(AppSettings.API_MEMBERS)
 					.subscribe(
 					data => {
 						let members = [];
-						if (this.user.group == 'Administrator' || this.user.group == 'Editor') {
+						if (this._userservice.currentUser.group == AppSettings.RULEADMINISTRATOR || this._userservice.currentUser.group == AppSettings.RULEEDITOR) {
 							let entries = JSON.parse(data.dictionary.entries[Object.keys(data.dictionary.entries)[0]].value)
 							for (let prop in entries) {
 								if (entries[prop].validated == false && entries[prop].refusedBy == undefined) {
@@ -159,7 +160,7 @@ export class MenuComponent implements OnInit {
 	}
 
 	initVariables() {
-		this.user = new User();
+		this.Const = AppSettings
 		this.nbReputationGained = 0;
 		this.isConnected = false
 		this.active = [true, false, false, false]
@@ -201,7 +202,7 @@ export class MenuComponent implements OnInit {
 					let hash = ""
 					for (let prop in entries) {
 						var tags = entries[prop].tags;
-						if (tags == ("||" + tag + "||")) {element.hash = prop}
+						if (tags == ("||" + tag + "||")) {element.hash = prop; hash = prop}
 					}
 					resolve(hash)
 				})
@@ -209,31 +210,56 @@ export class MenuComponent implements OnInit {
 	}
 
 
-	hideModalMyRequests() {
-		let length = this.requestsAnswered.length - 1
-		this.loadingAdd = true
-		let promisesAll = []
-		let isRuleChanged = ""
+	deleteRequestsAndHideModal() {
 		let instance = this;
-
 		for (let index = 0; index < this.requestsAnswered.length; index++) {
-			let element = instance.requestsAnswered[index];
-			if (element.type == 1) { isRuleChanged = element.rule; }
-			
-			this._httpService.deleteEntryJSON(this._userservice.currentUser.secretKey, AppSettings.API_REQUESTS, element.hash ).subscribe(
-				res => {
-					if (index == length) {
-						this.requestsAnswered.splice(0, this.requestsAnswered.length)
-						if (isRuleChanged != "") { this.user.group == isRuleChanged; this._userservice.currentUser.group == isRuleChanged }
-						this.loadingAdd = false
-						$('#requests').modal('hide')
-					} else {
-						console.log(index)
-					}
-				}
-			)
-			
+			if (this.requestsAnswered[index].type == 1) {
+				let content = this.requestsAnswered[index].content;
+				setTimeout(()=>{  this._userservice.currentUser.group = content}, 10); break;
+			}
 		}
+		
+		this.requestsAnswered.splice(0, this.requestsAnswered.length)
+		this.loadingAdd = false
+		$('#requests').modal('hide')
+	}
+
+	deleteRequestPromise(index) {
+		return new Promise((resolve, reject) => {
+			this.getHashWord(this.requestsAnswered[index]).then(
+				newHash => {
+					this._httpService.deleteEntryJSON(this._userservice.currentUser.secretKey, AppSettings.API_REQUESTS, newHash).subscribe(
+						res => { resolve(res) }
+					)
+				}
+			)		
+		})
+	}
+
+	startPromiseLoop(index, length) {
+		if (index != length-1) {
+			this.deleteRequestPromise(index).then(
+				res => { console.log(index); this.startPromiseLoop(++index, length) }
+			)
+		} else {
+			this.deleteRequestPromise(length-1).then( res => { this.deleteRequestsAndHideModal()} )
+		}
+	}
+
+	hideModalMyRequests() {
+		let length = this.requestsAnswered.length
+
+		this.loadingAdd = true
+
+		this._httpService.deleteEntryJSON(this._userservice.currentUser.secretKey, AppSettings.API_REQUESTS, this.requestsAnswered[0].hash).subscribe(
+			res => { 
+				if (length == 1) { 
+					this.deleteRequestsAndHideModal() 
+				} else {
+					this.startPromiseLoop(1, length);
+				}	
+			}
+		)
 	}
 
 	isValidNumber(value, id) {
@@ -334,7 +360,6 @@ export class MenuComponent implements OnInit {
 				maxRating: 5
 			});
 		$('.menu .item').tab();
-
 	}
 
 	delete() {
@@ -364,7 +389,7 @@ export class MenuComponent implements OnInit {
 								this.settingsReputation.repModify = Number(this.settingsReputation.repModify)
 								this.settingsReputation.repRevision = Number(this.settingsReputation.repRevision)
 
-								this._httpService.postEntryJSON(this.settingsReputation, AppSettings.API_SETTINGS, AppSettings.TAGSETTINGS, this.user.secretKey)
+								this._httpService.postEntryJSON(this.settingsReputation, AppSettings.API_SETTINGS, AppSettings.TAGSETTINGS, this._userservice.currentUser.secretKey)
 									.subscribe(
 									res => { console.log(res); this._userservice.currentUser.settingsReputation = this.settingsReputation; this.loadingSaveOptions = false; this._alert.create('success', AppSettings.MSG_SUCCESS_MODIFICATION); $('.ui.modal').modal('hide all') }
 									)
@@ -389,7 +414,7 @@ export class MenuComponent implements OnInit {
 	}
 
 	showOptions() {
-		this.settingsReputation = Object.assign({}, this.user.settingsReputation);
+		this.settingsReputation = Object.assign({}, this._userservice.currentUser.settingsReputation);
 		$('.ui.options.modal').modal('show')
 	}
 

@@ -1,5 +1,6 @@
 import { SettingsReputation } from '../model/settings-reputation'
 import { SettingsGeneral } from '../model/settings-general'
+import { AppSettings } from '../settings/app.settings'
 
 export class User {
 	mail : string
@@ -19,7 +20,7 @@ export class User {
 		this.secretKey = ""
 		this.observatories = []
 		this.validated = false
-		this.group = ""
+		this.group = AppSettings.RULELAMBDA
 		this.settingsReputation = new SettingsReputation()
 		this.settingsGeneral = new SettingsGeneral()
 	}

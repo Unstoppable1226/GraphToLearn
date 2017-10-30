@@ -18,7 +18,7 @@
             <div class="item active" data-tab="demandes" style="cursor:pointer!important; width: 50%;font-size:1.3em;padding-left:18%;opacity: 0.8;background: white;">
                 <div>Liste des demandes</div>
             </div>
-            <div [hidden]="user.group != 'Administrator'" class="item" data-tab="rules" style="cursor:pointer!important;width: 50%;font-size:1.3em;padding-left:18%;opacity: 0.8;background: white;">
+            <div [hidden]="_userservice.currentUser.group != Const.RULEADMINISTRATOR" class="item" data-tab="manage-rules-users" style="cursor:pointer!important;width: 50%;font-size:1.3em;padding-left:18%;opacity: 0.8;background: white;">
                 <div class="ui button" [ngClass]="{'loading': loading}" style="background:none"></div>
                 Gestion des rôles
             </div>
@@ -59,7 +59,7 @@
                     </div>
                 </div>
 
-                <div *ngIf="user.group == 'Editor' || user.group == 'Administrator'" class="tabacc">
+                <div *ngIf="_userservice.currentUser.group == Const.RULEEDITOR || _userservice.currentUser.group == Const.RULEADMINISTRATOR" class="tabacc">
                     <input class="input-tabacc" id="tabacc-two" type="checkbox" name="tabs">
                     <label class="label-tabacc" for="tabacc-two">
                         Nouvelles demandes d'accès
@@ -83,7 +83,7 @@
                     </div>
                 </div>
 
-                <div *ngIf="user.group == 'Editor' || user.group == 'Administrator'" class="tabacc">
+                <div *ngIf="_userservice.currentUser.group == Const.RULEEDITOR || _userservice.currentUser.group == Const.RULEADMINISTRATOR" class="tabacc">
                     <input class="input-tabacc" id="tabacc-three" type="checkbox" name="tabs">
                     <label class="label-tabacc" for="tabacc-three">
                         Autres nouvelles demandes
@@ -122,9 +122,9 @@
             </form>
         </div>
 
-        <div [hidden]="user.group != 'Administrator'" class="ui bottom attached tab segment" data-tab="rules" style="text-align:center;background: white!important;">
+        <div [hidden]="_userservice.currentUser.group != Const.RULEADMINISTRATOR" class="ui bottom attached tab segment" data-tab="manage-rules-users" style="text-align:center;background: white!important;">
 
-            <form *ngIf="user.group == 'Administrator'" id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white; padding: 25px; text-align: center;">
+            <form *ngIf="_userservice.currentUser.group == Const.RULEADMINISTRATOR" id="insert-form" class="ui form" [ngClass]="{'loading': loadingAddMembers}" style="background-color: white; padding: 25px; text-align: center;">
                 <div class="ui icon message">
                     <i class="id badge icon" style="color:black"></i>
                     <div class="content">
@@ -176,7 +176,7 @@
                         <tbody>
                             <tr *ngFor="let memb of allMembersArray; let i = index">
                                 <td>{{memb.mail}}</td>
-                                <td [ngClass]="{'group-Administrator': memb.group == 'Administrator', 'group-Editor' : memb.group == 'Editor', 'group-Lambda' : memb.group == 'Lambda'}">{{memb.group}}</td>
+                                <td [ngClass]="{'group-Administrator': memb.group == Const.RULEADMINISTRATOR, 'group-Editor' : memb.group == Const.RULEEDITOR, 'group-Lambda' : memb.group == Const.RULELAMBDA}">{{memb.group}}</td>
                                 <td>{{memb.publicKey}}</td>
                                 <td>
                                     <div id="modifyRule{{i}}" class="ui modifyRule button" (mouseover)='activatePopover(i)'>Modifier rôle</div>
@@ -190,28 +190,28 @@
                                                     <h4 class="ui header group-Lambda">Lambda</h4>
                                                     <p>Il peut rechercher des termes, donner son avis sur un terme, donner un
                                                         commentaire et proposer de nouveaux termes.</p>
-                                                    <div *ngIf="memb.group == 'Lambda'" class="ui message">
+                                                    <div *ngIf="memb.group == Const.RULELAMBDA" class="ui message">
                                                         <p>Son rôle</p>
                                                     </div>
-                                                    <div *ngIf="memb.group != 'Lambda'" class="ui button basic blue" (click)="modifyRule(i, 'Lambda')">Affecter</div>
+                                                    <div *ngIf="memb.group != Const.RULELAMBDA" class="ui button basic blue" (click)="modifyRule(i, Const.RULELAMBDA)">Affecter</div>
                                                 </div>
                                                 <div class="column">
                                                     <h4 class="ui header group-Editor">Editor</h4>
                                                     <p>Il peut en plus d'un utilisateur Lambda : modifier un terme ou le désactiver
                                                         et accepter des demandes d'accès d'autres membres</p>
-                                                    <div *ngIf="memb.group == 'Editor'" class="ui message">
+                                                    <div *ngIf="memb.group == Const.RULEEDITOR" class="ui message">
                                                         <p>Son rôle</p>
                                                     </div>
-                                                    <div *ngIf="memb.group != 'Editor'" class="ui button basic green" (click)="modifyRule(i, 'Editor')">Affecter</div>
+                                                    <div *ngIf="memb.group != Const.RULEEDITOR" class="ui button basic green" (click)="modifyRule(i, Const.RULEEDITOR)">Affecter</div>
                                                 </div>
                                                 <div class="column">
                                                     <h4 class="ui header group-Administrator">Administrator</h4>
                                                     <p>Il a accès a toutes les fonctionnalités de l'outil comme l'affectation
                                                         des rôles des membres ou modifier la distribution de la réputation.</p>
-                                                    <div *ngIf="memb.group == 'Administrator'" class="ui message">
+                                                    <div *ngIf="memb.group == Const.RULEADMINISTRATOR" class="ui message">
                                                         <p>Son rôle</p>
                                                     </div>
-                                                    <div *ngIf="memb.group != 'Administrator'" class="ui button basic red" (click)="modifyRule(i, 'Administrator')">Affecter</div>
+                                                    <div *ngIf="memb.group != Const.RULEADMINISTRATOR" class="ui button basic red" (click)="modifyRule(i, Const.RULEADMINISTRATOR)">Affecter</div>
                                                 </div>
                                             </div>
 
@@ -242,29 +242,16 @@
         <h3>Membre : {{requestSel.user}}, demandée le : {{requestSel.timestamp}}</h3>
         <h3>Concerne : {{requestSel.textType}}</h3>
         <div class="ui grid">
-            <div class="sixteen wide column">
+            <div class="sixteen wide column" style="text-align: center!important">
                 <h4>Informations sur l'entrée à insérer : <span class="group-Lambda">{{requestSel.content.name}}</span></h4>
-                <h5>Nom</h5>
-                <p>{{requestSel.content.name}}
-                </p>
-                <h5>Type</h5>
-                <p>{{requestSel.content.type}}
-                </p>
-                <h5>Explications</h5>
-                <p>{{requestSel.content.meaning}}
-                </p>
-                <h5>Définition</h5>
-                <p>{{requestSel.content.definition}}
-                </p>
-                <h5>Source</h5>
-                <p>{{requestSel.content.source}}
-                </p>
-                <h5>Contexte/Domaine</h5>
-                <p>{{requestSel.content.context}}
-                </p>
-                <h5>Mots clés</h5>
-                <p>{{requestSel.content.keywords}}
-                </p>
+                <h5>Nom  <i class="caret right icon"></i> {{requestSel.content.name}}</h5>
+                <h5>Type <i class="caret right icon"></i> {{requestSel.content.type}}</h5>
+                <h5>Explications <i class="caret down icon"></i></h5>
+                <p style="text-align:center">{{requestSel.content.meaning}}</p>
+                <h5>Définition <i class="caret right icon"></i> {{requestSel.content.definition}}</h5>
+                <h5>Source <i class="caret right icon"></i> {{requestSel.content.source}}</h5>
+                <h5>Contexte/Domaine <i class="caret right icon"></i> {{requestSel.content.context}}</h5>
+                <h5>Mots clés <i class="caret right icon"></i> {{requestSel.content.keywords}}</h5>
             </div>
         </div>
     </div>
@@ -286,37 +273,37 @@
                     <span class="group-Lambda">Modifications apportées</span>
                 </h4>
                 <h5>Nom</h5>
-                <p>{{lastModifEntry.name}}
+                <p style="text-align: center">{{lastModifEntry.name}}
                     <i class="caret right icon"></i>
                     <span [ngClass]="{'group-Lambda': lastModifEntry.name != requestSel.content.name}">{{requestSel.content.name}}</span>
                 </p>
                 <h5>Type</h5>
-                <p>{{lastModifEntry.type}}
+                <p style="text-align: center">{{lastModifEntry.type}}
                     <i class="caret right icon"></i>
                     <span [ngClass]="{'group-Lambda': lastModifEntry.type != requestSel.content.type}">{{requestSel.content.type}}</span>
                 </p>
                 <h5>Explications</h5>
-                <p>{{lastModifEntry.meaning}}
+                <p style="text-align: center">{{lastModifEntry.meaning}}
                     <i class="caret right icon"></i>
                     <span [ngClass]="{'group-Lambda': lastModifEntry.meaning != requestSel.content.meaning}">{{requestSel.content.meaning}}</span>
                 </p>
                 <h5>Définition</h5>
-                <p>{{lastModifEntry.definition}}
+                <p style="text-align: center">{{lastModifEntry.definition}}
                     <i class="caret right icon"></i>
                     <span [ngClass]="{'group-Lambda': lastModifEntry.definition != requestSel.content.definition}">{{requestSel.content.definition}}</span>
                 </p>
                 <h5>Source</h5>
-                <p>{{lastModifEntry.source}}
+                <p style="text-align: center">{{lastModifEntry.source}}
                     <i class="caret right icon"></i>
                     <span [ngClass]="{'group-Lambda': lastModifEntry.source != requestSel.content.source}">{{requestSel.content.source}}</span>
                 </p>
                 <h5>Contexte/Domaine</h5>
-                <p>{{lastModifEntry.context}}
+                <p style="text-align: center">{{lastModifEntry.context}}
                     <i class="caret right icon"></i>
                     <span [ngClass]="{'group-Lambda': lastModifEntry.context != requestSel.content.context}">{{requestSel.content.context}}</span>
                 </p>
                 <h5>Mots clés</h5>
-                <p>{{lastModifEntry.keywords}}
+                <p style="text-align: center">{{lastModifEntry.keywords}}
                     <i class="caret right icon"></i>
                     <span [ngClass]="{'group-Lambda': lastModifEntry.keywords != requestSel.content.keywords}">{{requestSel.content.keywords}}</span>
                 </p>

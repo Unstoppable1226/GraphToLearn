@@ -15,7 +15,7 @@ export class UserService {
 	private isConnected = false
 	public currentUser: User
 	
-	constructor(private _http: Http, private _router: Router, private _format: Formatter, private _httpservice: HttpAPIService) { }
+	constructor(private _http: Http, private _router: Router, private _format: Formatter, private _httpservice: HttpAPIService) { this.currentUser = new User() }
 
 	connect(secretKey: string) {
 		return this._httpservice.getUser(secretKey)

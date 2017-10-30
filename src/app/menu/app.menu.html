@@ -6,8 +6,8 @@
 		</a>
 		<a class="item" [ngClass]="{'active': active[1]}" data-tooltip="Consulter votre profil" data-inverted="" data-position="bottom center"
 		 (click)="changeActiveMenuItem(1, 'profile')">
-			{{user.mail}}
-			<span style="margin-left:5px" [ngClass]="{'group-Administrator': user.group == 'Administrator', 'group-Editor' : user.group == 'Editor', 'group-Lambda' : user.group == 'Lambda'}">[{{user.group}}]</span>
+			{{_userservice.currentUser.mail}}
+			<span style="margin-left:5px" [ngClass]="{'group-Administrator': _userservice.currentUser.group == Const.RULEADMINISTRATOR, 'group-Editor' : _userservice.currentUser.group == Const.RULEEDITOR, 'group-Lambda' : _userservice.currentUser.group == Const.RULELAMBDA}">[{{_userservice.currentUser.group}}]</span>
 			<i class="right user icon" style="margin-left:5px"></i>
 		</a>
 		<a class="item" [ngClass]="{'active': active[2]}" (click)="toggleSideBar()" data-tooltip="Consulter l'historique de vos dernières recherches"
@@ -17,17 +17,17 @@
 		</a>
 
 		<a class="item" [ngClass]="{'active': active[3]}" (click)="changeActiveMenuItem(3, 'manage-members')">
-			<span *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')">Gestion membres et demandes</span>
-			<span *ngIf="(user.group == 'Lambda')">Vos demandes
+			<span *ngIf="(_userservice.currentUser.group == Const.RULEADMINISTRATOR) || (_userservice.currentUser.group == Const.RULEEDITOR)">Gestion membres et demandes</span>
+			<span *ngIf="(_userservice.currentUser.group == Const.RULELAMBDA)">Vos demandes
 				<i class="right idea icon" style="margin-left:5px"></i>
 			</span>
 
-			<a *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')" class="ui green circular label">{{nbNewMembers}}</a>
-			<i *ngIf="(user.group == 'Administrator') || (user.group == 'Editor')" class="right users icon" style="margin-left:5px"></i>
+			<a *ngIf="(_userservice.currentUser.group == Const.RULEADMINISTRATOR) || (_userservice.currentUser.group == Const.RULEEDITOR)" class="ui green circular label">{{nbNewMembers}}</a>
+			<i *ngIf="(_userservice.currentUser.group == Const.RULEADMINISTRATOR) || (_userservice.currentUser.group == Const.RULEEDITOR)" class="right user icon" style="margin-left:5px"></i>
 		</a>
 		<a class="item right" data-tooltip="Cette réputation correspond à votre Réputation P" data-position="bottom center" data-inverted="">
 			Ma réputation
-			<a class="ui red left pointing label" [ngClass]="{'blue': user.reputation > -1 }">{{user.reputation}}</a>
+			<a class="ui red left pointing label" [ngClass]="{'blue': _userservice.currentUser.reputation > -1 }">{{_userservice.currentUser.reputation}}</a>
 		</a>
 		<a class="item" style="margin-left: auto;" (click)="showInfo()" data-tooltip="Infos GraphToLearn et son fonctionnement" data-inverted=""
 		 data-position="bottom center">
@@ -523,7 +523,7 @@
 
 
 		<div class="ui bottom attached tab segment" data-tab="reputation" style="text-align:center">
-			<div *ngIf="(user.group != 'Administrator')">
+			<div *ngIf="(_userservice.currentUser.group != Const.RULEADMINISTRATOR)">
 				<div class="ui message" style="text-align:left">
 					<div class="header">
 						Non autorisé
@@ -531,7 +531,7 @@
 					<p>Seul les membres autorisés peuvent accéder à ces options</p>
 				</div>
 			</div>
-			<div *ngIf="(user.group == 'Administrator')" class="ui message" style="text-align:left">
+			<div *ngIf="(_userservice.currentUser.group == Const.RULEADMINISTRATOR)" class="ui message" style="text-align:left">
 				<div class="header">
 					Modification de la distribution de la réputation
 				</div>
@@ -543,7 +543,7 @@
 						modifications seront apportées aussi sur tous les autres membres de la communauté, à ne pas négliger! </strong>
 				</p>
 			</div>
-			<form *ngIf="(user.group == 'Administrator')" [ngClass]="{'loading': loadingSaveOptions}" class="ui form">
+			<form *ngIf="(_userservice.currentUser.group == Const.RULEADMINISTRATOR)" [ngClass]="{'loading': loadingSaveOptions}" class="ui form">
 				<div class="field">
 					<label>Réputation nécessaire pour pouvoir faire une demande afin intégrer le groupe d'
 						<span class="group-Editor">[Editor]</span> :</label>
@@ -603,11 +603,11 @@
 		<h1 *ngIf="nbReputationGained != 0" style="color:#333">Grâce à votre implication sur GraphToLearn, vous gagner en réputation (
 			<span style="color:#1e70bf">+{{nbReputationGained}}</span>) !</h1>
 		<h2 *ngIf="nbReputationGained != 0" style="text-align:center">
-			<a class="ui blue label" [ngClass]="{red : ((user.reputation - nbReputationGained) < 0)}" data-tooltip="Votre ancienne Réputation P"
-			 data-inverted="" data-position="top center">{{user.reputation - nbReputationGained}}</a>
+			<a class="ui blue label" [ngClass]="{red : ((_userservice.currentUser.reputation - nbReputationGained) < 0)}" data-tooltip="Votre ancienne Réputation P"
+			 data-inverted="" data-position="top center">{{_userservice.currentUser.reputation - nbReputationGained}}</a>
 			<i class="caret right icon"></i>
-			<a style="margin-left:5px;font-size: 1em;" class="ui blue label" [ngClass]="{red : ((user.reputation - nbReputationGained) < 0)}"
-			 data-tooltip="Votre actuelle Réputation P" data-inverted="" data-position="top center">{{user.reputation}}</a>
+			<a style="margin-left:5px;font-size: 1em;" class="ui blue label" [ngClass]="{red : ((_userservice.currentUser.reputation - nbReputationGained) < 0)}"
+			 data-tooltip="Votre actuelle Réputation P" data-inverted="" data-position="top center">{{_userservice.currentUser.reputation}}</a>
 		</h2>
 	</div>
 	<div class="scrolling content" style="text-align:center!important">

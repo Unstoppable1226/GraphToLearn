@@ -27,7 +27,6 @@ import { Observable } from 'rxjs/Rx';
 
 export class AppManagerMembers implements OnInit {
 
-	public user: User
 	public numberAdmins: number = 0
 	public numberEditors: number = 0
 	public numberLambda: number = 0
@@ -41,17 +40,18 @@ export class AppManagerMembers implements OnInit {
 	public loadingAddMembers = false
 	public loadingModifyRule = false
 	public lastModifEntry : EntryCowaboo
+	public Const : AppSettings
 
 	constructor(private _httpService: HttpAPIService, private _format: Formatter, private _alert: AlertsService, private _userservice: UserService, private _historysearch: HistorySearchService) {
 		this._format.deleteAllModals()
 	}
 
 	ngOnInit() {
-		this.loading = true; this.user = new User(); this.requestSel = new Request(AppSettings.TYPEREQUESTRULE), this.lastModifEntry = new EntryCowaboo("","","","","","","","","","","",[], [], false, "","", [], [], 0);
+		this.Const = AppSettings
+		this.loading = true; this.requestSel = new Request(AppSettings.TYPEREQUESTRULE), this.lastModifEntry = new EntryCowaboo("","","","","","","","","","","",[], [], false, "","", [], [], 0);
 		if (this._userservice.currentUser == undefined) {
 			this.configureCurrentUser()
 		} else {
-			this.user = this._userservice.currentUser
 			this.getMembers()
 			this.getRequests()
 		}
@@ -60,7 +60,6 @@ export class AppManagerMembers implements OnInit {
 	configureCurrentUser() {
 		this._userservice.getCurrentUser().then(
 			(user: User) => {
-				this.user = user;
 				this.getMembers();
 				this.getRequests()
 			}
@@ -82,7 +81,7 @@ export class AppManagerMembers implements OnInit {
 						this.newMembers.push(this.allMembers[prop])
 					}
 				}
-				if (this.user.group == AppSettings.RULEADMINISTRATOR) {
+				if (this._userservice.currentUser.group == AppSettings.RULEADMINISTRATOR) {
 					for (let prop in this.allMembers) {
 						this.incrementNumber(this.allMembers[prop].group)
 						this.allMembersArray.push({ mail: prop, group: this.allMembers[prop].group, publicKey: this.allMembers[prop].publicKey, validated: this.allMembers[prop].validated })
@@ -218,10 +217,10 @@ export class AppManagerMembers implements OnInit {
 				this._httpService.postEntryJSON(allWords, AppSettings.API_WORDSNEW, AppSettings.TAGALLWORDS, this._userservice.currentUser.secretKey)
 					.subscribe(
 					res => {
-						this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this.user.settingsReputation.repNew)
+						this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this._userservice.currentUser.settingsReputation.repNew)
 							.subscribe(
 							balance => {
-								if (balance) { request.reputationGained = this.user.settingsReputation.repNew; this.answerRequest(event, index, request, true, AppSettings.TYPEREQUESTNEW + "-" + content.name) }
+								if (balance) { request.reputationGained = this._userservice.currentUser.settingsReputation.repNew; this.answerRequest(event, index, request, true, AppSettings.TYPEREQUESTNEW + "-" + content.name) }
 							}
 							)
 		
@@ -260,10 +259,10 @@ export class AppManagerMembers implements OnInit {
 				this._httpService.postEntryJSON(allWords, AppSettings.API_WORDSNEW, AppSettings.TAGALLWORDS, this._userservice.currentUser.secretKey)
 					.subscribe(
 					hashGenerated => {
-						this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this.user.settingsReputation.repModify)
+						this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this._userservice.currentUser.settingsReputation.repModify)
 							.subscribe(
 							balance => {
-								if (balance) { request.reputationGained = this.user.settingsReputation.repModify; this.answerRequest(event, index, request, true, tag); }
+								if (balance) { request.reputationGained = this._userservice.currentUser.settingsReputation.repModify; this.answerRequest(event, index, request, true, tag); }
 							}
 							)
 					}
@@ -279,9 +278,10 @@ export class AppManagerMembers implements OnInit {
 			words => {
 				let allWords = JSON.parse(words.dictionary.entries[Object.keys(words.dictionary.entries)[0]].value)
 				let newComment: Comment = new Comment(request.content.info, request.content.author, request.content.timestamp, request.content.likes)
-				let el: EntryCowaboo = allWords[request.content.name]
+				let el: EntryCowaboo = allWords[request.content.name.toLowerCase().trim()]
 				if (el.comments == undefined) { el.comments = [] }
 				el.comments.push(newComment)
+				
 				let dataInfoString = {
 					name: el.name,
 					type: el.type,
@@ -307,11 +307,11 @@ export class AppManagerMembers implements OnInit {
 				this._httpService.postEntryJSON(allWords, AppSettings.API_WORDSNEW, AppSettings.TAGALLWORDS, this._userservice.currentUser.secretKey)
 					.subscribe(
 					hashGenerated => {
-						this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this.user.settingsReputation.repRevision)
+						this._httpService.postBalance(AppSettings.API_PUBKEY, AppSettings.API_KEY, request.publicKeySender, this._userservice.currentUser.settingsReputation.repRevision)
 							.subscribe(
-							balance => {
-								if (balance) { request.reputationGained = this.user.settingsReputation.repRevision; this.answerRequest(event, index, request, true, tag); }
-							}
+								balance => {
+									if (balance) { request.reputationGained = this._userservice.currentUser.settingsReputation.repRevision; this.answerRequest(event, index, request, true, tag); }
+								}
 							)
 					}
 					)
@@ -320,6 +320,7 @@ export class AppManagerMembers implements OnInit {
 	}
 
 	refuseRequest(event, index, request) {
+		console.log('refuseRequest')
 		$(event.target).addClass('loading')
 		switch (request.type) {
 			case 1:
@@ -356,10 +357,6 @@ export class AppManagerMembers implements OnInit {
 							}
 						}
 						if (hash != "") {
-							setTimeout(function() {
-								instance.answerRequest(event, index, request, isAccepted, tag)
-							}, 1000);
-						} else {
 							$(event.target).removeClass('loading')
 							instance.allRequests[index].result = isAccepted;
 							instance.allRequests[index].validatedBy = this._userservice.currentUser.mail
@@ -379,7 +376,7 @@ export class AppManagerMembers implements OnInit {
 				let entries = requests.dictionary.entries, sameUser: boolean
 				for (let prop in entries) {
 					let element = JSON.parse(entries[prop].value);
-					sameUser = element.user == this.user.mail;
+					sameUser = element.user == this._userservice.currentUser.mail;
 					element.hash = prop
 					if (element.type == 1) {
 						element.text = (sameUser ? "Je " : "Ce membre ") + "souhaite devenir un membre [" + element.content + "] dans l'outil."

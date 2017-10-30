@@ -45,9 +45,12 @@ export class Manager3D {
 		mesh.material = materialSphere1
 
 		var label = new BABYLON.GUI.Rectangle("label" + mesh.name);
-		label.background = "transp"
+		label.background = "rgba(255, 255, 255, 0.7)"
+		label.color = "white"
 		label.height = "30px";
-		label.alpha = 0.5;
+		label.alpha = 0.7;
+		label.isType = "OtherWords"
+		label.isLabel = true
 		label.width = (mesh.name.length >= 11 ? (mesh.name.length >= 21 ? (mesh.name.length >= 32 ? "400px" : "300px") : "200px") : "100px");
 		label.cornerRadius = 20;
 		label.thickness = 1;
@@ -64,7 +67,14 @@ export class Manager3D {
 	}
 
 	refresh() {
+		this.spheres.splice(0, this.spheres.length)	
+	}
+
+	refreshNavigationToAnotherEntry() {
+		delete(this.wordSearch)
+		delete(this.wordSel)
 		this.spheres.splice(0, this.spheres.length)
+		this.scene.meshes.splice(0, this.scene.meshes.length)
 	}
 
 	moveCamera(mesh) {
@@ -91,7 +101,15 @@ export class Manager3D {
 			if (labels[i].name == type + mesh.name) {
 				pos = i
 			} else {
-				labels[i].alpha = 0.5
+				if (labels[i].isLabel) {
+					labels[i].color = "white"
+					labels[i].thickness = 1;
+					if (labels[i].isType == "OtherWords") {
+						labels[i].background = "rgba(255, 255, 255, 0.7)"
+						labels[i].color = "white"
+						labels[i].alpha = 0.7
+					}
+				}
 			}
 		}
 		return pos;
@@ -102,11 +120,17 @@ export class Manager3D {
 		this.camera.setTarget(mesh)
 		this.camera.maxCameraSpeed = 20
 		this.moveCamera(mesh)
-		var pos = this.getLabelByName(mesh, 'label')
-		var label = this.advancedTexture._rootContainer.children[pos]
-		label.alpha = 1
-		/*var label = this.advancedTexture.getMeshByName("label" + mesh.name)
-		console.log(label)*/
+		let pos = this.getLabelByName(mesh, 'label')
+		let label = this.advancedTexture._rootContainer.children[pos]
+		
+		label.thickness = 2;
+		if (label.isType == "OtherWords") {
+			label.color = this._userservice.currentUser.settingsGeneral.colOtherTerms
+			label.background = "rgba(255, 255, 255, 1)"
+			label.alpha = 1
+			return
+		}
+		label.color = (label.isType == "Module" ? this._userservice.currentUser.settingsGeneral.colModule : this._userservice.currentUser.settingsGeneral.colSearchTerm)
 	}
 
 	updateInfos(mesh, data) {
@@ -220,8 +244,9 @@ export class Manager3D {
 
 			line = new BABYLON.GUI.Line('line' + tag.name);
 			line.alpha = 1;
-			line.color = "#1678c2";
+			line.color = this._userservice.currentUser.settingsGeneral.colOtherTerms;
 			line.lineWidth = 0.5;
+			line.isLabel = false;
 
 			this.advancedTexture.addControl(line);
 			
@@ -233,7 +258,6 @@ export class Manager3D {
 
 	createScene(wordSearch, tags, wordSel, modules, user) {
 		this.wordSearch = wordSearch;
-		console.log(this.engine)
 		this.wordSel = wordSel;
 		this.scene = new BABYLON.Scene(this.engine);
 		this.scene.clearColor = new BABYLON.Color4(0, 0, 0, 0.0000000000000001);
@@ -256,21 +280,25 @@ export class Manager3D {
 		var sphereMaterial = new BABYLON.StandardMaterial();
 		
 		let i = 0;
+		
 		var sphere1 = BABYLON.Mesh.CreateSphere(wordSearch.name, 50.0, 15, this.scene);
 		var label1 = new BABYLON.GUI.Rectangle("label" + sphere1.name);
+		
 		this.lines.push(label1)
+		console.log(modules)
 		for (let props in modules) {
 			var element = modules[props];
-
+			
 			var sphere = BABYLON.Mesh.CreateSphere(element.id, 80.0, 25 , this.scene);
 			var label = new BABYLON.GUI.Rectangle("label" + sphere.name);
 			this.lines.push(label);
-			this.createMainMesh(sphere, label, (-50 * Object.keys(modules).length + (i * 100)), 50, user.settingsGeneral.colModule);
+			this.createMainMesh(sphere, label, (-50 * Object.keys(modules).length + (i * 100)), 50, user.settingsGeneral.colModule, "Module");
 			var line = new BABYLON.GUI.Line('line' + element.name);
-
+			
 			line.alpha = 1;
-			line.color = "black";
+			line.color = this._userservice.currentUser.settingsGeneral.colModule;
 			line.lineWidth = 1.5;
+			line.isLabel = false;
 			this.advancedTexture.addControl(line);
 			line.linkWithMesh(sphere);
 			line.connectedControl = label1;
@@ -280,9 +308,9 @@ export class Manager3D {
 			i++;
 		}
 		
-
-		this.createMainMesh(sphere1, label1, 0, 15, user.settingsGeneral.colSearchTerm);
-
+		
+		this.createMainMesh(sphere1, label1, 0, 15, user.settingsGeneral.colSearchTerm, "WordSearch");
+		
 		
 		for (var cpt = tags.length - 1; cpt >= 0; cpt--) {
 			this.spheres.push(
@@ -303,13 +331,16 @@ export class Manager3D {
 		*/
 	}
 
-	createMainMesh(sphere, label, posX, posY, color) {
+	createMainMesh(sphere, label, posX, posY, color, typeSphere) {
 		label.background = "#1B1C1D"
 		label.height = "30px";
+		label.isType = typeSphere
+		label.thickness = 1;
+		if (label.isType != 'Module') { label.color = this._userservice.currentUser.settingsGeneral.colSearchTerm; label.thickness = 2; }
 		label.alpha = 1;
+		label.isLabel = true
 		label.width = sphere.name.length >= 30 ? "400px" : sphere.name.length >= 20 ? "300px" : sphere.name.length >= 11 ? "200px" : "100px";
 		label.cornerRadius = 20;
-		label.thickness = 1;
 		label.linkOffsetY = 30;
 		this.advancedTexture.addControl(label);
 		label.linkWithMesh(sphere);
