@@ -23,8 +23,8 @@ export class AuthGuard implements CanActivate  {
 	}
 
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-		if (this._userservice.currentUser == undefined) {
-			if (sessionStorage.getItem(AppSettings.CURRENTUSER)) { // Logged in so return true
+		if (this._userservice.currentUser.secretKey == "") {
+			if (sessionStorage.getItem(AppSettings.CURRENTUSER) != undefined) { // Logged in so return true
 				try {
 					let key = window.atob(sessionStorage.getItem(AppSettings.CURRENTUSER))
 					this._httpservice.getUser(key).subscribe(

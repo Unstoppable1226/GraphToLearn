@@ -508,9 +508,17 @@ export class AppSearch implements OnInit {
 	onSubmit(data) {
 		this.loading = true
 		this.wordSearch.modules = {id : [], name : ""}
-		this.wordSel.modules = {id : [], name : ""}
 		this.wordSearch.modulesReputation.splice(0, this.wordSearch.modulesReputation.length)
+		this.wordSearch.updates.splice(0, this.wordSearch.updates.length)
+		this.wordSearch.comments.splice(0, this.wordSearch.comments.length)
+		this.wordSearch.lastUpdated = ""
+		this.wordSearch.isModule = false
+		this.wordSel.modules = {id : [], name : ""}
 		this.wordSel.modulesReputation.splice(0, this.wordSel.modulesReputation.length)
+		this.wordSel.lastUpdated = ""
+		this.wordSel.isModule = false
+		this.wordSel.updates.splice(0, this.wordSel.updates.length)
+		this.wordSel.comments.splice(0, this.wordSel.comments.length)
 		this.allEntries.splice(0, this.allEntries.length)
 		this._manager3d.refreshNavigationToAnotherEntry()
 		this._router.navigate(['/search/' + data.name])
@@ -959,6 +967,12 @@ export class AppSearch implements OnInit {
 		return allEntries
 	} // initReputation
 
+	sortModulesReputation(allEntries) {
+		for (let index = 0; index < allEntries.length; index++) {
+			allEntries[index].modulesReputation.sort(function(a,b) { return ( ((b.totalReput * 100) / b.totalPoints) - ((a.totalReput * 100) / a.totalPoints) ) })
+		}
+	}
+
 	getReputationFromAllUsers(allEntries, wordSearch) {
 		let promiseGetReputation = []
 		for (let prop in this.allUsers) {
@@ -978,7 +992,9 @@ export class AppSearch implements OnInit {
 
 			allEntries = this.constructTotalPointsReputation(allEntries)
 			allEntries = this.constructAnimationReputation(allEntries)
-			
+		
+			this.sortModulesReputation(allEntries)
+
 			if (this._manager3d.engine != null) {
 				allEntries = this.deleteWordSearchFromEntries(allEntries, wordSearch)
 				this._manager3d.refresh()
@@ -1023,6 +1039,7 @@ export class AppSearch implements OnInit {
 
 
 		if (!this._userservice.currentUser.settingsGeneral.rule2.isActive) {
+			this.sortModulesReputation(allEntries)
 			allEntries = this.deleteWordSearchFromEntries(allEntries, wordSearch)
 			this._manager3d.refresh()
 			this._manager3d.createScene(wordSearch, allEntries, this.wordSel, this.modulesOfWord, this.user);

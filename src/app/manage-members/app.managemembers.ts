@@ -40,9 +40,9 @@ export class AppManagerMembers implements OnInit {
 	public loadingAddMembers = false
 	public loadingModifyRule = false
 	public lastModifEntry : EntryCowaboo
-	public Const : AppSettings
+	public Const : any
 
-	constructor(private _httpService: HttpAPIService, private _format: Formatter, private _alert: AlertsService, private _userservice: UserService, private _historysearch: HistorySearchService) {
+	constructor(private _httpService: HttpAPIService, private _format: Formatter, private _alert: AlertsService, public _userservice: UserService, private _historysearch: HistorySearchService) {
 		this._format.deleteAllModals()
 	}
 

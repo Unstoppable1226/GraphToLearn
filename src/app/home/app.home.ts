@@ -50,7 +50,7 @@ export class AppHome implements OnInit {
 	public isInserting : boolean
 	public attributeErrorEmpty : string
 
-	constructor(private _httpService: HttpAPIService, private _wordsservice: WordsService, private _historyservice: HistorySearchService, private _alert: AlertsService, private _format: Formatter, private _router: Router, private _authservice: AuthService, private _userservice: UserService) {
+	constructor(private _httpService: HttpAPIService, private _wordsservice: WordsService, private _historyservice: HistorySearchService, private _alert: AlertsService, private _format: Formatter, private _router: Router, private _authservice: AuthService, public _userservice: UserService) {
 		this._format.deleteAllModals() // This is necessary for the modal system. That cleans every modal to avoid bugs
 	}
 

@@ -33,7 +33,7 @@ declare var $: any; // This is necessary if you want to use jQuery in the app
 export class AppInsertion implements OnInit {
 
 	public loading: boolean = false
-	public Const : AppSettings
+	public Const : any
 	public newModule = false;
 	public nameTaken = false;
 	public nameTakenModule = false;
@@ -70,7 +70,7 @@ export class AppInsertion implements OnInit {
 
 	public items = [];
 
-	constructor(private _httpService: HttpAPIService, private _format: Formatter, private _alert: AlertsService, private _userservice: UserService, private _historysearch: HistorySearchService) { }
+	constructor(private _httpService: HttpAPIService, private _format: Formatter, private _alert: AlertsService, public _userservice: UserService, private _historysearch: HistorySearchService) { }
 
 	ngOnInit() {
 		this.Const = AppSettings

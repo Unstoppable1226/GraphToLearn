@@ -57,11 +57,10 @@ export class MenuComponent implements OnInit {
 	public error: boolean
 	public settingsReputation: SettingsReputation
 	public settingsGeneral: SettingsGeneral
-	public Const : AppSettings
+	public Const : any
 
 
-
-	constructor(private _httpService: HttpAPIService, private _alert: AlertsService, private _wordsservice: WordsService, private _format: Formatter, private _authservice: AuthService, private _router: Router, private _userservice: UserService, private _historysearch: HistorySearchService) {
+	constructor(private _httpService: HttpAPIService, private _alert: AlertsService, private _wordsservice: WordsService, private _format: Formatter, private _authservice: AuthService, private _router: Router, public _userservice: UserService, private _historysearch: HistorySearchService) {
 		$('.ui.left.vertical.menu.sidebar.inverted').remove()
 	}
 
